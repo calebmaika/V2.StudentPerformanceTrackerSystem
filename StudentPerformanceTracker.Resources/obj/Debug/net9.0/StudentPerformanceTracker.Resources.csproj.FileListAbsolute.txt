@@ -1,0 +1,16 @@
+C:\Users\Administrator\Desktop\StudentPerformanceTracker\StudentPerformanceTracker.Resources\bin\Debug\net9.0\StudentPerformanceTracker.Resources.deps.json
+C:\Users\Administrator\Desktop\StudentPerformanceTracker\StudentPerformanceTracker.Resources\bin\Debug\net9.0\StudentPerformanceTracker.Resources.dll
+C:\Users\Administrator\Desktop\StudentPerformanceTracker\StudentPerformanceTracker.Resources\bin\Debug\net9.0\StudentPerformanceTracker.Resources.pdb
+C:\Users\Administrator\Desktop\StudentPerformanceTracker\StudentPerformanceTracker.Resources\bin\Debug\net9.0\StudentPerformanceTracker.Data.dll
+C:\Users\Administrator\Desktop\StudentPerformanceTracker\StudentPerformanceTracker.Resources\bin\Debug\net9.0\StudentPerformanceTracker.Data.pdb
+C:\Users\Administrator\Desktop\StudentPerformanceTracker\StudentPerformanceTracker.Resources\obj\Debug\net9.0\StudentPerformanceTracker.Resources.csproj.AssemblyReference.cache
+C:\Users\Administrator\Desktop\StudentPerformanceTracker\StudentPerformanceTracker.Resources\obj\Debug\net9.0\StudentPerformanceTracker.Resources.GeneratedMSBuildEditorConfig.editorconfig
+C:\Users\Administrator\Desktop\StudentPerformanceTracker\StudentPerformanceTracker.Resources\obj\Debug\net9.0\StudentPerformanceTracker.Resources.AssemblyInfoInputs.cache
+C:\Users\Administrator\Desktop\StudentPerformanceTracker\StudentPerformanceTracker.Resources\obj\Debug\net9.0\StudentPerformanceTracker.Resources.AssemblyInfo.cs
+C:\Users\Administrator\Desktop\StudentPerformanceTracker\StudentPerformanceTracker.Resources\obj\Debug\net9.0\StudentPerformanceTracker.Resources.csproj.CoreCompileInputs.cache
+C:\Users\Administrator\Desktop\StudentPerformanceTracker\StudentPerformanceTracker.Resources\obj\Debug\net9.0\StudentPerformanceTracker.Resources.sourcelink.json
+C:\Users\Administrator\Desktop\StudentPerformanceTracker\StudentPerformanceTracker.Resources\obj\Debug\net9.0\StudentP.197A5E2A.Up2Date
+C:\Users\Administrator\Desktop\StudentPerformanceTracker\StudentPerformanceTracker.Resources\obj\Debug\net9.0\StudentPerformanceTracker.Resources.dll
+C:\Users\Administrator\Desktop\StudentPerformanceTracker\StudentPerformanceTracker.Resources\obj\Debug\net9.0\refint\StudentPerformanceTracker.Resources.dll
+C:\Users\Administrator\Desktop\StudentPerformanceTracker\StudentPerformanceTracker.Resources\obj\Debug\net9.0\StudentPerformanceTracker.Resources.pdb
+C:\Users\Administrator\Desktop\StudentPerformanceTracker\StudentPerformanceTracker.Resources\obj\Debug\net9.0\ref\StudentPerformanceTracker.Resources.dll

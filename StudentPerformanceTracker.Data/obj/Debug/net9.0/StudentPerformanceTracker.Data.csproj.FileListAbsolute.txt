@@ -1,0 +1,15 @@
+C:\Users\Administrator\Desktop\StudentPerformanceTracker\StudentPerformanceTracker.Data\bin\Debug\net9.0\StudentPerformanceTracker.Data.deps.json
+C:\Users\Administrator\Desktop\StudentPerformanceTracker\StudentPerformanceTracker.Data\bin\Debug\net9.0\StudentPerformanceTracker.Data.dll
+C:\Users\Administrator\Desktop\StudentPerformanceTracker\StudentPerformanceTracker.Data\bin\Debug\net9.0\StudentPerformanceTracker.Data.pdb
+C:\Users\Administrator\Desktop\StudentPerformanceTracker\StudentPerformanceTracker.Data\obj\Debug\net9.0\StudentPerformanceTracker.Data.GeneratedMSBuildEditorConfig.editorconfig
+C:\Users\Administrator\Desktop\StudentPerformanceTracker\StudentPerformanceTracker.Data\obj\Debug\net9.0\StudentPerformanceTracker.Data.AssemblyInfoInputs.cache
+C:\Users\Administrator\Desktop\StudentPerformanceTracker\StudentPerformanceTracker.Data\obj\Debug\net9.0\StudentPerformanceTracker.Data.AssemblyInfo.cs
+C:\Users\Administrator\Desktop\StudentPerformanceTracker\StudentPerformanceTracker.Data\obj\Debug\net9.0\StudentPerformanceTracker.Data.csproj.CoreCompileInputs.cache
+C:\Users\Administrator\Desktop\StudentPerformanceTracker\StudentPerformanceTracker.Data\obj\Debug\net9.0\StudentPerformanceTracker.Data.sourcelink.json
+C:\Users\Administrator\Desktop\StudentPerformanceTracker\StudentPerformanceTracker.Data\obj\Debug\net9.0\StudentPerformanceTracker.Data.dll
+C:\Users\Administrator\Desktop\StudentPerformanceTracker\StudentPerformanceTracker.Data\obj\Debug\net9.0\refint\StudentPerformanceTracker.Data.dll
+C:\Users\Administrator\Desktop\StudentPerformanceTracker\StudentPerformanceTracker.Data\obj\Debug\net9.0\StudentPerformanceTracker.Data.pdb
+C:\Users\Administrator\Desktop\StudentPerformanceTracker\StudentPerformanceTracker.Data\obj\Debug\net9.0\ref\StudentPerformanceTracker.Data.dll
+C:\Users\Administrator\Desktop\StudentPerformanceTracker\StudentPerformanceTracker.Data\bin\Debug\net9.0\StudentPerformanceTracker.Data.runtimeconfig.json
+C:\Users\Administrator\Desktop\StudentPerformanceTracker\StudentPerformanceTracker.Data\obj\Debug\net9.0\StudentPerformanceTracker.Data.csproj.AssemblyReference.cache
+C:\Users\Administrator\Desktop\StudentPerformanceTracker\StudentPerformanceTracker.Data\obj\Debug\net9.0\StudentPerformanceTracker.Data.genruntimeconfig.cache

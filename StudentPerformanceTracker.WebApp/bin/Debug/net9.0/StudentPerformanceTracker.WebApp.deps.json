@@ -1,0 +1,83 @@
+{
+  "runtimeTarget": {
+    "name": ".NETCoreApp,Version=v9.0",
+    "signature": ""
+  },
+  "compilationOptions": {},
+  "targets": {
+    ".NETCoreApp,Version=v9.0": {
+      "StudentPerformanceTracker.WebApp/1.0.0": {
+        "dependencies": {
+          "Microsoft.EntityFrameworkCore.Tools": "10.0.0",
+          "StudentPerformanceTracker.Data": "1.0.0",
+          "StudentPerformanceTracker.Resources": "1.0.0",
+          "StudentPerformanceTracker.Services": "1.0.0"
+        },
+        "runtime": {
+          "StudentPerformanceTracker.WebApp.dll": {}
+        }
+      },
+      "Microsoft.EntityFrameworkCore.Tools/10.0.0": {},
+      "StudentPerformanceTracker.Data/1.0.0": {
+        "runtime": {
+          "StudentPerformanceTracker.Data.dll": {
+            "assemblyVersion": "1.0.0.0",
+            "fileVersion": "1.0.0.0"
+          }
+        }
+      },
+      "StudentPerformanceTracker.Resources/1.0.0": {
+        "dependencies": {
+          "StudentPerformanceTracker.Data": "1.0.0"
+        },
+        "runtime": {
+          "StudentPerformanceTracker.Resources.dll": {
+            "assemblyVersion": "1.0.0.0",
+            "fileVersion": "1.0.0.0"
+          }
+        }
+      },
+      "StudentPerformanceTracker.Services/1.0.0": {
+        "dependencies": {
+          "StudentPerformanceTracker.Data": "1.0.0",
+          "StudentPerformanceTracker.Resources": "1.0.0"
+        },
+        "runtime": {
+          "StudentPerformanceTracker.Services.dll": {
+            "assemblyVersion": "1.0.0.0",
+            "fileVersion": "1.0.0.0"
+          }
+        }
+      }
+    }
+  },
+  "libraries": {
+    "StudentPerformanceTracker.WebApp/1.0.0": {
+      "type": "project",
+      "serviceable": false,
+      "sha512": ""
+    },
+    "Microsoft.EntityFrameworkCore.Tools/10.0.0": {
+      "type": "package",
+      "serviceable": true,
+      "sha512": "sha512-Gx6AWCf1CsBHTbvVVWBYBKp6hrwZt0IgBigoBPaybwOBG2EFIfZc7NP2BoR6r56YuuikbPIzCuvQuFYNnX43+A==",
+      "path": "microsoft.entityframeworkcore.tools/10.0.0",
+      "hashPath": "microsoft.entityframeworkcore.tools.10.0.0.nupkg.sha512"
+    },
+    "StudentPerformanceTracker.Data/1.0.0": {
+      "type": "project",
+      "serviceable": false,
+      "sha512": ""
+    },
+    "StudentPerformanceTracker.Resources/1.0.0": {
+      "type": "project",
+      "serviceable": false,
+      "sha512": ""
+    },
+    "StudentPerformanceTracker.Services/1.0.0": {
+      "type": "project",
+      "serviceable": false,
+      "sha512": ""
+    }
+  }
+}
