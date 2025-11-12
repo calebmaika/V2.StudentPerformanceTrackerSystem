@@ -1,4 +1,4 @@
-namespace StudentPerformanceTracker.Models;
+namespace StudentPerformanceTracker.WebApp.Models;
 
 public class ErrorViewModel
 {

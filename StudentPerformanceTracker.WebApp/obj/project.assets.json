@@ -1,0 +1,188 @@
+{
+  "version": 3,
+  "targets": {
+    "net9.0": {
+      "Microsoft.EntityFrameworkCore.Tools/10.0.0": {
+        "type": "package"
+      },
+      "StudentPerformanceTracker.Data/1.0.0": {
+        "type": "project",
+        "framework": ".NETCoreApp,Version=v9.0",
+        "compile": {
+          "bin/placeholder/StudentPerformanceTracker.Data.dll": {}
+        },
+        "runtime": {
+          "bin/placeholder/StudentPerformanceTracker.Data.dll": {}
+        }
+      },
+      "StudentPerformanceTracker.Resources/1.0.0": {
+        "type": "project",
+        "framework": ".NETCoreApp,Version=v9.0",
+        "dependencies": {
+          "StudentPerformanceTracker.Data": "1.0.0"
+        },
+        "compile": {
+          "bin/placeholder/StudentPerformanceTracker.Resources.dll": {}
+        },
+        "runtime": {
+          "bin/placeholder/StudentPerformanceTracker.Resources.dll": {}
+        }
+      },
+      "StudentPerformanceTracker.Services/1.0.0": {
+        "type": "project",
+        "framework": ".NETCoreApp,Version=v9.0",
+        "dependencies": {
+          "StudentPerformanceTracker.Data": "1.0.0",
+          "StudentPerformanceTracker.Resources": "1.0.0"
+        },
+        "compile": {
+          "bin/placeholder/StudentPerformanceTracker.Services.dll": {}
+        },
+        "runtime": {
+          "bin/placeholder/StudentPerformanceTracker.Services.dll": {}
+        }
+      }
+    }
+  },
+  "libraries": {
+    "Microsoft.EntityFrameworkCore.Tools/10.0.0": {
+      "sha512": "Gx6AWCf1CsBHTbvVVWBYBKp6hrwZt0IgBigoBPaybwOBG2EFIfZc7NP2BoR6r56YuuikbPIzCuvQuFYNnX43+A==",
+      "type": "package",
+      "path": "microsoft.entityframeworkcore.tools/10.0.0",
+      "hasTools": true,
+      "files": [
+        ".nupkg.metadata",
+        ".signature.p7s",
+        "Icon.png",
+        "docs/PACKAGE.md",
+        "microsoft.entityframeworkcore.tools.10.0.0.nupkg.sha512",
+        "microsoft.entityframeworkcore.tools.nuspec",
+        "tools/EntityFrameworkCore.PS2.psd1",
+        "tools/EntityFrameworkCore.PS2.psm1",
+        "tools/EntityFrameworkCore.psd1",
+        "tools/EntityFrameworkCore.psm1",
+        "tools/about_EntityFrameworkCore.help.txt",
+        "tools/init.ps1",
+        "tools/net10.0/any/ef.dll",
+        "tools/net10.0/any/ef.runtimeconfig.json",
+        "tools/net472/any/ef.exe",
+        "tools/net472/win-arm64/ef.exe",
+        "tools/net472/win-x86/ef.exe"
+      ]
+    },
+    "StudentPerformanceTracker.Data/1.0.0": {
+      "type": "project",
+      "path": "../StudentPerformanceTracker.Data/StudentPerformanceTracker.Data.csproj",
+      "msbuildProject": "../StudentPerformanceTracker.Data/StudentPerformanceTracker.Data.csproj"
+    },
+    "StudentPerformanceTracker.Resources/1.0.0": {
+      "type": "project",
+      "path": "../StudentPerformanceTracker.Resources/StudentPerformanceTracker.Resources.csproj",
+      "msbuildProject": "../StudentPerformanceTracker.Resources/StudentPerformanceTracker.Resources.csproj"
+    },
+    "StudentPerformanceTracker.Services/1.0.0": {
+      "type": "project",
+      "path": "../StudentPerformanceTracker.Services/StudentPerformanceTracker.Services.csproj",
+      "msbuildProject": "../StudentPerformanceTracker.Services/StudentPerformanceTracker.Services.csproj"
+    }
+  },
+  "projectFileDependencyGroups": {
+    "net9.0": [
+      "Microsoft.EntityFrameworkCore.Tools >= 10.0.0",
+      "StudentPerformanceTracker.Data >= 1.0.0",
+      "StudentPerformanceTracker.Resources >= 1.0.0",
+      "StudentPerformanceTracker.Services >= 1.0.0"
+    ]
+  },
+  "packageFolders": {
+    "C:\\Users\\Administrator\\.nuget\\packages\\": {},
+    "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages": {}
+  },
+  "project": {
+    "version": "1.0.0",
+    "restore": {
+      "projectUniqueName": "C:\\Users\\Administrator\\Desktop\\StudentPerformanceTracker\\StudentPerformanceTracker.WebApp\\StudentPerformanceTracker.WebApp.csproj",
+      "projectName": "StudentPerformanceTracker.WebApp",
+      "projectPath": "C:\\Users\\Administrator\\Desktop\\StudentPerformanceTracker\\StudentPerformanceTracker.WebApp\\StudentPerformanceTracker.WebApp.csproj",
+      "packagesPath": "C:\\Users\\Administrator\\.nuget\\packages\\",
+      "outputPath": "C:\\Users\\Administrator\\Desktop\\StudentPerformanceTracker\\StudentPerformanceTracker.WebApp\\obj\\",
+      "projectStyle": "PackageReference",
+      "fallbackFolders": [
+        "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"
+      ],
+      "configFilePaths": [
+        "C:\\Users\\Administrator\\AppData\\Roaming\\NuGet\\NuGet.Config",
+        "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.FallbackLocation.config",
+        "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
+      ],
+      "originalTargetFrameworks": [
+        "net9.0"
+      ],
+      "sources": {
+        "C:\\Program Files (x86)\\Microsoft SDKs\\NuGetPackages\\": {},
+        "C:\\Program Files\\dotnet\\library-packs": {},
+        "https://api.nuget.org/v3/index.json": {}
+      },
+      "frameworks": {
+        "net9.0": {
+          "targetAlias": "net9.0",
+          "projectReferences": {
+            "C:\\Users\\Administrator\\Desktop\\StudentPerformanceTracker\\StudentPerformanceTracker.Data\\StudentPerformanceTracker.Data.csproj": {
+              "projectPath": "C:\\Users\\Administrator\\Desktop\\StudentPerformanceTracker\\StudentPerformanceTracker.Data\\StudentPerformanceTracker.Data.csproj"
+            },
+            "C:\\Users\\Administrator\\Desktop\\StudentPerformanceTracker\\StudentPerformanceTracker.Resources\\StudentPerformanceTracker.Resources.csproj": {
+              "projectPath": "C:\\Users\\Administrator\\Desktop\\StudentPerformanceTracker\\StudentPerformanceTracker.Resources\\StudentPerformanceTracker.Resources.csproj"
+            },
+            "C:\\Users\\Administrator\\Desktop\\StudentPerformanceTracker\\StudentPerformanceTracker.Services\\StudentPerformanceTracker.Services.csproj": {
+              "projectPath": "C:\\Users\\Administrator\\Desktop\\StudentPerformanceTracker\\StudentPerformanceTracker.Services\\StudentPerformanceTracker.Services.csproj"
+            }
+          }
+        }
+      },
+      "warningProperties": {
+        "warnAsError": [
+          "NU1605"
+        ]
+      },
+      "restoreAuditProperties": {
+        "enableAudit": "true",
+        "auditLevel": "low",
+        "auditMode": "direct"
+      },
+      "SdkAnalysisLevel": "9.0.300"
+    },
+    "frameworks": {
+      "net9.0": {
+        "targetAlias": "net9.0",
+        "dependencies": {
+          "Microsoft.EntityFrameworkCore.Tools": {
+            "include": "Runtime, Build, Native, ContentFiles, Analyzers, BuildTransitive",
+            "suppressParent": "All",
+            "target": "Package",
+            "version": "[10.0.0, )"
+          }
+        },
+        "imports": [
+          "net461",
+          "net462",
+          "net47",
+          "net471",
+          "net472",
+          "net48",
+          "net481"
+        ],
+        "assetTargetFallback": true,
+        "warn": true,
+        "frameworkReferences": {
+          "Microsoft.AspNetCore.App": {
+            "privateAssets": "none"
+          },
+          "Microsoft.NETCore.App": {
+            "privateAssets": "all"
+          }
+        },
+        "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\9.0.305/PortableRuntimeIdentifierGraph.json"
+      }
+    }
+  }
+}

@@ -14,11 +14,11 @@
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "C:\\Users\\Administrator\\Desktop\\StudentPerformanceTracker\\StudentPerformanceTracker.csproj",
-      "projectName": "StudentPerformanceTracker",
-      "projectPath": "C:\\Users\\Administrator\\Desktop\\StudentPerformanceTracker\\StudentPerformanceTracker.csproj",
+      "projectUniqueName": "C:\\Users\\Administrator\\Desktop\\StudentPerformanceTracker\\StudentPerformanceTracker.Data\\StudentPerformanceTracker.Data.csproj",
+      "projectName": "StudentPerformanceTracker.Data",
+      "projectPath": "C:\\Users\\Administrator\\Desktop\\StudentPerformanceTracker\\StudentPerformanceTracker.Data\\StudentPerformanceTracker.Data.csproj",
       "packagesPath": "C:\\Users\\Administrator\\.nuget\\packages\\",
-      "outputPath": "C:\\Users\\Administrator\\Desktop\\StudentPerformanceTracker\\obj\\",
+      "outputPath": "C:\\Users\\Administrator\\Desktop\\StudentPerformanceTracker\\StudentPerformanceTracker.Data\\obj\\",
       "projectStyle": "PackageReference",
       "fallbackFolders": [
         "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"
@@ -69,9 +69,6 @@
         "assetTargetFallback": true,
         "warn": true,
         "frameworkReferences": {
-          "Microsoft.AspNetCore.App": {
-            "privateAssets": "none"
-          },
           "Microsoft.NETCore.App": {
             "privateAssets": "all"
           }

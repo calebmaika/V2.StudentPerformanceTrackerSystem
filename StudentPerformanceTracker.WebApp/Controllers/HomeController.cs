@@ -1,8 +1,8 @@
 using System.Diagnostics;
 using Microsoft.AspNetCore.Mvc;
-using StudentPerformanceTracker.Models;
+using StudentPerformanceTracker.WebApp.Models;
 
-namespace StudentPerformanceTracker.Controllers;
+namespace StudentPerformanceTracker.WebApp.Controllers;
 
 public class HomeController : Controller
 {
