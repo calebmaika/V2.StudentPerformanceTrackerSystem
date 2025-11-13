@@ -1,0 +1,548 @@
+@model IEnumerable<StudentPerformanceTracker.Data.Entities.AdminManagement.TeacherManagement>
+
+@{
+    ViewData["Title"] = "Teacher Management";
+    Layout = "~/Views/Shared/_AdminLayout.cshtml";
+}
+
+<style>
+    .page-header {
+        background: white;
+        padding: 24px 32px;
+        border-radius: 16px;
+        margin-bottom: 24px;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+        border: 1px solid #e9ecef;
+    }
+
+    .page-header-top {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 16px;
+    }
+
+    .page-title {
+        font-size: 24px;
+        font-weight: 700;
+        color: #0f172a;
+        margin: 0;
+    }
+
+    .page-subtitle {
+        color: #64748b;
+        font-size: 14px;
+        margin: 0;
+    }
+
+    .btn-primary-custom {
+        background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%);
+        border: none;
+        color: white;
+        padding: 10px 20px;
+        border-radius: 10px;
+        font-weight: 600;
+        font-size: 14px;
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        transition: all 0.2s ease;
+        text-decoration: none;
+    }
+
+    .btn-primary-custom:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 6px 20px rgba(37, 99, 235, 0.3);
+        color: white;
+    }
+
+    .search-filter-section {
+        display: flex;
+        gap: 12px;
+        align-items: center;
+    }
+
+    .search-box {
+        flex: 1;
+        max-width: 400px;
+        position: relative;
+    }
+
+    .search-box input {
+        width: 100%;
+        padding: 10px 16px 10px 40px;
+        border: 1.5px solid #e2e8f0;
+        border-radius: 10px;
+        font-size: 14px;
+        transition: all 0.2s ease;
+    }
+
+    .search-box input:focus {
+        outline: none;
+        border-color: #2563eb;
+        box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+    }
+
+    .search-box i {
+        position: absolute;
+        left: 14px;
+        top: 50%;
+        transform: translateY(-50%);
+        color: #64748b;
+    }
+
+    .filter-btn {
+        padding: 10px 16px;
+        border: 1.5px solid #e2e8f0;
+        background: white;
+        border-radius: 10px;
+        color: #64748b;
+        font-size: 14px;
+        cursor: pointer;
+        transition: all 0.2s ease;
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+    }
+
+    .filter-btn:hover {
+        border-color: #2563eb;
+        color: #2563eb;
+    }
+
+    .stats-row {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: 16px;
+        margin-bottom: 24px;
+    }
+
+    .stat-card {
+        background: white;
+        padding: 20px;
+        border-radius: 12px;
+        border: 1px solid #e9ecef;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+    }
+
+    .stat-card .stat-icon {
+        width: 40px;
+        height: 40px;
+        border-radius: 10px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin-bottom: 12px;
+        font-size: 18px;
+    }
+
+    .stat-card .stat-value {
+        font-size: 28px;
+        font-weight: 700;
+        color: #0f172a;
+        margin-bottom: 4px;
+    }
+
+    .stat-card .stat-label {
+        font-size: 13px;
+        color: #64748b;
+    }
+
+    .teachers-table-card {
+        background: white;
+        border-radius: 16px;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+        border: 1px solid #e9ecef;
+        overflow: hidden;
+    }
+
+    .table-wrapper {
+        overflow-x: auto;
+    }
+
+    .teachers-table {
+        width: 100%;
+        border-collapse: separate;
+        border-spacing: 0;
+    }
+
+    .teachers-table thead {
+        background: #f8f9fa;
+    }
+
+    .teachers-table thead th {
+        padding: 16px 20px;
+        font-size: 13px;
+        font-weight: 600;
+        color: #64748b;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        border-bottom: 1px solid #e9ecef;
+        text-align: left;
+    }
+
+    .teachers-table tbody td {
+        padding: 16px 20px;
+        border-bottom: 1px solid #f1f5f9;
+        color: #0f172a;
+        font-size: 14px;
+    }
+
+    .teachers-table tbody tr:hover {
+        background: #f8f9fa;
+    }
+
+    .teacher-profile {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+    }
+
+    .teacher-avatar {
+        width: 40px;
+        height: 40px;
+        border-radius: 50%;
+        object-fit: cover;
+        background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: white;
+        font-weight: 600;
+        font-size: 14px;
+    }
+
+    .teacher-info h4 {
+        font-size: 14px;
+        font-weight: 600;
+        color: #0f172a;
+        margin: 0 0 2px 0;
+    }
+
+    .teacher-info p {
+        font-size: 13px;
+        color: #64748b;
+        margin: 0;
+    }
+
+    .status-badge {
+        display: inline-block;
+        padding: 4px 12px;
+        border-radius: 20px;
+        font-size: 12px;
+        font-weight: 600;
+    }
+
+    .status-badge.active {
+        background: #dcfce7;
+        color: #16a34a;
+    }
+
+    .status-badge.inactive {
+        background: #fee2e2;
+        color: #dc2626;
+    }
+
+    .action-buttons {
+        display: flex;
+        gap: 8px;
+    }
+
+    .btn-action {
+        width: 32px;
+        height: 32px;
+        border-radius: 8px;
+        border: none;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+        transition: all 0.2s ease;
+        font-size: 14px;
+    }
+
+    .btn-view {
+        background: #eff6ff;
+        color: #2563eb;
+    }
+
+    .btn-view:hover {
+        background: #dbeafe;
+    }
+
+    .btn-edit {
+        background: #fef3c7;
+        color: #d97706;
+    }
+
+    .btn-edit:hover {
+        background: #fde68a;
+    }
+
+    .btn-delete {
+        background: #fee2e2;
+        color: #dc2626;
+    }
+
+    .btn-delete:hover {
+        background: #fecaca;
+    }
+
+    .empty-state {
+        text-align: center;
+        padding: 60px 20px;
+    }
+
+    .empty-state i {
+        font-size: 64px;
+        color: #e2e8f0;
+        margin-bottom: 16px;
+    }
+
+    .empty-state h3 {
+        font-size: 18px;
+        font-weight: 600;
+        color: #0f172a;
+        margin-bottom: 8px;
+    }
+
+    .empty-state p {
+        color: #64748b;
+        font-size: 14px;
+        margin-bottom: 24px;
+    }
+
+    .alert-custom {
+        padding: 14px 20px;
+        border-radius: 12px;
+        margin-bottom: 24px;
+        border: none;
+        font-size: 14px;
+        display: flex;
+        align-items: center;
+        gap: 12px;
+    }
+
+    .alert-success {
+        background: #dcfce7;
+        color: #16a34a;
+    }
+
+    .alert-error {
+        background: #fee2e2;
+        color: #dc2626;
+    }
+
+    .subjects-preview {
+        max-width: 200px;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+</style>
+
+@if (TempData["SuccessMessage"] != null)
+{
+    <div class="alert-custom alert-success">
+        <i class="fas fa-check-circle"></i>
+        <span>@TempData["SuccessMessage"]</span>
+    </div>
+}
+
+@if (TempData["ErrorMessage"] != null)
+{
+    <div class="alert-custom alert-error">
+        <i class="fas fa-exclamation-circle"></i>
+        <span>@TempData["ErrorMessage"]</span>
+    </div>
+}
+
+<!-- Page Header -->
+<div class="page-header">
+    <div class="page-header-top">
+        <div>
+            <h1 class="page-title">
+                <i class="fas fa-chalkboard-teacher" style="color: #2563eb;"></i>
+                Teacher Management
+            </h1>
+            <p class="page-subtitle">Manage and organize your teaching staff</p>
+        </div>
+        <a href="/Admin/Teachers/Create" class="btn-primary-custom">
+            <i class="fas fa-plus"></i>
+            Add New Teacher
+        </a>
+    </div>
+
+    <div class="search-filter-section">
+        <div class="search-box">
+            <i class="fas fa-search"></i>
+            <input type="text" id="searchInput" placeholder="Search teachers by name, username, or subjects..." />
+        </div>
+        <button class="filter-btn" id="filterBtn">
+            <i class="fas fa-filter"></i>
+            Filter
+        </button>
+    </div>
+</div>
+
+<!-- Stats Row -->
+<div class="stats-row">
+    <div class="stat-card">
+        <div class="stat-icon" style="background: #eff6ff; color: #2563eb;">
+            <i class="fas fa-users"></i>
+        </div>
+        <div class="stat-value">@Model.Count()</div>
+        <div class="stat-label">Total Teachers</div>
+    </div>
+    <div class="stat-card">
+        <div class="stat-icon" style="background: #dcfce7; color: #16a34a;">
+            <i class="fas fa-user-check"></i>
+        </div>
+        <div class="stat-value">@Model.Count(t => t.IsActive)</div>
+        <div class="stat-label">Active Teachers</div>
+    </div>
+    <div class="stat-card">
+        <div class="stat-icon" style="background: #fee2e2; color: #dc2626;">
+            <i class="fas fa-user-times"></i>
+        </div>
+        <div class="stat-value">@Model.Count(t => !t.IsActive)</div>
+        <div class="stat-label">Inactive Teachers</div>
+    </div>
+</div>
+
+<!-- Teachers Table -->
+<div class="teachers-table-card">
+    @if (Model.Any())
+    {
+        <div class="table-wrapper">
+            <table class="teachers-table" id="teachersTable">
+                <thead>
+                    <tr>
+                        <th>Teacher</th>
+                        <th>Username</th>
+                        <th>Age</th>
+                        <th>Subjects</th>
+                        <th>Status</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var teacher in Model)
+                    {
+                        <tr>
+                            <td>
+                                <div class="teacher-profile">
+                                    @if (!string.IsNullOrEmpty(teacher.ProfilePicture))
+                                    {
+                                        <img src="@teacher.ProfilePicture" alt="@teacher.FirstName" class="teacher-avatar" />
+                                    }
+                                    else
+                                    {
+                                        <div class="teacher-avatar">
+                                            @{
+                                                var initials = $"{teacher.FirstName?.FirstOrDefault()}{teacher.LastName?.FirstOrDefault()}";
+                                            }
+                                            @initials.ToUpper()
+                                        </div>
+                                    }
+                                    <div class="teacher-info">
+                                        <h4>@teacher.FirstName @teacher.LastName</h4>
+                                        <p>@teacher.Address</p>
+                                    </div>
+                                </div>
+                            </td>
+                            <td>@@@teacher.Username</td>
+                            <td>@teacher.Age years</td>
+                            <td>
+                                <div class="subjects-preview" title="@teacher.SubjectsAssigned">
+                                    @(string.IsNullOrEmpty(teacher.SubjectsAssigned) ? "Not assigned" : teacher.SubjectsAssigned)
+                                </div>
+                            </td>
+                            <td>
+                                @if (teacher.IsActive)
+                                {
+                                    <span class="status-badge active">
+                                        <i class="fas fa-circle" style="font-size: 8px;"></i>
+                                        Active
+                                    </span>
+                                }
+                                else
+                                {
+                                    <span class="status-badge inactive">
+                                        <i class="fas fa-circle" style="font-size: 8px;"></i>
+                                        Inactive
+                                    </span>
+                                }
+                            </td>
+                            <td>
+                                <div class="action-buttons">
+                                    <a href="/Admin/Teachers/Details/@teacher.TeacherId" class="btn-action btn-view" title="View Details">
+                                        <i class="fas fa-eye"></i>
+                                    </a>
+                                    <a href="/Admin/Teachers/Edit/@teacher.TeacherId" class="btn-action btn-edit" title="Edit">
+                                        <i class="fas fa-edit"></i>
+                                    </a>
+                                    <button type="button" class="btn-action btn-delete" title="Delete"
+                                            onclick="confirmDelete(@teacher.TeacherId, '@teacher.FirstName @teacher.LastName')">
+                                        <i class="fas fa-trash"></i>
+                                    </button>
+                                </div>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    }
+    else
+    {
+        <div class="empty-state">
+            <i class="fas fa-chalkboard-teacher"></i>
+            <h3>No Teachers Found</h3>
+            <p>Get started by adding your first teacher to the system</p>
+            <a href="/Admin/Teachers/Create" class="btn-primary-custom">
+                <i class="fas fa-plus"></i>
+                Add New Teacher
+            </a>
+        </div>
+    }
+</div>
+
+<!-- Delete Confirmation Form (Hidden) -->
+<form id="deleteForm" method="post" style="display: none;">
+    @Html.AntiForgeryToken()
+</form>
+
+@section Scripts {
+    <script>
+        // Search functionality
+        document.getElementById('searchInput').addEventListener('keyup', function() {
+            const searchTerm = this.value.toLowerCase();
+            const tableRows = document.querySelectorAll('#teachersTable tbody tr');
+
+            tableRows.forEach(row => {
+                const text = row.textContent.toLowerCase();
+                row.style.display = text.includes(searchTerm) ? '' : 'none';
+            });
+        });
+
+        // Delete confirmation
+        function confirmDelete(teacherId, teacherName) {
+            if (confirm(`Are you sure you want to delete ${teacherName}?\n\nThis action cannot be undone.`)) {
+                const form = document.getElementById('deleteForm');
+                form.action = `/Admin/Teachers/Delete/${teacherId}`;
+                form.submit();
+            }
+        }
+
+        // Auto-hide alerts after 5 seconds
+        setTimeout(function() {
+            const alerts = document.querySelectorAll('.alert-custom');
+            alerts.forEach(alert => {
+                alert.style.transition = 'opacity 0.5s ease';
+                alert.style.opacity = '0';
+                setTimeout(() => alert.remove(), 500);
+            });
+        }, 5000);
+    </script>
+}
