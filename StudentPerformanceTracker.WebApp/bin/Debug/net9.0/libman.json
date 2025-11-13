@@ -32,6 +32,10 @@
         "webfonts/fa-brands-400.woff2",
         "webfonts/fa-brands-400.ttf"
       ]
+    },
+    {
+      "library": "jquery-validation-unobtrusive@3.2.12",
+      "destination": "wwwroot/lib/jquery-validation-unobtrusive"
     }
   ]
 }

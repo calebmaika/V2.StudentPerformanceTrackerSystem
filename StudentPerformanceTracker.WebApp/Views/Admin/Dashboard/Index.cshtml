@@ -1,0 +1,121 @@
+@{
+    ViewData["Title"] = "Admin Dashboard";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<div class="container-fluid">
+    <!-- Page Header -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <h1 class="display-4">
+                <i class="fas fa-tachometer-alt text-primary"></i> Admin Dashboard
+            </h1>
+            <p class="lead">Welcome back, <strong>@ViewData["FullName"]</strong>!</p>
+            <hr />
+        </div>
+    </div>
+    
+    <!-- Statistics Cards -->
+    <div class="row">
+        <div class="col-md-3">
+            <div class="card text-white bg-primary mb-3">
+                <div class="card-body text-center">
+                    <i class="fas fa-users fa-3x mb-3"></i>
+                    <h3 class="card-title">150</h3>
+                    <p class="card-text">Total Students</p>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-md-3">
+            <div class="card text-white bg-success mb-3">
+                <div class="card-body text-center">
+                    <i class="fas fa-chalkboard-teacher fa-3x mb-3"></i>
+                    <h3 class="card-title">25</h3>
+                    <p class="card-text">Total Teachers</p>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-md-3">
+            <div class="card text-white bg-info mb-3">
+                <div class="card-body text-center">
+                    <i class="fas fa-book fa-3x mb-3"></i>
+                    <h3 class="card-title">12</h3>
+                    <p class="card-text">Active Courses</p>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-md-3">
+            <div class="card text-white bg-warning mb-3">
+                <div class="card-body text-center">
+                    <i class="fas fa-chart-line fa-3x mb-3"></i>
+                    <h3 class="card-title">89%</h3>
+                    <p class="card-text">Average Grade</p>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Recent Activities and Quick Actions -->
+    <div class="row mt-4">
+        <div class="col-md-6">
+            <div class="card shadow-sm">
+                <div class="card-header bg-primary text-white">
+                    <h5 class="mb-0"><i class="fas fa-bell"></i> Recent Activities</h5>
+                </div>
+                <div class="card-body">
+                    <ul class="list-group list-group-flush">
+                        <li class="list-group-item">
+                            <i class="fas fa-user-plus text-success"></i> New student registered - John Doe
+                        </li>
+                        <li class="list-group-item">
+                            <i class="fas fa-edit text-info"></i> Grade updated for Math 101
+                        </li>
+                        <li class="list-group-item">
+                            <i class="fas fa-book text-primary"></i> New course added - Physics 201
+                        </li>
+                        <li class="list-group-item">
+                            <i class="fas fa-file-alt text-warning"></i> Report generated for Q1
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-md-6">
+            <div class="card shadow-sm">
+                <div class="card-header bg-success text-white">
+                    <h5 class="mb-0"><i class="fas fa-cog"></i> Quick Actions</h5>
+                </div>
+                <div class="card-body">
+                    <div class="d-grid gap-2">
+                        <a href="#" class="btn btn-outline-primary">
+                            <i class="fas fa-user-plus"></i> Add New Student
+                        </a>
+                        <a href="#" class="btn btn-outline-success">
+                            <i class="fas fa-chalkboard-teacher"></i> Manage Teachers
+                        </a>
+                        <a href="#" class="btn btn-outline-info">
+                            <i class="fas fa-book"></i> Manage Courses
+                        </a>
+                        <a href="#" class="btn btn-outline-warning">
+                            <i class="fas fa-chart-bar"></i> View Reports
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- System Status -->
+    <div class="row mt-4">
+        <div class="col-12">
+            <div class="alert alert-info">
+                <i class="fas fa-info-circle"></i>
+                <strong>System Status:</strong> All systems operational. Last backup: 2 hours ago.
+            </div>
+        </div>
+    </div>
+</div>
