@@ -171,7 +171,7 @@
     <!-- Filter Section -->
     <div class="filter-section">
         <div class="row align-items-end">
-            <div class="col-md-6 mb-3 mb-md-0">
+            <div class="col-md-4 mb-3 mb-md-0">
                 <label class="form-label small fw-semibold">Search</label>
                 <div class="input-group">
                     <span class="input-group-text bg-white">
@@ -179,6 +179,16 @@
                     </span>
                     <input type="text" id="searchInput" class="form-control" placeholder="Search by code or name...">
                 </div>
+            </div>
+            <div class="col-md-2 mb-3 mb-md-0">
+                <label class="form-label small fw-semibold">Code</label>
+                <select id="codeFilter" class="form-select">
+                    <option value="">All Codes</option>
+                    <option value="701">701</option>
+                    <option value="801">801</option>
+                    <option value="901">901</option>
+                    <option value="1001">1001</option>
+                </select>
             </div>
             <div class="col-md-2 mb-3 mb-md-0">
                 <label class="form-label small fw-semibold">Status</label>
@@ -328,6 +338,7 @@
         });
 
         document.getElementById('searchInput').addEventListener('input', applyFilters);
+        document.getElementById('codeFilter').addEventListener('change', applyFilters);
         document.getElementById('statusFilter').addEventListener('change', applyFilters);
         document.getElementById('sortBy').addEventListener('change', applyFilters);
 
@@ -344,6 +355,7 @@
 
         function applyFilters() {
             const searchTerm = document.getElementById('searchInput').value.toLowerCase();
+            const codeFilter = document.getElementById('codeFilter').value.toLowerCase();
             const statusFilter = document.getElementById('statusFilter').value;
             const sortBy = document.getElementById('sortBy').value;
 
@@ -356,9 +368,10 @@
                     code.includes(searchTerm) || 
                     name.includes(searchTerm);
                 
+                const matchesCode = !codeFilter || code.includes(codeFilter);
                 const matchesStatus = !statusFilter || status === statusFilter;
 
-                return matchesSearch && matchesStatus;
+                return matchesSearch && matchesCode && matchesStatus;
             });
 
             filteredCards.sort((a, b) => {
@@ -407,6 +420,7 @@
 
         function resetFilters() {
             document.getElementById('searchInput').value = '';
+            document.getElementById('codeFilter').value = '';
             document.getElementById('statusFilter').value = '';
             document.getElementById('sortBy').value = 'code';
             applyFilters();
