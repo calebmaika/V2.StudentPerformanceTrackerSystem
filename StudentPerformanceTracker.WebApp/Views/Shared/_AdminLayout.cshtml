@@ -3,665 +3,827 @@
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>@ViewData["Title"] - Admin Portal</title>
+    <title>@ViewData["Title"] - Student Performance Tracker</title>
     
-    <!-- Bootstrap CSS -->
-    <link rel="stylesheet" href="~/lib/bootstrap/css/bootstrap.min.css" />
-    <!-- Font Awesome Icons -->
-    <link rel="stylesheet" href="~/lib/font-awesome/css/all.min.css" />
+    <!-- Bootstrap 5 CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     
     <style>
+        /* ===================================
+           CSS VARIABLES FOR THEMING
+           =================================== */
+        :root {
+            --primary: #2563eb;
+            --primary-dark: #1e40af;
+            --bg: #ffffff;
+            --card-bg: #ffffff;
+            --input-bg: #ffffff;
+            --border-color: #e2e8f0;
+            --text-primary: #1e293b;
+            --text-muted: #64748b;
+            --white: #ffffff;
+            --light-gray: #f1f5f9;
+            --dark: #1e293b;
+            --gray: #64748b;
+            --sidebar-bg: #1e293b;
+            --sidebar-hover: #334155;
+            --sidebar-active: #2563eb;
+        }
+
+        [data-theme="dark"] {
+            --primary: #3b82f6;
+            --primary-dark: #2563eb;
+            --bg: #0f172a;
+            --card-bg: #1e293b;
+            --input-bg: #1e293b;
+            --border-color: #334155;
+            --text-primary: #f1f5f9;
+            --text-muted: #94a3b8;
+            --white: #1e293b;
+            --light-gray: #334155;
+            --dark: #f1f5f9;
+            --gray: #94a3b8;
+            --sidebar-bg: #0f172a;
+            --sidebar-hover: #1e293b;
+            --sidebar-active: #3b82f6;
+        }
+
+        /* ===================================
+           GLOBAL STYLES
+           =================================== */
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
         }
 
-        :root {
-            --primary: #2563eb;
-            --primary-dark: #1d4ed8;
-            --dark: #0f172a;
-            --gray: #64748b;
-            --light-gray: #f1f5f9;
-            --white: #ffffff;
-            --sidebar-width: 260px;
-            --topbar-height: 64px;
-            --border-color: #e2e8f0;
-        }
-
-        /* Dark mode variables */
-        [data-theme="dark"] {
-            --dark: #f1f5f9;
-            --gray: #cbd5e1;
-            --light-gray: #1e293b;
-            --white: #0f172a;
-            --border-color: #334155;
-        }
-
         body {
-            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-            background: var(--light-gray);
-            color: var(--dark);
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: var(--bg);
+            color: var(--text-primary);
             transition: background-color 0.3s ease, color 0.3s ease;
+            overflow-x: hidden;
         }
 
-        /* Sidebar */
+        .admin-wrapper {
+            display: flex;
+            min-height: 100vh;
+        }
+
+        /* ===================================
+           SIDEBAR STYLES
+           =================================== */
         .sidebar {
-            position: fixed;
-            top: 0;
-            left: 0;
-            height: 100vh;
-            width: var(--sidebar-width);
-            background: var(--white);
+            width: 260px;
+            background: var(--card-bg);
             border-right: 1px solid var(--border-color);
-            z-index: 1000;
             transition: all 0.3s ease;
+            position: fixed;
+            left: 0;
+            top: 0;
+            bottom: 0;
+            overflow-y: auto;
+            z-index: 1000;
+        }
+
+        .sidebar::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        .sidebar::-webkit-scrollbar-track {
+            background: transparent;
+        }
+
+        .sidebar::-webkit-scrollbar-thumb {
+            background: var(--border-color);
+            border-radius: 3px;
         }
 
         .sidebar-brand {
-            height: var(--topbar-height);
+            padding: 1.5rem;
             display: flex;
             align-items: center;
-            padding: 0 24px;
+            gap: 12px;
             border-bottom: 1px solid var(--border-color);
+            background: var(--bg);
         }
 
-        .brand-icon {
-            width: 36px;
-            height: 36px;
-            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
-            border-radius: 8px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            margin-right: 12px;
+        .sidebar-brand i {
+            font-size: 32px;
+            color: var(--primary);
         }
 
-        .brand-icon i {
-            color: #ffffff;
-            font-size: 18px;
-        }
-
-        .brand-text h1 {
+        .brand-text h4 {
+            margin: 0;
             font-size: 18px;
             font-weight: 700;
-            color: var(--dark);
-            margin: 0;
+            color: var(--text-primary);
         }
 
-        .brand-text p {
-            font-size: 11px;
-            color: var(--gray);
-            margin: 0;
+        .brand-text span {
+            font-size: 12px;
+            color: var(--text-muted);
             text-transform: uppercase;
-            letter-spacing: 0.5px;
+            letter-spacing: 1px;
         }
 
-        .sidebar-nav {
-            padding: 24px 0;
-            overflow-y: auto;
-            height: calc(100vh - var(--topbar-height) - 80px);
+        .sidebar-menu {
+            padding: 1rem 0;
         }
 
-        .nav-section {
-            margin-bottom: 24px;
+        .menu-section {
+            margin-bottom: 1.5rem;
         }
 
-        .nav-section-title {
+        .menu-section-title {
+            padding: 0 1.5rem;
+            margin-bottom: 0.5rem;
             font-size: 11px;
             font-weight: 600;
-            color: var(--gray);
             text-transform: uppercase;
-            letter-spacing: 0.5px;
-            padding: 0 24px;
-            margin-bottom: 8px;
+            letter-spacing: 1px;
+            color: var(--text-muted);
         }
 
-        .nav-item {
-            list-style: none;
-        }
-
-        .nav-link {
+        .menu-item {
             display: flex;
             align-items: center;
-            padding: 12px 24px;
-            color: var(--gray);
+            padding: 0.75rem 1.5rem;
+            color: var(--text-muted);
             text-decoration: none;
+            transition: all 0.2s ease;
             font-size: 14px;
             font-weight: 500;
-            transition: all 0.2s ease;
-            position: relative;
+            border-left: 3px solid transparent;
         }
 
-        .nav-link:hover {
-            background: var(--light-gray);
-            color: var(--primary);
-        }
-
-        .nav-link.active {
-            background: #eff6ff;
-            color: var(--primary);
-        }
-
-        [data-theme="dark"] .nav-link.active {
-            background: #1e3a8a;
-        }
-
-        .nav-link.active::before {
-            content: '';
-            position: absolute;
-            left: 0;
-            top: 0;
-            height: 100%;
-            width: 3px;
-            background: var(--primary);
-        }
-
-        .nav-link i {
+        .menu-item i {
             width: 20px;
             margin-right: 12px;
             font-size: 16px;
         }
 
-        .nav-badge {
-            margin-left: auto;
-            background: var(--primary);
-            color: #ffffff;
-            font-size: 11px;
-            font-weight: 600;
-            padding: 2px 8px;
-            border-radius: 12px;
+        .menu-item:hover {
+            background: var(--light-gray);
+            color: var(--text-primary);
         }
 
-        .sidebar-footer {
-            position: absolute;
-            bottom: 0;
-            left: 0;
-            width: 100%;
-            padding: 16px 24px;
+        .menu-item.active {
+            background: var(--light-gray);
+            color: var(--primary);
+            border-left-color: var(--primary);
+        }
+
+        /* Profile Section */
+        .profile-section {
+            padding: 1rem 1.5rem;
             border-top: 1px solid var(--border-color);
-            background: var(--white);
+            margin-top: auto;
+            background: var(--bg);
         }
 
-        .user-profile {
+        .profile-info {
             display: flex;
             align-items: center;
+            gap: 12px;
         }
 
-        .user-avatar {
+        .profile-avatar {
             width: 40px;
             height: 40px;
-            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
             border-radius: 50%;
+            background: var(--primary);
+            color: white;
             display: flex;
             align-items: center;
             justify-content: center;
-            color: #ffffff;
             font-weight: 600;
-            font-size: 14px;
-            margin-right: 12px;
+            font-size: 16px;
         }
 
-        .user-info h4 {
-            font-size: 14px;
-            font-weight: 600;
-            color: var(--dark);
+        .profile-details h6 {
             margin: 0;
+            font-size: 14px;
+            font-weight: 600;
+            color: var(--text-primary);
         }
 
-        .user-info p {
+        .profile-details span {
             font-size: 12px;
-            color: var(--gray);
-            margin: 0;
+            color: var(--text-muted);
         }
 
-        /* Main Content */
-        .main-wrapper {
-            margin-left: var(--sidebar-width);
-            min-height: 100vh;
-        }
-
-        .topbar {
-            height: var(--topbar-height);
-            background: var(--white);
-            border-bottom: 1px solid var(--border-color);
+        /* ===================================
+           MAIN CONTENT AREA
+           =================================== */
+        .main-content {
+            flex: 1;
+            margin-left: 260px;
             display: flex;
-            align-items: center;
+            flex-direction: column;
+            min-height: 100vh;
+            background: var(--bg);
+        }
+
+        /* ===================================
+           TOP NAVBAR
+           =================================== */
+        .top-navbar {
+            background: var(--card-bg);
+            border-bottom: 1px solid var(--border-color);
+            padding: 1rem 2rem;
+            display: flex;
             justify-content: space-between;
-            padding: 0 32px;
+            align-items: center;
             position: sticky;
             top: 0;
             z-index: 999;
         }
 
-        .topbar-left h2 {
-            font-size: 20px;
+        .navbar-title {
+            font-size: 24px;
             font-weight: 700;
-            color: var(--dark);
+            color: var(--text-primary);
             margin: 0;
         }
 
-        .topbar-right {
+        .navbar-actions {
             display: flex;
             align-items: center;
-            gap: 16px;
+            gap: 1rem;
         }
 
-        .topbar-btn {
+        .theme-toggle,
+        .navbar-icon {
             width: 40px;
             height: 40px;
-            border-radius: 8px;
-            border: none;
-            background: transparent;
-            color: var(--gray);
-            cursor: pointer;
+            border-radius: 10px;
+            border: 1px solid var(--border-color);
+            background: var(--bg);
+            color: var(--text-primary);
             display: flex;
             align-items: center;
             justify-content: center;
-            transition: all 0.2s ease;
-            position: relative;
-        }
-
-        .topbar-btn:hover {
-            background: var(--light-gray);
-            color: var(--primary);
-        }
-
-        .topbar-btn .badge {
-            position: absolute;
-            top: 8px;
-            right: 8px;
-            width: 8px;
-            height: 8px;
-            background: #ef4444;
-            border-radius: 50%;
-            border: 2px solid var(--white);
-        }
-
-        /* Dark Mode Toggle Button */
-        .theme-toggle {
-            width: 40px;
-            height: 40px;
-            border-radius: 8px;
-            border: none;
-            background: var(--light-gray);
-            color: var(--dark);
             cursor: pointer;
-            display: flex;
-            align-items: center;
-            justify-content: center;
             transition: all 0.2s ease;
-            position: relative;
-            overflow: hidden;
         }
 
-        .theme-toggle:hover {
-            background: var(--primary);
-            color: #ffffff;
-            transform: scale(1.05);
-        }
-
-        .theme-toggle i {
-            position: absolute;
-            transition: all 0.3s ease;
-        }
-
-        .theme-toggle .fa-sun {
-            opacity: 1;
-            transform: rotate(0deg) scale(1);
-        }
-
-        .theme-toggle .fa-moon {
-            opacity: 0;
-            transform: rotate(180deg) scale(0);
-        }
-
-        [data-theme="dark"] .theme-toggle .fa-sun {
-            opacity: 0;
-            transform: rotate(-180deg) scale(0);
-        }
-
-        [data-theme="dark"] .theme-toggle .fa-moon {
-            opacity: 1;
-            transform: rotate(0deg) scale(1);
+        .theme-toggle:hover,
+        .navbar-icon:hover {
+            background: var(--light-gray);
+            border-color: var(--primary);
         }
 
         .logout-btn {
-            background: var(--light-gray);
-            color: var(--gray);
-            padding: 8px 16px;
+            padding: 0.5rem 1rem;
             border-radius: 8px;
             border: none;
-            font-size: 14px;
+            background: #ef4444;
+            color: white;
             font-weight: 500;
             cursor: pointer;
+            transition: all 0.2s ease;
             display: flex;
             align-items: center;
-            gap: 8px;
-            transition: all 0.2s ease;
+            gap: 0.5rem;
         }
 
         .logout-btn:hover {
-            background: #fee2e2;
-            color: #dc2626;
+            background: #dc2626;
+            transform: translateY(-2px);
         }
 
-        .content {
-            padding: 32px;
+        /* ===================================
+           CONTENT AREA
+           =================================== */
+        .content-area {
+            flex: 1;
+            padding: 2rem;
         }
 
-        /* Mobile Toggle */
-        .mobile-toggle {
-            display: none;
+        /* ===================================
+           CARDS
+           =================================== */
+        .card {
+            background: var(--card-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            color: var(--text-primary);
+            transition: all 0.3s ease;
+        }
+
+        .card-header {
+            background: var(--card-bg);
+            border-bottom: 1px solid var(--border-color);
+            color: var(--text-primary);
+            font-weight: 600;
+        }
+
+        .card-body {
+            color: var(--text-primary);
+        }
+
+        /* ===================================
+           FORM CONTROLS - DARK MODE FIX
+           =================================== */
+        .form-control,
+        .form-select {
+            background-color: var(--input-bg);
+            border-color: var(--border-color);
+            color: var(--text-primary);
+            transition: all 0.2s ease;
+        }
+
+        .form-control:focus,
+        .form-select:focus {
+            background-color: var(--input-bg);
+            border-color: var(--primary);
+            color: var(--text-primary);
+            box-shadow: 0 0 0 0.2rem rgba(37, 99, 235, 0.25);
+        }
+
+        .form-control::placeholder {
+            color: var(--text-muted);
+            opacity: 0.7;
+        }
+
+        .input-group-text {
+            background-color: var(--card-bg);
+            border-color: var(--border-color);
+            color: var(--text-primary);
+        }
+
+        .form-select option {
+            background-color: var(--card-bg);
+            color: var(--text-primary);
+        }
+
+        .form-label {
+            color: var(--text-primary);
+            font-weight: 500;
+        }
+
+        [data-theme="dark"] .form-control,
+        [data-theme="dark"] .form-select {
+            background-color: var(--input-bg);
+            border-color: var(--border-color);
+            color: var(--text-primary);
+        }
+
+        [data-theme="dark"] .form-control:focus,
+        [data-theme="dark"] .form-select:focus {
+            background-color: var(--input-bg);
+            border-color: var(--primary);
+            color: var(--text-primary);
+            box-shadow: 0 0 0 0.2rem rgba(59, 130, 246, 0.25);
+        }
+
+        [data-theme="dark"] .form-control::placeholder {
+            color: var(--text-muted);
+            opacity: 0.7;
+        }
+
+        [data-theme="dark"] .input-group-text {
+            background-color: var(--card-bg);
+            border-color: var(--border-color);
+            color: var(--text-primary);
+        }
+
+        [data-theme="dark"] .form-select option {
+            background-color: var(--input-bg);
+            color: var(--text-primary);
+        }
+
+        [data-theme="dark"] .form-label {
+            color: var(--text-primary);
+        }
+
+        /* ===================================
+           BUTTONS
+           =================================== */
+        .btn-primary {
+            background: var(--primary);
+            border-color: var(--primary);
+            font-weight: 500;
+        }
+
+        .btn-primary:hover {
+            background: var(--primary-dark);
+            border-color: var(--primary-dark);
+        }
+
+        .btn-secondary {
+            background: var(--light-gray);
+            border-color: var(--border-color);
+            color: var(--text-primary);
+        }
+
+        .btn-secondary:hover {
+            background: var(--gray);
+            border-color: var(--border-color);
+        }
+
+        /* ===================================
+           TABLES
+           =================================== */
+        .table {
+            color: var(--text-primary);
+        }
+
+        .table thead th {
+            border-bottom: 2px solid var(--border-color);
+            color: var(--text-primary);
+        }
+
+        .table tbody td {
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        [data-theme="dark"] .table {
+            color: var(--text-primary);
+        }
+
+        [data-theme="dark"] .table-striped tbody tr:nth-of-type(odd) {
+            background-color: rgba(255, 255, 255, 0.02);
+        }
+
+        [data-theme="dark"] .table thead th {
+            border-bottom-color: var(--border-color);
+        }
+
+        [data-theme="dark"] .table tbody td {
+            border-bottom-color: var(--border-color);
+        }
+
+        /* ===================================
+           MODALS
+           =================================== */
+        [data-theme="dark"] .modal-content {
+            background-color: var(--card-bg);
+            color: var(--text-primary);
+            border-color: var(--border-color);
+        }
+
+        [data-theme="dark"] .modal-header {
+            border-bottom-color: var(--border-color);
+        }
+
+        [data-theme="dark"] .modal-footer {
+            border-top-color: var(--border-color);
+        }
+
+        [data-theme="dark"] .btn-close {
+            filter: invert(1);
+        }
+
+        /* ===================================
+           BREADCRUMBS
+           =================================== */
+        .breadcrumb {
+            background-color: transparent;
+            margin-bottom: 0;
+        }
+
+        [data-theme="dark"] .breadcrumb {
+            background-color: transparent;
+        }
+
+        [data-theme="dark"] .breadcrumb-item + .breadcrumb-item::before {
+            color: var(--text-muted);
+        }
+
+        [data-theme="dark"] .breadcrumb-item a {
+            color: var(--primary);
+        }
+
+        [data-theme="dark"] .breadcrumb-item.active {
+            color: var(--text-muted);
+        }
+
+        /* ===================================
+           ALERTS
+           =================================== */
+        [data-theme="dark"] .alert {
+            border-color: var(--border-color);
+        }
+
+        [data-theme="dark"] .alert-success {
+            background-color: rgba(34, 197, 94, 0.1);
+            border-color: rgba(34, 197, 94, 0.3);
+            color: #86efac;
+        }
+
+        [data-theme="dark"] .alert-danger {
+            background-color: rgba(239, 68, 68, 0.1);
+            border-color: rgba(239, 68, 68, 0.3);
+            color: #fca5a5;
+        }
+
+        [data-theme="dark"] .alert-warning {
+            background-color: rgba(245, 158, 11, 0.1);
+            border-color: rgba(245, 158, 11, 0.3);
+            color: #fcd34d;
+        }
+
+        [data-theme="dark"] .alert-info {
+            background-color: rgba(59, 130, 246, 0.1);
+            border-color: rgba(59, 130, 246, 0.3);
+            color: #93c5fd;
+        }
+
+        /* ===================================
+           TEXT UTILITIES
+           =================================== */
+        [data-theme="dark"] .text-muted {
+            color: var(--text-muted) !important;
+        }
+
+        [data-theme="dark"] .text-dark {
+            color: var(--text-primary) !important;
+        }
+
+        /* ===================================
+           DROPDOWNS
+           =================================== */
+        [data-theme="dark"] .dropdown-menu {
+            background-color: var(--card-bg);
+            border-color: var(--border-color);
+        }
+
+        [data-theme="dark"] .dropdown-item {
+            color: var(--text-primary);
+        }
+
+        [data-theme="dark"] .dropdown-item:hover {
+            background-color: var(--light-gray);
+            color: var(--text-primary);
+        }
+
+        [data-theme="dark"] .dropdown-divider {
+            border-top-color: var(--border-color);
+        }
+
+        /* ===================================
+           BADGES
+           =================================== */
+        [data-theme="dark"] .badge {
+            color: #fff;
+        }
+
+        /* ===================================
+           PAGINATION
+           =================================== */
+        [data-theme="dark"] .pagination .page-link {
+            background-color: var(--card-bg);
+            border-color: var(--border-color);
+            color: var(--text-primary);
+        }
+
+        [data-theme="dark"] .pagination .page-link:hover {
+            background-color: var(--light-gray);
+            border-color: var(--border-color);
+        }
+
+        [data-theme="dark"] .pagination .page-item.active .page-link {
+            background-color: var(--primary);
+            border-color: var(--primary);
+        }
+
+        [data-theme="dark"] .pagination .page-item.disabled .page-link {
+            background-color: var(--card-bg);
+            border-color: var(--border-color);
+            color: var(--text-muted);
+        }
+
+        /* ===================================
+           PROFILE SECTION
+           =================================== */
+        .profile-section {
+            padding: 1rem 1.5rem;
+            border-top: 1px solid var(--border-color);
+            margin-top: auto;
+            background: var(--card-bg);
+        }
+
+        .profile-info {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .profile-avatar {
             width: 40px;
             height: 40px;
-            border-radius: 8px;
-            border: none;
-            background: var(--light-gray);
-            color: var(--dark);
-            cursor: pointer;
+            border-radius: 50%;
+            background: var(--primary);
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 600;
+            font-size: 16px;
         }
 
-        /* Responsive */
+        .profile-details h6 {
+            margin: 0;
+            font-size: 14px;
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+
+        .profile-details span {
+            font-size: 12px;
+            color: var(--text-muted);
+        }
+
+        /* ===================================
+           RESPONSIVE DESIGN
+           =================================== */
         @@media (max-width: 768px) {
             .sidebar {
                 transform: translateX(-100%);
             }
 
-            .sidebar.active {
+            .sidebar.show {
                 transform: translateX(0);
             }
 
-            .main-wrapper {
+            .main-content {
                 margin-left: 0;
             }
 
-            .mobile-toggle {
-                display: flex;
-                align-items: center;
-                justify-content: center;
+            .top-navbar {
+                padding: 1rem;
             }
 
-            .topbar {
-                padding: 0 16px;
-            }
-
-            .content {
-                padding: 16px;
+            .content-area {
+                padding: 1rem;
             }
         }
 
-        /* Overlay for mobile */
-        .sidebar-overlay {
-            display: none;
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(0, 0, 0, 0.5);
-            z-index: 999;
+        /* ===================================
+           SCROLLBAR STYLING
+           =================================== */
+        ::-webkit-scrollbar {
+            width: 10px;
         }
 
-        .sidebar-overlay.active {
-            display: block;
+        ::-webkit-scrollbar-track {
+            background: var(--bg);
         }
 
-        /* Scrollbar styling */
-        .sidebar-nav::-webkit-scrollbar {
-            width: 6px;
-        }
-
-        .sidebar-nav::-webkit-scrollbar-track {
-            background: transparent;
-        }
-
-        .sidebar-nav::-webkit-scrollbar-thumb {
+        ::-webkit-scrollbar-thumb {
             background: var(--border-color);
-            border-radius: 3px;
+            border-radius: 5px;
         }
 
-        .sidebar-nav::-webkit-scrollbar-thumb:hover {
+        ::-webkit-scrollbar-thumb:hover {
             background: var(--gray);
         }
-
-        /* Cards dark mode support */
-        .card {
-            background: var(--white);
-            border-color: var(--border-color);
-            color: var(--dark);
-        }
-
-        .card-header {
-            border-color: var(--border-color);
-        }
-
-        /* Tables dark mode support */
-        .table {
-            color: var(--dark);
-        }
-
-        .table-light {
-            background-color: var(--light-gray);
-            color: var(--dark);
-        }
-
-        /* Form controls dark mode */
-        .form-control, .form-select {
-            background-color: var(--white);
-            border-color: var(--border-color);
-            color: var(--dark);
-        }
-
-        .form-control:focus, .form-select:focus {
-            background-color: var(--white);
-            color: var(--dark);
-            border-color: var(--primary);
-        }
-
-        /* Alerts dark mode */
-        [data-theme="dark"] .alert-success {
-            background-color: #064e3b;
-            border-color: #065f46;
-            color: #a7f3d0;
-        }
-
-        [data-theme="dark"] .alert-danger {
-            background-color: #7f1d1d;
-            border-color: #991b1b;
-            color: #fecaca;
-        }
-
-        [data-theme="dark"] .alert-info {
-            background-color: #1e3a8a;
-            border-color: #1e40af;
-            color: #bfdbfe;
-        }
     </style>
+
+    @await RenderSectionAsync("Styles", required: false)
 </head>
 <body>
-    <!-- Sidebar Overlay (Mobile) -->
-    <div class="sidebar-overlay" id="sidebarOverlay"></div>
-
-    <!-- Sidebar -->
-    <aside class="sidebar" id="sidebar">
-        <!-- Brand -->
-        <div class="sidebar-brand">
-            <div class="brand-icon">
+    <div class="admin-wrapper">
+        <!-- Sidebar -->
+        <aside class="sidebar">
+            <!-- Brand -->
+            <div class="sidebar-brand">
                 <i class="fas fa-graduation-cap"></i>
-            </div>
-            <div class="brand-text">
-                <h1>Student Tracker</h1>
-                <p>Admin Portal</p>
-            </div>
-        </div>
-
-        <!-- Navigation -->
-        <nav class="sidebar-nav">
-            <div class="nav-section">
-                <div class="nav-section-title">Main</div>
-                <ul>
-                    <li class="nav-item">
-                        <a href="/Admin/Dashboard" class="nav-link">
-                            <i class="fas fa-th-large"></i>
-                            <span>Dashboard</span>
-                        </a>
-                    </li>
-                </ul>
-            </div>
-
-            <div class="nav-section">
-                <div class="nav-section-title">Management</div>
-                <ul>
-                    <li class="nav-item">
-                        <a href="/Admin/Teachers" class="nav-link">
-                            <i class="fas fa-chalkboard-teacher"></i>
-                            <span>Teachers</span>
-                        </a>
-                    </li>
-                    <li class="nav-item">
-                        <a href="/Admin/Students" class="nav-link">
-                            <i class="fas fa-user-graduate"></i>
-                            <span>Students</span>
-                        </a>
-                    </li>
-                    <li class="nav-item">
-                        <a href="/Admin/Subjects" class="nav-link">
-                            <i class="fas fa-book"></i>
-                            <span>Subjects</span>
-                        </a>
-                    </li>
-                </ul>
-            </div>
-
-            <div class="nav-section">
-                <div class="nav-section-title">Settings</div>
-                <ul>
-                    <li class="nav-item">
-                        <a href="/Admin/Settings" class="nav-link">
-                            <i class="fas fa-cog"></i>
-                            <span>Settings</span>
-                        </a>
-                    </li>
-                </ul>
-            </div>
-        </nav>
-
-        <!-- User Profile -->
-        <div class="sidebar-footer">
-            <div class="user-profile">
-                <div class="user-avatar">
-                    @{
-                        var userName = User.Identity?.Name ?? "Admin";
-                        var initials = string.Join("", userName.Split(' ').Select(n => n[0])).ToUpper();
-                    }
-                    @initials
-                </div>
-                <div class="user-info">
-                    <h4>@(User.FindFirst("FullName")?.Value ?? "Administrator")</h4>
-                    <p>@@@userName</p>
+                <div class="brand-text">
+                    <h4>Student Tracker</h4>
+                    <span>ADMIN PORTAL</span>
                 </div>
             </div>
-        </div>
-    </aside>
 
-    <!-- Main Content -->
-    <div class="main-wrapper">
-        <!-- Top Bar -->
-        <header class="topbar">
-            <div class="topbar-left">
-                <button class="mobile-toggle" id="mobileToggle">
-                    <i class="fas fa-bars"></i>
-                </button>
-                <h2>@ViewData["Title"]</h2>
+            <!-- Menu -->
+            <nav class="sidebar-menu">
+                <!-- Main Section -->
+                <div class="menu-section">
+                    <div class="menu-section-title">MAIN</div>
+                    <a href="/Admin/Dashboard" class="menu-item @(ViewContext.RouteData.Values["controller"]?.ToString() == "Dashboard" ? "active" : "")">
+                        <i class="fas fa-th-large"></i>
+                        <span>Dashboard</span>
+                    </a>
+                </div>
+
+                <!-- Management Section -->
+                <div class="menu-section">
+                    <div class="menu-section-title">MANAGEMENT</div>
+                    <a href="/Admin/Teachers" class="menu-item @(ViewContext.RouteData.Values["controller"]?.ToString() == "Teachers" ? "active" : "")">
+                        <i class="fas fa-chalkboard-teacher"></i>
+                        <span>Teachers</span>
+                    </a>
+                    <a href="#" class="menu-item">
+                        <i class="fas fa-user-graduate"></i>
+                        <span>Students</span>
+                    </a>
+                    <a href="/Admin/Subjects" class="menu-item @(ViewContext.RouteData.Values["controller"]?.ToString() == "Subjects" ? "active" : "")">
+                        <i class="fas fa-book"></i>
+                        <span>Subjects</span>
+                    </a>
+                </div>
+
+                <!-- Settings Section -->
+                <div class="menu-section">
+                    <div class="menu-section-title">SETTINGS</div>
+                    <a href="#" class="menu-item">
+                        <i class="fas fa-cog"></i>
+                        <span>Settings</span>
+                    </a>
+                </div>
+            </nav>
+
+            <!-- Profile Section -->
+            <div class="profile-section">
+                <div class="profile-info">
+                    <div class="profile-avatar">A</div>
+                    <div class="profile-details">
+                        <h6>System Administrator</h6>
+                        <span>@@admin</span>
+                    </div>
+                </div>
             </div>
-            <div class="topbar-right">
-                <!-- Dark Mode Toggle -->
-                <button class="theme-toggle" id="themeToggle" title="Toggle Dark Mode">
-                    <i class="fas fa-sun"></i>
-                    <i class="fas fa-moon"></i>
-                </button>
+        </aside>
 
-                <!-- Notifications -->
-                <button class="topbar-btn">
-                    <i class="fas fa-bell"></i>
-                    <span class="badge"></span>
-                </button>
-
-                <!-- Messages -->
-                <button class="topbar-btn">
-                    <i class="fas fa-envelope"></i>
-                </button>
-
-                <!-- Logout -->
-                <form asp-controller="Account" asp-action="Logout" method="post" class="d-inline">
-                    <button type="submit" class="logout-btn">
-                        <i class="fas fa-sign-out-alt"></i>
-                        <span>Logout</span>
+        <!-- Main Content -->
+        <main class="main-content">
+            <!-- Top Navbar -->
+            <div class="top-navbar">
+                <h1 class="navbar-title">@ViewData["Title"]</h1>
+                <div class="navbar-actions">
+                    <!-- Dark Mode Toggle -->
+                    <button class="theme-toggle" id="themeToggle" title="Toggle Dark Mode">
+                        <i class="fas fa-moon"></i>
                     </button>
-                </form>
+                    
+                    <!-- Notifications -->
+                    <button class="navbar-icon" title="Notifications">
+                        <i class="fas fa-bell"></i>
+                    </button>
+                    
+                    <!-- Messages -->
+                    <button class="navbar-icon" title="Messages">
+                        <i class="fas fa-envelope"></i>
+                    </button>
+                    
+                    <!-- Logout -->
+                    <form asp-controller="Account" asp-action="Logout" method="post" class="d-inline">
+                        <button type="submit" class="logout-btn">
+                            <i class="fas fa-sign-out-alt"></i>
+                            Logout
+                        </button>
+                    </form>
+                </div>
             </div>
-        </header>
 
-        <!-- Page Content -->
-        <main class="content">
-            @RenderBody()
+            <!-- Content Area -->
+            <div class="content-area">
+                @RenderBody()
+            </div>
         </main>
     </div>
 
-    <!-- Scripts -->
-    <script src="~/lib/jquery/jquery.min.js"></script>
-    <script src="~/lib/bootstrap/js/bootstrap.bundle.min.js"></script>
+    <!-- Bootstrap JS Bundle -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     
+    <!-- Dark Mode Toggle Script -->
     <script>
-        // Mobile sidebar toggle
-        const sidebar = document.getElementById('sidebar');
-        const mobileToggle = document.getElementById('mobileToggle');
-        const sidebarOverlay = document.getElementById('sidebarOverlay');
-
-        mobileToggle?.addEventListener('click', () => {
-            sidebar.classList.toggle('active');
-            sidebarOverlay.classList.toggle('active');
-        });
-
-        sidebarOverlay?.addEventListener('click', () => {
-            sidebar.classList.remove('active');
-            sidebarOverlay.classList.remove('active');
-        });
-
-        // Dark Mode Toggle
-        const themeToggle = document.getElementById('themeToggle');
-        const htmlElement = document.documentElement;
-
         // Check for saved theme preference or default to light mode
         const currentTheme = localStorage.getItem('theme') || 'light';
-        htmlElement.setAttribute('data-theme', currentTheme);
+        document.documentElement.setAttribute('data-theme', currentTheme);
+        
+        // Update icon based on current theme
+        const themeIcon = document.querySelector('#themeToggle i');
+        if (currentTheme === 'dark') {
+            themeIcon.classList.remove('fa-moon');
+            themeIcon.classList.add('fa-sun');
+        }
 
-        themeToggle.addEventListener('click', () => {
-            const currentTheme = htmlElement.getAttribute('data-theme');
+        // Theme toggle functionality
+        document.getElementById('themeToggle').addEventListener('click', function() {
+            const currentTheme = document.documentElement.getAttribute('data-theme');
             const newTheme = currentTheme === 'light' ? 'dark' : 'light';
             
-            htmlElement.setAttribute('data-theme', newTheme);
+            document.documentElement.setAttribute('data-theme', newTheme);
             localStorage.setItem('theme', newTheme);
             
-            // Optional: Add a subtle animation
-            themeToggle.style.transform = 'rotate(360deg)';
-            setTimeout(() => {
-                themeToggle.style.transform = 'rotate(0deg)';
-            }, 300);
-        });
-
-        // Set active nav link based on current URL
-        document.addEventListener('DOMContentLoaded', function() {
-            const currentPath = window.location.pathname;
-            const navLinks = document.querySelectorAll('.nav-link');
-            
-            navLinks.forEach(link => {
-                link.classList.remove('active');
-                if (link.getAttribute('href') === currentPath) {
-                    link.classList.add('active');
-                }
-            });
+            // Update icon
+            const icon = this.querySelector('i');
+            if (newTheme === 'dark') {
+                icon.classList.remove('fa-moon');
+                icon.classList.add('fa-sun');
+            } else {
+                icon.classList.remove('fa-sun');
+                icon.classList.add('fa-moon');
+            }
         });
     </script>
 
