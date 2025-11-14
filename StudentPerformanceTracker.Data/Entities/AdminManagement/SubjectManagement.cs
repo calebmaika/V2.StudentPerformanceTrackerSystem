@@ -48,5 +48,10 @@ namespace StudentPerformanceTracker.Data.Entities.AdminManagement
         /// Whether this subject is active (can be assigned)
         /// </summary>
         public bool IsActive { get; set; } = true;
+
+        /// <summary>
+        /// Navigation property for teacher-subject assignments
+        /// </summary>
+        public ICollection<TeacherSubject> TeacherSubjects { get; set; } = new List<TeacherSubject>();
     }
 }

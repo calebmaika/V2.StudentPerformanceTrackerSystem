@@ -159,12 +159,18 @@
                 </div>
                 <div class="card-body">
                     <small class="text-muted">Subjects Assigned</small>
-                    @if (!string.IsNullOrEmpty(Model.SubjectsAssigned))
+                    @inject StudentPerformanceTracker.Services.Subject.ISubjectService SubjectService
+                    @{
+                        var assignedSubjectIds = Model.SelectedSubjectIds;
+                        var allSubjects = await SubjectService.GetAllSubjectsAsync();
+                        var assignedSubjects = allSubjects.Where(s => assignedSubjectIds.Contains(s.SubjectId)).ToList();
+                    }
+                    @if (assignedSubjects != null && assignedSubjects.Any())
                     {
                         <p class="mb-0">
-                            @foreach (var subject in Model.SubjectsAssigned.Split(','))
+                            @foreach (var subject in assignedSubjects)
                             {
-                                <span class="badge bg-info me-1">@subject.Trim()</span>
+                                <span class="badge bg-info me-1 mb-1">@subject.SubjectCode - @subject.SubjectName</span>
                             }
                         </p>
                     }

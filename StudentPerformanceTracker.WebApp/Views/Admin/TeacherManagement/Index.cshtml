@@ -10,7 +10,7 @@
         transition: all 0.3s ease;
         border: 1px solid var(--border-color);
         background: var(--white);
-        border-radius: 12px;  /* ← ADDED THIS */
+        border-radius: 12px; 
     }
 
     .teacher-card:hover {
@@ -286,7 +286,7 @@
                 <div class="teacher-card" 
                      data-name="@teacher.FullName.ToLower()" 
                      data-username="@teacher.Username.ToLower()" 
-                     data-subjects="@(teacher.SubjectsAssigned?.ToLower() ?? "")"
+                     data-subjects="@(teacher.TeacherSubjects != null && teacher.TeacherSubjects.Any() ? string.Join(",", teacher.TeacherSubjects.Select(ts => ts.Subject.SubjectCode)).ToLower() : "")"
                      data-status="@(teacher.IsActive ? "active" : "inactive")"
                      data-id="@teacher.TeacherId"
                      data-age="@teacher.Age">
@@ -333,11 +333,11 @@
                                     <i class="fas fa-map-marker-alt"></i>
                                     <span>@teacher.Address</span>
                                 </div>
-                                @if (!string.IsNullOrEmpty(teacher.SubjectsAssigned))
+                                @if (teacher.TeacherSubjects != null && teacher.TeacherSubjects.Any())
                                 {
                                     <div class="teacher-meta-item">
                                         <i class="fas fa-book"></i>
-                                        <span>@teacher.SubjectsAssigned</span>
+                                        <span>@string.Join(", ", teacher.TeacherSubjects.Select(ts => ts.Subject.SubjectCode))</span>
                                     </div>
                                 }
                             </div>

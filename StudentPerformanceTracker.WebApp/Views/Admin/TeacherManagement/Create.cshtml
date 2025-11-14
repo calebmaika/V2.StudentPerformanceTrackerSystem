@@ -5,6 +5,213 @@
     Layout = "~/Views/Shared/_AdminLayout.cshtml";
 }
 
+<style>
+    /* Modern Multi-Select Dropdown */
+    .custom-multiselect {
+        position: relative;
+    }
+
+    .multiselect-trigger {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 0.75rem 1rem;
+        border: 1px solid var(--border-color);
+        border-radius: 8px;
+        background: var(--input-bg);
+        cursor: pointer;
+        transition: all 0.2s;
+        min-height: 48px;
+    }
+
+    .multiselect-trigger:hover {
+        border-color: var(--primary);
+    }
+
+    .multiselect-trigger.active {
+        border-color: var(--primary);
+        box-shadow: 0 0 0 0.2rem rgba(37, 99, 235, 0.25);
+    }
+
+    .multiselect-selected {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 6px;
+        flex: 1;
+    }
+
+    .multiselect-placeholder {
+        color: var(--text-muted);
+    }
+
+    .multiselect-badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        padding: 4px 10px;
+        background: var(--primary);
+        color: white;
+        border-radius: 6px;
+        font-size: 13px;
+        font-weight: 500;
+    }
+
+    .multiselect-badge-remove {
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        width: 16px;
+        height: 16px;
+        border-radius: 50%;
+        background: rgba(255, 255, 255, 0.2);
+        transition: background 0.2s;
+    }
+
+    .multiselect-badge-remove:hover {
+        background: rgba(255, 255, 255, 0.3);
+    }
+
+    .multiselect-arrow {
+        margin-left: 8px;
+        transition: transform 0.2s;
+    }
+
+    .multiselect-arrow.active {
+        transform: rotate(180deg);
+    }
+
+    .multiselect-dropdown {
+        position: absolute;
+        top: 100%;
+        left: 0;
+        right: 0;
+        margin-top: 8px;
+        background: var(--card-bg);
+        border: 1px solid var(--border-color);
+        border-radius: 8px;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+        z-index: 1000;
+        max-height: 400px;
+        display: none;
+        flex-direction: column;
+    }
+
+    .multiselect-dropdown.active {
+        display: flex;
+    }
+
+    .multiselect-search {
+        padding: 12px;
+        border-bottom: 1px solid var(--border-color);
+    }
+
+    .multiselect-search input {
+        width: 100%;
+        padding: 8px 12px;
+        border: 1px solid var(--border-color);
+        border-radius: 6px;
+        background: var(--input-bg);
+        color: var(--text-primary);
+        font-size: 14px;
+    }
+
+    .multiselect-search input:focus {
+        outline: none;
+        border-color: var(--primary);
+    }
+
+    .multiselect-options {
+        overflow-y: auto;
+        max-height: 300px;
+    }
+
+    .multiselect-option {
+        display: flex;
+        align-items: center;
+        padding: 10px 12px;
+        cursor: pointer;
+        transition: background 0.2s;
+    }
+
+    .multiselect-option:hover {
+        background: var(--light-gray);
+    }
+
+    .multiselect-option.selected {
+        background: rgba(37, 99, 235, 0.1);
+    }
+
+    .multiselect-checkbox {
+        width: 18px;
+        height: 18px;
+        border: 2px solid var(--border-color);
+        border-radius: 4px;
+        margin-right: 12px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transition: all 0.2s;
+    }
+
+    .multiselect-option.selected .multiselect-checkbox {
+        background: var(--primary);
+        border-color: var(--primary);
+    }
+
+    .multiselect-checkbox i {
+        color: white;
+        font-size: 12px;
+        display: none;
+    }
+
+    .multiselect-option.selected .multiselect-checkbox i {
+        display: block;
+    }
+
+    .multiselect-label {
+        flex: 1;
+        font-size: 14px;
+        color: var(--text-primary);
+    }
+
+    .multiselect-empty {
+        padding: 20px;
+        text-align: center;
+        color: var(--text-muted);
+        font-size: 14px;
+    }
+
+    .multiselect-footer {
+        padding: 10px 12px;
+        border-top: 1px solid var(--border-color);
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+
+    .multiselect-count {
+        font-size: 13px;
+        color: var(--text-muted);
+    }
+
+    .multiselect-clear {
+        color: var(--primary);
+        font-size: 13px;
+        cursor: pointer;
+        font-weight: 500;
+    }
+
+    .multiselect-clear:hover {
+        text-decoration: underline;
+    }
+
+    /* Hidden original select */
+    #SelectedSubjectIds {
+        display: none;
+    }
+</style>
+
 <div class="container-fluid">
     <!-- Page Header -->
     <div class="mb-4">
@@ -105,10 +312,56 @@
                             <i class="fas fa-book"></i> Teaching Information
                         </h5>
                         <div class="mb-4">
-                            <label asp-for="SubjectsAssigned" class="form-label"></label>
-                            <textarea asp-for="SubjectsAssigned" class="form-control" rows="3" placeholder="e.g., Mathematics, Science, English"></textarea>
-                            <small class="form-text text-muted">Enter subjects separated by commas</small>
-                            <span asp-validation-for="SubjectsAssigned" class="text-danger"></span>
+                            <label class="form-label">Subjects Assigned</label>
+                            
+                            <!-- Custom Multi-Select -->
+                            <div class="custom-multiselect">
+                                <div class="multiselect-trigger" id="multiselectTrigger">
+                                    <div class="multiselect-selected" id="multiselectSelected">
+                                        <span class="multiselect-placeholder">Select subjects...</span>
+                                    </div>
+                                    <i class="fas fa-chevron-down multiselect-arrow" id="multiselectArrow"></i>
+                                </div>
+
+                                <div class="multiselect-dropdown" id="multiselectDropdown">
+                                    <div class="multiselect-search">
+                                        <input type="text" placeholder="Search subjects..." id="multiselectSearch">
+                                    </div>
+                                    <div class="multiselect-options" id="multiselectOptions">
+                                        @if (ViewBag.Subjects != null)
+                                        {
+                                            foreach (var subject in ViewBag.Subjects)
+                                            {
+                                                <div class="multiselect-option" data-value="@subject.Value" data-text="@subject.Text">
+                                                    <div class="multiselect-checkbox">
+                                                        <i class="fas fa-check"></i>
+                                                    </div>
+                                                    <span class="multiselect-label">@subject.Text</span>
+                                                </div>
+                                            }
+                                        }
+                                        else
+                                        {
+                                            <div class="multiselect-empty">No subjects available</div>
+                                        }
+                                    </div>
+                                    <div class="multiselect-footer">
+                                        <span class="multiselect-count" id="multiselectCount">0 selected</span>
+                                        <span class="multiselect-clear" id="multiselectClear">Clear all</span>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Hidden original select (for form submission) -->
+                            <select name="SelectedSubjectIds" id="SelectedSubjectIds" multiple style="display: none;">
+                                @if (ViewBag.Subjects != null)
+                                {
+                                    foreach (var subject in ViewBag.Subjects)
+                                    {
+                                        <option value="@subject.Value">@subject.Text</option>
+                                    }
+                                }
+                            </select>
                         </div>
 
                         <!-- Status -->
@@ -190,5 +443,142 @@
 
         // Calculate age on page load if date exists
         document.addEventListener('DOMContentLoaded', calculateAge);
+
+        // ==========================================
+        // MODERN MULTI-SELECT FUNCTIONALITY
+        // ==========================================
+        const trigger = document.getElementById('multiselectTrigger');
+        const dropdown = document.getElementById('multiselectDropdown');
+        const arrow = document.getElementById('multiselectArrow');
+        const searchInput = document.getElementById('multiselectSearch');
+        const optionsContainer = document.getElementById('multiselectOptions');
+        const selectedContainer = document.getElementById('multiselectSelected');
+        const countSpan = document.getElementById('multiselectCount');
+        const clearBtn = document.getElementById('multiselectClear');
+        const hiddenSelect = document.getElementById('SelectedSubjectIds');
+
+        let selectedValues = [];
+
+        // Toggle dropdown
+        trigger.addEventListener('click', function(e) {
+            e.stopPropagation();
+            dropdown.classList.toggle('active');
+            arrow.classList.toggle('active');
+            trigger.classList.toggle('active');
+            if (dropdown.classList.contains('active')) {
+                searchInput.focus();
+            }
+        });
+
+        // Close dropdown when clicking outside
+        document.addEventListener('click', function(e) {
+            if (!dropdown.contains(e.target) && !trigger.contains(e.target)) {
+                dropdown.classList.remove('active');
+                arrow.classList.remove('active');
+                trigger.classList.remove('active');
+            }
+        });
+
+        // Search functionality
+        searchInput.addEventListener('input', function() {
+            const searchTerm = this.value.toLowerCase();
+            const options = optionsContainer.querySelectorAll('.multiselect-option');
+            
+            options.forEach(option => {
+                const text = option.getAttribute('data-text').toLowerCase();
+                if (text.includes(searchTerm)) {
+                    option.style.display = 'flex';
+                } else {
+                    option.style.display = 'none';
+                }
+            });
+        });
+
+        // Handle option selection
+        optionsContainer.addEventListener('click', function(e) {
+            const option = e.target.closest('.multiselect-option');
+            if (!option) return;
+
+            const value = option.getAttribute('data-value');
+            const text = option.getAttribute('data-text');
+
+            if (option.classList.contains('selected')) {
+                // Deselect
+                option.classList.remove('selected');
+                selectedValues = selectedValues.filter(v => v.value !== value);
+            } else {
+                // Select
+                option.classList.add('selected');
+                selectedValues.push({ value, text });
+            }
+
+            updateDisplay();
+            updateHiddenSelect();
+        });
+
+        // Clear all selections
+        clearBtn.addEventListener('click', function(e) {
+            e.stopPropagation();
+            selectedValues = [];
+            const options = optionsContainer.querySelectorAll('.multiselect-option');
+            options.forEach(option => option.classList.remove('selected'));
+            updateDisplay();
+            updateHiddenSelect();
+        });
+
+        // Update display
+        function updateDisplay() {
+            selectedContainer.innerHTML = '';
+            
+            if (selectedValues.length === 0) {
+                selectedContainer.innerHTML = '<span class="multiselect-placeholder">Select subjects...</span>';
+                countSpan.textContent = '0 selected';
+            } else {
+                selectedValues.forEach(item => {
+                    const badge = document.createElement('div');
+                    badge.className = 'multiselect-badge';
+                    badge.innerHTML = `
+                        ${item.text}
+                        <span class="multiselect-badge-remove" data-value="${item.value}">
+                            <i class="fas fa-times"></i>
+                        </span>
+                    `;
+                    
+                    badge.querySelector('.multiselect-badge-remove').addEventListener('click', function(e) {
+                        e.stopPropagation();
+                        removeSelection(item.value);
+                    });
+                    
+                    selectedContainer.appendChild(badge);
+                });
+                
+                countSpan.textContent = `${selectedValues.length} selected`;
+            }
+        }
+
+        // Remove individual selection
+        function removeSelection(value) {
+            selectedValues = selectedValues.filter(v => v.value !== value);
+            const option = optionsContainer.querySelector(`[data-value="${value}"]`);
+            if (option) {
+                option.classList.remove('selected');
+            }
+            updateDisplay();
+            updateHiddenSelect();
+        }
+
+        // Update hidden select for form submission
+        function updateHiddenSelect() {
+            // Clear all selections
+            Array.from(hiddenSelect.options).forEach(option => option.selected = false);
+            
+            // Select the chosen options
+            selectedValues.forEach(item => {
+                const option = hiddenSelect.querySelector(`option[value="${item.value}"]`);
+                if (option) {
+                    option.selected = true;
+                }
+            });
+        }
     </script>
 }

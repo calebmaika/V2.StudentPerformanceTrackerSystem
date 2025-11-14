@@ -53,10 +53,8 @@ namespace StudentPerformanceTracker.WebApp.Models.Admin
         [Display(Name = "Address")]
         public string Address { get; set; } = string.Empty;
 
-        [StringLength(500, ErrorMessage = "Subjects assigned cannot exceed 500 characters")]
         [Display(Name = "Subjects Assigned")]
-        [DataType(DataType.MultilineText)]
-        public string? SubjectsAssigned { get; set; }
+        public List<int> SelectedSubjectIds { get; set; } = new List<int>();
 
         [Display(Name = "Active")]
         public bool IsActive { get; set; } = true;

@@ -73,13 +73,6 @@ namespace StudentPerformanceTracker.Data.Entities.AdminManagement
         public string Address { get; set; } = string.Empty;
 
         /// <summary>
-        /// Comma-separated list of subjects assigned to teacher
-        /// Example: "Math, Science, English"
-        /// </summary>
-        [MaxLength(500)]
-        public string? SubjectsAssigned { get; set; }
-
-        /// <summary>
         /// When this teacher record was created
         /// </summary>
         public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
@@ -93,6 +86,11 @@ namespace StudentPerformanceTracker.Data.Entities.AdminManagement
         /// Whether this teacher account is active (can login)
         /// </summary>
         public bool IsActive { get; set; } = true;
+
+        /// <summary>
+        /// Navigation property for teacher-subject assignments
+        /// </summary>
+        public ICollection<TeacherSubject> TeacherSubjects { get; set; } = new List<TeacherSubject>();
 
         /// <summary>
         /// Full name computed property

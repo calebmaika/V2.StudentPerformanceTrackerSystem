@@ -14,6 +14,7 @@ namespace StudentPerformanceTracker.Data.Context
         public DbSet<Admin> Admins { get; set; }
         public DbSet<TeacherManagement> Teachers { get; set; } 
         public DbSet<SubjectManagement> Subjects { get; set; }
+        public DbSet<TeacherSubject> TeacherSubjects { get; set; }
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
@@ -44,6 +45,26 @@ namespace StudentPerformanceTracker.Data.Context
                 entity.HasKey(e => e.SubjectId);
                 entity.HasIndex(e => e.SubjectCode).IsUnique();
                 entity.ToTable("Subjects");
+            });
+
+            modelBuilder.Entity<TeacherSubject>(entity =>
+            {
+                entity.HasKey(e => e.TeacherSubjectId);
+                entity.ToTable("TeacherSubjects");
+
+                // Configure relationships
+                entity.HasOne(ts => ts.Teacher)
+                    .WithMany(t => t.TeacherSubjects)
+                    .HasForeignKey(ts => ts.TeacherId)
+                    .OnDelete(DeleteBehavior.Cascade);
+
+                entity.HasOne(ts => ts.Subject)
+                    .WithMany(s => s.TeacherSubjects)
+                    .HasForeignKey(ts => ts.SubjectId)
+                    .OnDelete(DeleteBehavior.Cascade);
+
+                // Ensure a teacher can't be assigned to the same subject twice
+                entity.HasIndex(e => new { e.TeacherId, e.SubjectId }).IsUnique();
             });
 
             modelBuilder.Entity<Admin>().HasData(

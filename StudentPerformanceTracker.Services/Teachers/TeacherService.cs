@@ -9,10 +9,11 @@ namespace StudentPerformanceTracker.Services.Teachers
     {
         Task<List<TeacherManagement>> GetAllTeachersAsync();  
         Task<TeacherManagement?> GetTeacherByIdAsync(int id);  
-        Task<TeacherManagement> CreateTeacherAsync(TeacherManagement teacher, string password);  
-        Task<TeacherManagement> UpdateTeacherAsync(TeacherManagement teacher);  
+        Task<TeacherManagement> CreateTeacherAsync(TeacherManagement teacher, string password, List<int> subjectIds);  
+        Task<TeacherManagement> UpdateTeacherAsync(TeacherManagement teacher, List<int> subjectIds);  
         Task<bool> DeleteTeacherAsync(int id);
         Task<bool> UsernameExistsAsync(string username, int? excludeTeacherId = null);
+        Task<List<int>> GetTeacherSubjectIdsAsync(int teacherId);
     }
 
     public class TeacherService : ITeacherService
@@ -29,6 +30,8 @@ namespace StudentPerformanceTracker.Services.Teachers
         public async Task<List<TeacherManagement>> GetAllTeachersAsync()
         {
             return await _context.Teachers
+                .Include(t => t.TeacherSubjects)
+                    .ThenInclude(ts => ts.Subject)
                 .OrderBy(t => t.LastName)
                 .ThenBy(t => t.FirstName)
                 .ToListAsync();
@@ -36,10 +39,13 @@ namespace StudentPerformanceTracker.Services.Teachers
 
         public async Task<TeacherManagement?> GetTeacherByIdAsync(int id)
         {
-            return await _context.Teachers.FindAsync(id);
+            return await _context.Teachers
+                .Include(t => t.TeacherSubjects)
+                    .ThenInclude(ts => ts.Subject)
+                .FirstOrDefaultAsync(t => t.TeacherId == id);
         }
 
-        public async Task<TeacherManagement> CreateTeacherAsync(TeacherManagement teacher, string password)
+        public async Task<TeacherManagement> CreateTeacherAsync(TeacherManagement teacher, string password, List<int> subjectIds)
         {
             teacher.PasswordHash = _passwordService.HashPassword(password);
             teacher.CreatedAt = DateTime.UtcNow;
@@ -47,15 +53,52 @@ namespace StudentPerformanceTracker.Services.Teachers
             _context.Teachers.Add(teacher);
             await _context.SaveChangesAsync();
 
+            // Assign subjects
+            if (subjectIds != null && subjectIds.Any())
+            {
+                foreach (var subjectId in subjectIds)
+                {
+                    var teacherSubject = new TeacherSubject
+                    {
+                        TeacherId = teacher.TeacherId,
+                        SubjectId = subjectId,
+                        AssignedAt = DateTime.UtcNow
+                    };
+                    _context.TeacherSubjects.Add(teacherSubject);
+                }
+                await _context.SaveChangesAsync();
+            }
+
             return teacher;
         }
 
-        public async Task<TeacherManagement> UpdateTeacherAsync(TeacherManagement teacher)
+        public async Task<TeacherManagement> UpdateTeacherAsync(TeacherManagement teacher, List<int> subjectIds)
         {
             teacher.UpdatedAt = DateTime.UtcNow;
             _context.Teachers.Update(teacher);
-            await _context.SaveChangesAsync();
 
+            // Remove existing subject assignments
+            var existingAssignments = await _context.TeacherSubjects
+                .Where(ts => ts.TeacherId == teacher.TeacherId)
+                .ToListAsync();
+            _context.TeacherSubjects.RemoveRange(existingAssignments);
+
+            // Add new subject assignments
+            if (subjectIds != null && subjectIds.Any())
+            {
+                foreach (var subjectId in subjectIds)
+                {
+                    var teacherSubject = new TeacherSubject
+                    {
+                        TeacherId = teacher.TeacherId,
+                        SubjectId = subjectId,
+                        AssignedAt = DateTime.UtcNow
+                    };
+                    _context.TeacherSubjects.Add(teacherSubject);
+                }
+            }
+
+            await _context.SaveChangesAsync();
             return teacher;
         }
 
@@ -65,6 +108,7 @@ namespace StudentPerformanceTracker.Services.Teachers
             if (teacher == null)
                 return false;
 
+            // Remove subject assignments (will be done automatically by cascade delete)
             _context.Teachers.Remove(teacher);
             await _context.SaveChangesAsync();
 
@@ -81,6 +125,14 @@ namespace StudentPerformanceTracker.Services.Teachers
             }
 
             return await query.AnyAsync();
+        }
+
+        public async Task<List<int>> GetTeacherSubjectIdsAsync(int teacherId)
+        {
+            return await _context.TeacherSubjects
+                .Where(ts => ts.TeacherId == teacherId)
+                .Select(ts => ts.SubjectId)
+                .ToListAsync();
         }
     }
 }

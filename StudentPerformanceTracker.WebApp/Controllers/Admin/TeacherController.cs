@@ -1,38 +1,35 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Rendering;
 using StudentPerformanceTracker.Data.Entities.AdminManagement;
 using StudentPerformanceTracker.Services.Teachers;
 using StudentPerformanceTracker.Services.Authentication;
+using StudentPerformanceTracker.Services.Subject;
 using StudentPerformanceTracker.WebApp.Models.Admin;
 
 namespace StudentPerformanceTracker.WebApp.Controllers.Admin
 {
-    /// <summary>
-    /// Controller for managing teachers (Admin side)
-    /// Route: /Admin/Teachers/...
-    /// </summary>
     [Authorize(Roles = "Admin")]
     [Route("Admin/Teachers")]
     public class TeachersController : Controller
     {
         private readonly ITeacherService _teacherService;
+        private readonly ISubjectService _subjectService;
         private readonly IPasswordService _passwordService;
         private readonly IWebHostEnvironment _environment;
 
         public TeachersController(
-            ITeacherService teacherService, 
+            ITeacherService teacherService,
+            ISubjectService subjectService,
             IPasswordService passwordService,
             IWebHostEnvironment environment)
         {
             _teacherService = teacherService;
+            _subjectService = subjectService;
             _passwordService = passwordService;
             _environment = environment;
         }
 
-        /// <summary>
-        /// GET: /Admin/Teachers
-        /// Shows list of all teachers
-        /// </summary>
         [HttpGet("")]
         [HttpGet("Index")]
         public async Task<IActionResult> Index()
@@ -41,47 +38,57 @@ namespace StudentPerformanceTracker.WebApp.Controllers.Admin
             return View("~/Views/Admin/TeacherManagement/Index.cshtml", teachers);
         }
 
-        /// <summary>
-        /// GET: /Admin/Teachers/Create
-        /// Shows create teacher form
-        /// </summary>
         [HttpGet("Create")]
-        public IActionResult Create()
+        public async Task<IActionResult> Create()
         {
+            var subjects = await _subjectService.GetAllSubjectsAsync();
+            ViewBag.Subjects = subjects.Where(s => s.IsActive)
+                .Select(s => new SelectListItem
+                {
+                    Value = s.SubjectId.ToString(),
+                    Text = $"{s.SubjectCode} - {s.SubjectName}"
+                }).ToList();
+
             return View("~/Views/Admin/TeacherManagement/Create.cshtml", new TeacherViewModel());
         }
 
-        /// <summary>
-        /// POST: /Admin/Teachers/Create
-        /// Creates a new teacher
-        /// </summary>
         [HttpPost("Create")]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create(TeacherViewModel model)
         {
             if (!ModelState.IsValid)
             {
+                var subjects = await _subjectService.GetAllSubjectsAsync();
+                ViewBag.Subjects = subjects.Where(s => s.IsActive)
+                    .Select(s => new SelectListItem
+                    {
+                        Value = s.SubjectId.ToString(),
+                        Text = $"{s.SubjectCode} - {s.SubjectName}"
+                    }).ToList();
                 return View("~/Views/Admin/TeacherManagement/Create.cshtml", model);
             }
 
-            // Check if username already exists
             if (await _teacherService.UsernameExistsAsync(model.Username))
             {
                 ModelState.AddModelError("Username", "Username already exists");
+                var subjects = await _subjectService.GetAllSubjectsAsync();
+                ViewBag.Subjects = subjects.Where(s => s.IsActive)
+                    .Select(s => new SelectListItem
+                    {
+                        Value = s.SubjectId.ToString(),
+                        Text = $"{s.SubjectCode} - {s.SubjectName}"
+                    }).ToList();
                 return View("~/Views/Admin/TeacherManagement/Create.cshtml", model);
             }
 
-            // Handle profile picture upload
             string? profilePicturePath = null;
             if (model.ProfilePictureFile != null)
             {
                 profilePicturePath = await SaveProfilePicture(model.ProfilePictureFile);
             }
 
-            // Calculate age from date of birth
             var age = CalculateAge(model.DateOfBirth);
 
-            // Create teacher entity
             var teacher = new TeacherManagement
             {
                 Username = model.Username,
@@ -92,20 +99,15 @@ namespace StudentPerformanceTracker.WebApp.Controllers.Admin
                 DateOfBirth = model.DateOfBirth,
                 Age = age,
                 Address = model.Address,
-                SubjectsAssigned = model.SubjectsAssigned,
                 IsActive = model.IsActive
             };
 
-            await _teacherService.CreateTeacherAsync(teacher, model.Password!);
+            await _teacherService.CreateTeacherAsync(teacher, model.Password!, model.SelectedSubjectIds);
 
             TempData["SuccessMessage"] = "Teacher created successfully!";
             return RedirectToAction("Index");
         }
 
-        /// <summary>
-        /// GET: /Admin/Teachers/Edit/5
-        /// Shows edit teacher form
-        /// </summary>
         [HttpGet("Edit/{id}")]
         public async Task<IActionResult> Edit(int id)
         {
@@ -116,6 +118,17 @@ namespace StudentPerformanceTracker.WebApp.Controllers.Admin
                 return RedirectToAction("Index");
             }
 
+            var subjects = await _subjectService.GetAllSubjectsAsync();
+            var selectedSubjectIds = await _teacherService.GetTeacherSubjectIdsAsync(id);
+
+            ViewBag.Subjects = subjects.Where(s => s.IsActive)
+                .Select(s => new SelectListItem
+                {
+                    Value = s.SubjectId.ToString(),
+                    Text = $"{s.SubjectCode} - {s.SubjectName}",
+                    Selected = selectedSubjectIds.Contains(s.SubjectId)
+                }).ToList();
+
             var model = new TeacherViewModel
             {
                 TeacherId = teacher.TeacherId,
@@ -127,17 +140,13 @@ namespace StudentPerformanceTracker.WebApp.Controllers.Admin
                 DateOfBirth = teacher.DateOfBirth,
                 Age = teacher.Age,
                 Address = teacher.Address,
-                SubjectsAssigned = teacher.SubjectsAssigned,
+                SelectedSubjectIds = selectedSubjectIds,
                 IsActive = teacher.IsActive
             };
 
             return View("~/Views/Admin/TeacherManagement/Edit.cshtml", model);
         }
 
-        /// <summary>
-        /// POST: /Admin/Teachers/Edit/5
-        /// Updates an existing teacher
-        /// </summary>
         [HttpPost("Edit/{id}")]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Edit(int id, TeacherViewModel model)
@@ -147,11 +156,18 @@ namespace StudentPerformanceTracker.WebApp.Controllers.Admin
                 return NotFound();
             }
 
-            // Remove password validation for edit (password is optional when editing)
             ModelState.Remove("Password");
 
             if (!ModelState.IsValid)
             {
+                var subjects = await _subjectService.GetAllSubjectsAsync();
+                ViewBag.Subjects = subjects.Where(s => s.IsActive)
+                    .Select(s => new SelectListItem
+                    {
+                        Value = s.SubjectId.ToString(),
+                        Text = $"{s.SubjectCode} - {s.SubjectName}",
+                        Selected = model.SelectedSubjectIds.Contains(s.SubjectId)
+                    }).ToList();
                 return View("~/Views/Admin/TeacherManagement/Edit.cshtml", model);
             }
 
@@ -162,17 +178,22 @@ namespace StudentPerformanceTracker.WebApp.Controllers.Admin
                 return RedirectToAction("Index");
             }
 
-            // Check if username exists (excluding current teacher)
             if (await _teacherService.UsernameExistsAsync(model.Username, id))
             {
                 ModelState.AddModelError("Username", "Username already exists");
+                var subjects = await _subjectService.GetAllSubjectsAsync();
+                ViewBag.Subjects = subjects.Where(s => s.IsActive)
+                    .Select(s => new SelectListItem
+                    {
+                        Value = s.SubjectId.ToString(),
+                        Text = $"{s.SubjectCode} - {s.SubjectName}",
+                        Selected = model.SelectedSubjectIds.Contains(s.SubjectId)
+                    }).ToList();
                 return View("~/Views/Admin/TeacherManagement/Edit.cshtml", model);
             }
 
-            // Handle profile picture upload
             if (model.ProfilePictureFile != null)
             {
-                // Delete old picture if exists
                 if (!string.IsNullOrEmpty(teacher.ProfilePicture))
                 {
                     DeleteProfilePicture(teacher.ProfilePicture);
@@ -180,7 +201,6 @@ namespace StudentPerformanceTracker.WebApp.Controllers.Admin
                 teacher.ProfilePicture = await SaveProfilePicture(model.ProfilePictureFile);
             }
 
-            // Update teacher properties
             teacher.Username = model.Username;
             teacher.FirstName = model.FirstName;
             teacher.MiddleName = model.MiddleName;
@@ -188,25 +208,19 @@ namespace StudentPerformanceTracker.WebApp.Controllers.Admin
             teacher.DateOfBirth = model.DateOfBirth;
             teacher.Age = CalculateAge(model.DateOfBirth);
             teacher.Address = model.Address;
-            teacher.SubjectsAssigned = model.SubjectsAssigned;
             teacher.IsActive = model.IsActive;
 
-            // Update password if provided
             if (!string.IsNullOrEmpty(model.Password))
             {
                 teacher.PasswordHash = _passwordService.HashPassword(model.Password);
             }
 
-            await _teacherService.UpdateTeacherAsync(teacher);
+            await _teacherService.UpdateTeacherAsync(teacher, model.SelectedSubjectIds);
 
             TempData["SuccessMessage"] = "Teacher updated successfully!";
             return RedirectToAction("Index");
         }
 
-        /// <summary>
-        /// GET: /Admin/Teachers/Details/5
-        /// Shows teacher details
-        /// </summary>
         [HttpGet("Details/{id}")]
         public async Task<IActionResult> Details(int id)
         {
@@ -217,6 +231,8 @@ namespace StudentPerformanceTracker.WebApp.Controllers.Admin
                 return RedirectToAction("Index");
             }
 
+            var selectedSubjectIds = await _teacherService.GetTeacherSubjectIdsAsync(id);
+
             var model = new TeacherViewModel
             {
                 TeacherId = teacher.TeacherId,
@@ -228,17 +244,13 @@ namespace StudentPerformanceTracker.WebApp.Controllers.Admin
                 DateOfBirth = teacher.DateOfBirth,
                 Age = teacher.Age,
                 Address = teacher.Address,
-                SubjectsAssigned = teacher.SubjectsAssigned,
+                SelectedSubjectIds = selectedSubjectIds,
                 IsActive = teacher.IsActive
             };
 
             return View("~/Views/Admin/TeacherManagement/Details.cshtml", model);
         }
 
-        /// <summary>
-        /// POST: /Admin/Teachers/Delete/5
-        /// Deletes a teacher
-        /// </summary>
         [HttpPost("Delete/{id}")]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Delete(int id)
@@ -247,7 +259,6 @@ namespace StudentPerformanceTracker.WebApp.Controllers.Admin
             
             if (teacher != null)
             {
-                // Delete profile picture if exists
                 if (!string.IsNullOrEmpty(teacher.ProfilePicture))
                 {
                     DeleteProfilePicture(teacher.ProfilePicture);
@@ -266,15 +277,11 @@ namespace StudentPerformanceTracker.WebApp.Controllers.Admin
 
         #region Helper Methods
 
-        /// <summary>
-        /// Calculate age from date of birth
-        /// </summary>
         private int CalculateAge(DateTime dateOfBirth)
         {
             var today = DateTime.Today;
             var age = today.Year - dateOfBirth.Year;
             
-            // Adjust if birthday hasn't occurred this year
             if (dateOfBirth.Date > today.AddYears(-age))
             {
                 age--;
@@ -283,32 +290,22 @@ namespace StudentPerformanceTracker.WebApp.Controllers.Admin
             return age;
         }
 
-        /// <summary>
-        /// Save uploaded profile picture and return path
-        /// </summary>
         private async Task<string> SaveProfilePicture(IFormFile file)
         {
-            // Create uploads folder if it doesn't exist
             var uploadsFolder = Path.Combine(_environment.WebRootPath, "uploads", "teachers");
             Directory.CreateDirectory(uploadsFolder);
 
-            // Generate unique filename
             var uniqueFileName = $"{Guid.NewGuid()}_{file.FileName}";
             var filePath = Path.Combine(uploadsFolder, uniqueFileName);
 
-            // Save file
             using (var fileStream = new FileStream(filePath, FileMode.Create))
             {
                 await file.CopyToAsync(fileStream);
             }
 
-            // Return web path
             return $"/uploads/teachers/{uniqueFileName}";
         }
 
-        /// <summary>
-        /// Delete profile picture from server
-        /// </summary>
         private void DeleteProfilePicture(string filePath)
         {
             var fullPath = Path.Combine(_environment.WebRootPath, filePath.TrimStart('/'));
