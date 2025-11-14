@@ -42,31 +42,41 @@ namespace StudentPerformanceTracker.WebApp.Controllers.Admin
                 return View("~/Views/Admin/StudentManagement/Create.cshtml", model);
             }
 
-            string? profilePicturePath = null;
-            if (model.ProfilePictureFile != null)
+            try
             {
-                profilePicturePath = await SaveProfilePicture(model.ProfilePictureFile);
+                string? profilePicturePath = null;
+                if (model.ProfilePictureFile != null)
+                {
+                    profilePicturePath = await SaveProfilePicture(model.ProfilePictureFile);
+                }
+
+                var age = CalculateAge(model.DateOfBirth);
+
+                var student = new StudentManagement
+                {
+                    ProfilePicture = profilePicturePath,
+                    FirstName = model.FirstName,
+                    MiddleName = model.MiddleName,
+                    LastName = model.LastName,
+                    DateOfBirth = model.DateOfBirth,
+                    Age = age,
+                    GradeLevel = model.GradeLevel,
+                    Address = model.Address,
+                    IsActive = model.IsActive
+                };
+
+                await _studentService.CreateStudentAsync(student);
+
+                TempData["SuccessMessage"] = "Student created successfully!";
+                
+                // IMPORTANT: Always redirect after POST to prevent form resubmission
+                return RedirectToAction(nameof(Index));
             }
-
-            var age = CalculateAge(model.DateOfBirth);
-
-            var student = new StudentManagement
+            catch (Exception ex)
             {
-                ProfilePicture = profilePicturePath,
-                FirstName = model.FirstName,
-                MiddleName = model.MiddleName,
-                LastName = model.LastName,
-                DateOfBirth = model.DateOfBirth,
-                Age = age,
-                GradeLevel = model.GradeLevel,
-                Address = model.Address,
-                IsActive = model.IsActive
-            };
-
-            await _studentService.CreateStudentAsync(student);
-
-            TempData["SuccessMessage"] = "Student created successfully!";
-            return RedirectToAction("Index");
+                TempData["ErrorMessage"] = $"Error creating student: {ex.Message}";
+                return View("~/Views/Admin/StudentManagement/Create.cshtml", model);
+            }
         }
 
         [HttpGet("Edit/{id}")]
@@ -110,35 +120,45 @@ namespace StudentPerformanceTracker.WebApp.Controllers.Admin
                 return View("~/Views/Admin/StudentManagement/Edit.cshtml", model);
             }
 
-            var student = await _studentService.GetStudentByIdAsync(id);
-            if (student == null)
+            try
             {
-                TempData["ErrorMessage"] = "Student not found";
-                return RedirectToAction("Index");
-            }
-
-            if (model.ProfilePictureFile != null)
-            {
-                if (!string.IsNullOrEmpty(student.ProfilePicture))
+                var student = await _studentService.GetStudentByIdAsync(id);
+                if (student == null)
                 {
-                    DeleteProfilePicture(student.ProfilePicture);
+                    TempData["ErrorMessage"] = "Student not found";
+                    return RedirectToAction("Index");
                 }
-                student.ProfilePicture = await SaveProfilePicture(model.ProfilePictureFile);
+
+                if (model.ProfilePictureFile != null)
+                {
+                    if (!string.IsNullOrEmpty(student.ProfilePicture))
+                    {
+                        DeleteProfilePicture(student.ProfilePicture);
+                    }
+                    student.ProfilePicture = await SaveProfilePicture(model.ProfilePictureFile);
+                }
+
+                student.FirstName = model.FirstName;
+                student.MiddleName = model.MiddleName;
+                student.LastName = model.LastName;
+                student.DateOfBirth = model.DateOfBirth;
+                student.Age = CalculateAge(model.DateOfBirth);
+                student.GradeLevel = model.GradeLevel;
+                student.Address = model.Address;
+                student.IsActive = model.IsActive;
+
+                await _studentService.UpdateStudentAsync(student);
+
+                TempData["SuccessMessage"] = "Student updated successfully!";
+                
+                // Always redirect after successful POST
+                return RedirectToAction(nameof(Index));
             }
-
-            student.FirstName = model.FirstName;
-            student.MiddleName = model.MiddleName;
-            student.LastName = model.LastName;
-            student.DateOfBirth = model.DateOfBirth;
-            student.Age = CalculateAge(model.DateOfBirth);
-            student.GradeLevel = model.GradeLevel;
-            student.Address = model.Address;
-            student.IsActive = model.IsActive;
-
-            await _studentService.UpdateStudentAsync(student);
-
-            TempData["SuccessMessage"] = "Student updated successfully!";
-            return RedirectToAction("Index");
+            catch (Exception ex)
+            {
+                TempData["ErrorMessage"] = $"Error updating student: {ex.Message}";
+                return View("~/Views/Admin/StudentManagement/Edit.cshtml", model);
+            }
         }
 
         [HttpGet("Details/{id}")]
@@ -172,24 +192,31 @@ namespace StudentPerformanceTracker.WebApp.Controllers.Admin
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Delete(int id)
         {
-            var student = await _studentService.GetStudentByIdAsync(id);
-            
-            if (student != null)
+            try
             {
-                if (!string.IsNullOrEmpty(student.ProfilePicture))
+                var student = await _studentService.GetStudentByIdAsync(id);
+                
+                if (student != null)
                 {
-                    DeleteProfilePicture(student.ProfilePicture);
+                    if (!string.IsNullOrEmpty(student.ProfilePicture))
+                    {
+                        DeleteProfilePicture(student.ProfilePicture);
+                    }
+
+                    await _studentService.DeleteStudentAsync(id);
+                    TempData["SuccessMessage"] = "Student deleted successfully!";
                 }
-
-                await _studentService.DeleteStudentAsync(id);
-                TempData["SuccessMessage"] = "Student deleted successfully!";
+                else
+                {
+                    TempData["ErrorMessage"] = "Student not found";
+                }
             }
-            else
+            catch (Exception ex)
             {
-                TempData["ErrorMessage"] = "Student not found";
+                TempData["ErrorMessage"] = $"Error deleting student: {ex.Message}";
             }
 
-            return RedirectToAction("Index");
+            return RedirectToAction(nameof(Index));
         }
 
         #region Helper Methods
