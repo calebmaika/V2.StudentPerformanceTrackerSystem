@@ -1,0 +1,213 @@
+@model StudentPerformanceTracker.WebApp.Models.Admin.StudentViewModel
+
+@{
+    ViewData["Title"] = "Student Details";
+    Layout = "~/Views/Shared/_AdminLayout.cshtml";
+}
+
+<div class="container-fluid">
+    <!-- Page Header -->
+    <div class="mb-4">
+        <nav aria-label="breadcrumb">
+            <ol class="breadcrumb">
+                <li class="breadcrumb-item"><a asp-action="Index">Students</a></li>
+                <li class="breadcrumb-item active">Student Details</li>
+            </ol>
+        </nav>
+        <div class="d-flex justify-content-between align-items-center">
+            <h2 class="mb-0">
+                <i class="fas fa-user-graduate text-info"></i> Student Details
+            </h2>
+            <div>
+                <a asp-action="Edit" asp-route-id="@Model.StudentId" class="btn btn-warning">
+                    <i class="fas fa-edit"></i> Edit
+                </a>
+                <a asp-action="Index" class="btn btn-secondary">
+                    <i class="fas fa-arrow-left"></i> Back to List
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <!-- Profile Card -->
+        <div class="col-lg-4">
+            <div class="card shadow-sm mb-4">
+                <div class="card-body text-center">
+                    @if (!string.IsNullOrEmpty(Model.ProfilePicture))
+                    {
+                        <img src="@Model.ProfilePicture" alt="@Model.FullName" class="rounded-circle mb-3" style="width: 150px; height: 150px; object-fit: cover;">
+                    }
+                    else
+                    {
+                        <div class="rounded-circle bg-primary d-inline-flex align-items-center justify-content-center text-white mb-3" style="width: 150px; height: 150px; font-size: 60px;">
+                            <i class="fas fa-user-graduate"></i>
+                        </div>
+                    }
+                    <h4 class="mb-1">@Model.FullName</h4>
+                    <p class="text-muted mb-3">Grade @Model.GradeLevel Student</p>
+                    @if (Model.IsActive)
+                    {
+                        <span class="badge bg-success">Active</span>
+                    }
+                    else
+                    {
+                        <span class="badge bg-danger">Inactive</span>
+                    }
+                </div>
+            </div>
+
+            <!-- Quick Stats Card -->
+            <div class="card shadow-sm mb-4">
+                <div class="card-body">
+                    <h5 class="card-title mb-3">Quick Info</h5>
+                    <div class="d-flex justify-content-between mb-2">
+                        <span>Student ID:</span>
+                        <strong>@Model.StudentId</strong>
+                    </div>
+                    <div class="d-flex justify-content-between mb-2">
+                        <span>Age:</span>
+                        <strong>@Model.Age years</strong>
+                    </div>
+                    <div class="d-flex justify-content-between mb-2">
+                        <span>Grade Level:</span>
+                        <strong>Grade @Model.GradeLevel</strong>
+                    </div>
+                    <div class="d-flex justify-content-between">
+                        <span>Status:</span>
+                        <strong>@(Model.IsActive ? "Active" : "Inactive")</strong>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Actions Card -->
+            <div class="card shadow-sm">
+                <div class="card-body">
+                    <h5 class="card-title mb-3">Actions</h5>
+                    <div class="d-grid gap-2">
+                        <a asp-action="Edit" asp-route-id="@Model.StudentId" class="btn btn-warning">
+                            <i class="fas fa-edit"></i> Edit Student
+                        </a>
+                        <button type="button" class="btn btn-danger" onclick="confirmDelete(@Model.StudentId, '@Model.FullName')">
+                            <i class="fas fa-trash"></i> Delete Student
+                        </button>
+                        <a asp-action="Index" class="btn btn-secondary">
+                            <i class="fas fa-list"></i> View All Students
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Details Card -->
+        <div class="col-lg-8">
+            <!-- Personal Information -->
+            <div class="card shadow-sm mb-4">
+                <div class="card-header bg-white">
+                    <h5 class="mb-0">
+                        <i class="fas fa-id-card text-primary"></i> Personal Information
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <div class="row mb-3">
+                        <div class="col-md-4">
+                            <small class="text-muted">First Name</small>
+                            <p class="mb-0"><strong>@Model.FirstName</strong></p>
+                        </div>
+                        <div class="col-md-4">
+                            <small class="text-muted">Middle Name</small>
+                            <p class="mb-0"><strong>@(string.IsNullOrEmpty(Model.MiddleName) ? "N/A" : Model.MiddleName)</strong></p>
+                        </div>
+                        <div class="col-md-4">
+                            <small class="text-muted">Last Name</small>
+                            <p class="mb-0"><strong>@Model.LastName</strong></p>
+                        </div>
+                    </div>
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <small class="text-muted">Date of Birth</small>
+                            <p class="mb-0"><strong>@Model.DateOfBirth.ToString("MMMM dd, yyyy")</strong></p>
+                        </div>
+                        <div class="col-md-6">
+                            <small class="text-muted">Age</small>
+                            <p class="mb-0"><strong>@Model.Age years old</strong></p>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-12">
+                            <small class="text-muted">Address</small>
+                            <p class="mb-0"><strong>@Model.Address</strong></p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Academic Information -->
+            <div class="card shadow-sm">
+                <div class="card-header bg-white">
+                    <h5 class="mb-0">
+                        <i class="fas fa-graduation-cap text-success"></i> Academic Information
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <small class="text-muted">Grade Level</small>
+                            <p class="mb-0">
+                                <span class="badge bg-primary" style="font-size: 16px;">Grade @Model.GradeLevel</span>
+                            </p>
+                        </div>
+                        <div class="col-md-6">
+                            <small class="text-muted">Status</small>
+                            <p class="mb-0">
+                                @if (Model.IsActive)
+                                {
+                                    <span class="badge bg-success">Active Student</span>
+                                }
+                                else
+                                {
+                                    <span class="badge bg-danger">Inactive Student</span>
+                                }
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Delete Confirmation Modal -->
+<div class="modal fade" id="deleteModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Confirm Delete</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <p>Are you sure you want to delete <strong id="studentName"></strong>?</p>
+                <p class="text-danger mb-0">
+                    <i class="fas fa-exclamation-triangle"></i> This action cannot be undone.
+                </p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                <form id="deleteForm" method="post" class="d-inline">
+                    @Html.AntiForgeryToken()
+                    <button type="submit" class="btn btn-danger">Delete</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        function confirmDelete(studentId, studentName) {
+            document.getElementById('studentName').textContent = studentName;
+            document.getElementById('deleteForm').action = '/Admin/Students/Delete/' + studentId;
+            new bootstrap.Modal(document.getElementById('deleteModal')).show();
+        }
+    </script>
+}

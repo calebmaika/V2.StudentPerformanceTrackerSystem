@@ -36,6 +36,22 @@ build_metadata.AdditionalFiles.CssScope =
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcQWRtaW5cTG9naW4uY3NodG1s
 build_metadata.AdditionalFiles.CssScope = 
 
+[C:/Users/Administrator/Desktop/StudentPerformanceTracker/StudentPerformanceTracker.WebApp/Views/Admin/StudentManagement/Create.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcQWRtaW5cU3R1ZGVudE1hbmFnZW1lbnRcQ3JlYXRlLmNzaHRtbA==
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/Administrator/Desktop/StudentPerformanceTracker/StudentPerformanceTracker.WebApp/Views/Admin/StudentManagement/Details.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcQWRtaW5cU3R1ZGVudE1hbmFnZW1lbnRcRGV0YWlscy5jc2h0bWw=
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/Administrator/Desktop/StudentPerformanceTracker/StudentPerformanceTracker.WebApp/Views/Admin/StudentManagement/Edit.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcQWRtaW5cU3R1ZGVudE1hbmFnZW1lbnRcRWRpdC5jc2h0bWw=
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/Administrator/Desktop/StudentPerformanceTracker/StudentPerformanceTracker.WebApp/Views/Admin/StudentManagement/Index.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcQWRtaW5cU3R1ZGVudE1hbmFnZW1lbnRcSW5kZXguY3NodG1s
+build_metadata.AdditionalFiles.CssScope = 
+
 [C:/Users/Administrator/Desktop/StudentPerformanceTracker/StudentPerformanceTracker.WebApp/Views/Admin/SubjectManagement/Create.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcQWRtaW5cU3ViamVjdE1hbmFnZW1lbnRcQ3JlYXRlLmNzaHRtbA==
 build_metadata.AdditionalFiles.CssScope = 

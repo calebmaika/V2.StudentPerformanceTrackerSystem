@@ -2,6 +2,7 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using StudentPerformanceTracker.Data.Context;
 
@@ -10,9 +11,11 @@ using StudentPerformanceTracker.Data.Context;
 namespace StudentPerformanceTracker.Data.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20251114121700_AddStudentManagement")]
+    partial class AddStudentManagement
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder.HasAnnotation("ProductVersion", "9.0.0");
@@ -66,7 +69,7 @@ namespace StudentPerformanceTracker.Data.Migrations
                         new
                         {
                             AdminId = 1,
-                            CreatedAt = new DateTime(2025, 11, 14, 13, 27, 49, 752, DateTimeKind.Utc).AddTicks(4490),
+                            CreatedAt = new DateTime(2025, 11, 14, 12, 16, 59, 723, DateTimeKind.Utc).AddTicks(9952),
                             Email = "admin@studenttracker.com",
                             FullName = "System Administrator",
                             IsActive = true,
@@ -113,10 +116,6 @@ namespace StudentPerformanceTracker.Data.Migrations
 
                     b.Property<string>("MiddleName")
                         .HasMaxLength(100)
-                        .HasColumnType("TEXT");
-
-                    b.Property<string>("ProfilePicture")
-                        .HasMaxLength(255)
                         .HasColumnType("TEXT");
 
                     b.Property<DateTime?>("UpdatedAt")
