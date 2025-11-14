@@ -38,7 +38,7 @@ namespace StudentPerformanceTracker.WebApp.Controllers.Admin
         public async Task<IActionResult> Index()
         {
             var teachers = await _teacherService.GetAllTeachersAsync();
-            return View("~/Views/Admin/Teachers/Index.cshtml", teachers);
+            return View("~/Views/Admin/TeacherManagement/Index.cshtml", teachers);
         }
 
         /// <summary>
@@ -48,7 +48,7 @@ namespace StudentPerformanceTracker.WebApp.Controllers.Admin
         [HttpGet("Create")]
         public IActionResult Create()
         {
-            return View("~/Views/Admin/Teachers/Create.cshtml", new TeacherViewModel());
+            return View("~/Views/Admin/TeacherManagement/Create.cshtml", new TeacherViewModel());
         }
 
         /// <summary>
@@ -61,14 +61,14 @@ namespace StudentPerformanceTracker.WebApp.Controllers.Admin
         {
             if (!ModelState.IsValid)
             {
-                return View("~/Views/Admin/Teachers/Create.cshtml", model);
+                return View("~/Views/Admin/TeacherManagement/Create.cshtml", model);
             }
 
             // Check if username already exists
             if (await _teacherService.UsernameExistsAsync(model.Username))
             {
                 ModelState.AddModelError("Username", "Username already exists");
-                return View("~/Views/Admin/Teachers/Create.cshtml", model);
+                return View("~/Views/Admin/TeacherManagement/Create.cshtml", model);
             }
 
             // Handle profile picture upload
@@ -131,7 +131,7 @@ namespace StudentPerformanceTracker.WebApp.Controllers.Admin
                 IsActive = teacher.IsActive
             };
 
-            return View("~/Views/Admin/Teachers/Edit.cshtml", model);
+            return View("~/Views/Admin/TeacherManagement/Edit.cshtml", model);
         }
 
         /// <summary>
@@ -152,7 +152,7 @@ namespace StudentPerformanceTracker.WebApp.Controllers.Admin
 
             if (!ModelState.IsValid)
             {
-                return View("~/Views/Admin/Teachers/Edit.cshtml", model);
+                return View("~/Views/Admin/TeacherManagement/Edit.cshtml", model);
             }
 
             var teacher = await _teacherService.GetTeacherByIdAsync(id);
@@ -166,7 +166,7 @@ namespace StudentPerformanceTracker.WebApp.Controllers.Admin
             if (await _teacherService.UsernameExistsAsync(model.Username, id))
             {
                 ModelState.AddModelError("Username", "Username already exists");
-                return View("~/Views/Admin/Teachers/Edit.cshtml", model);
+                return View("~/Views/Admin/TeacherManagement/Edit.cshtml", model);
             }
 
             // Handle profile picture upload
@@ -232,7 +232,7 @@ namespace StudentPerformanceTracker.WebApp.Controllers.Admin
                 IsActive = teacher.IsActive
             };
 
-            return View("~/Views/Admin/Teachers/Details.cshtml", model);
+            return View("~/Views/Admin/TeacherManagement/Details.cshtml", model);
         }
 
         /// <summary>

@@ -2,6 +2,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using StudentPerformanceTracker.Data.Context;
 using StudentPerformanceTracker.Services.Authentication;
+using StudentPerformanceTracker.Services.Teachers;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -31,6 +32,7 @@ builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationSc
 // Scoped = new instance per request
 builder.Services.AddScoped<IPasswordService, PasswordService>();
 builder.Services.AddScoped<IAdminAuthenticationService, AuthenticationService>();
+builder.Services.AddScoped<ITeacherService, TeacherService>();
 
 // Add Session support (optional but useful)
 builder.Services.AddSession(options =>

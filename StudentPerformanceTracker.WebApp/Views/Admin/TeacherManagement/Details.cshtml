@@ -1,0 +1,179 @@
+@model StudentPerformanceTracker.WebApp.Models.Admin.TeacherViewModel
+
+@{
+    ViewData["Title"] = "Teacher Details";
+    Layout = "~/Views/Shared/_AdminLayout.cshtml";
+}
+
+<div class="container-fluid">
+    <!-- Page Header -->
+    <div class="mb-4">
+        <nav aria-label="breadcrumb">
+            <ol class="breadcrumb">
+                <li class="breadcrumb-item"><a asp-action="Index">Teachers</a></li>
+                <li class="breadcrumb-item active">Teacher Details</li>
+            </ol>
+        </nav>
+        <div class="d-flex justify-content-between align-items-center">
+            <h2 class="mb-0">
+                <i class="fas fa-user-circle text-info"></i> Teacher Details
+            </h2>
+            <div>
+                <a asp-action="Edit" asp-route-id="@Model.TeacherId" class="btn btn-warning">
+                    <i class="fas fa-edit"></i> Edit
+                </a>
+                <a asp-action="Index" class="btn btn-secondary">
+                    <i class="fas fa-arrow-left"></i> Back to List
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <!-- Profile Card -->
+        <div class="col-lg-4">
+            <div class="card shadow-sm mb-4">
+                <div class="card-body text-center">
+                    @if (!string.IsNullOrEmpty(Model.ProfilePicture))
+                    {
+                        <img src="@Model.ProfilePicture" alt="@Model.FullName" class="rounded-circle mb-3" style="width: 150px; height: 150px; object-fit: cover;">
+                    }
+                    else
+                    {
+                        <div class="rounded-circle bg-secondary d-inline-flex align-items-center justify-content-center text-white mb-3" style="width: 150px; height: 150px; font-size: 60px;">
+                            <i class="fas fa-user"></i>
+                        </div>
+                    }
+                    <h4 class="mb-1">@Model.FullName</h4>
+                    <p class="text-muted mb-3">@Model.Username</p>
+                    @if (Model.IsActive)
+                    {
+                        <span class="badge bg-success">Active</span>
+                    }
+                    else
+                    {
+                        <span class="badge bg-danger">Inactive</span>
+                    }
+                </div>
+            </div>
+
+            <!-- Quick Stats Card -->
+            <div class="card shadow-sm">
+                <div class="card-body">
+                    <h5 class="card-title mb-3">Quick Stats</h5>
+                    <div class="d-flex justify-content-between mb-2">
+                        <span>Teacher ID:</span>
+                        <strong>@Model.TeacherId</strong>
+                    </div>
+                    <div class="d-flex justify-content-between mb-2">
+                        <span>Age:</span>
+                        <strong>@Model.Age years</strong>
+                    </div>
+                    <div class="d-flex justify-content-between">
+                        <span>Status:</span>
+                        <strong>@(Model.IsActive ? "Active" : "Inactive")</strong>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Details Card -->
+        <div class="col-lg-8">
+            <!-- Personal Information -->
+            <div class="card shadow-sm mb-4">
+                <div class="card-header bg-white">
+                    <h5 class="mb-0">
+                        <i class="fas fa-id-card text-primary"></i> Personal Information
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <div class="row mb-3">
+                        <div class="col-md-4">
+                            <small class="text-muted">First Name</small>
+                            <p class="mb-0"><strong>@Model.FirstName</strong></p>
+                        </div>
+                        <div class="col-md-4">
+                            <small class="text-muted">Middle Name</small>
+                            <p class="mb-0"><strong>@(string.IsNullOrEmpty(Model.MiddleName) ? "N/A" : Model.MiddleName)</strong></p>
+                        </div>
+                        <div class="col-md-4">
+                            <small class="text-muted">Last Name</small>
+                            <p class="mb-0"><strong>@Model.LastName</strong></p>
+                        </div>
+                    </div>
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <small class="text-muted">Date of Birth</small>
+                            <p class="mb-0"><strong>@Model.DateOfBirth.ToString("MMMM dd, yyyy")</strong></p>
+                        </div>
+                        <div class="col-md-6">
+                            <small class="text-muted">Age</small>
+                            <p class="mb-0"><strong>@Model.Age years old</strong></p>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-12">
+                            <small class="text-muted">Address</small>
+                            <p class="mb-0"><strong>@Model.Address</strong></p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Account Information -->
+            <div class="card shadow-sm mb-4">
+                <div class="card-header bg-white">
+                    <h5 class="mb-0">
+                        <i class="fas fa-user-circle text-success"></i> Account Information
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <small class="text-muted">Username</small>
+                            <p class="mb-0"><strong>@Model.Username</strong></p>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <small class="text-muted">Account Status</small>
+                            <p class="mb-0">
+                                @if (Model.IsActive)
+                                {
+                                    <span class="badge bg-success">Active</span>
+                                }
+                                else
+                                {
+                                    <span class="badge bg-danger">Inactive</span>
+                                }
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Teaching Information -->
+            <div class="card shadow-sm">
+                <div class="card-header bg-white">
+                    <h5 class="mb-0">
+                        <i class="fas fa-book text-info"></i> Teaching Information
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <small class="text-muted">Subjects Assigned</small>
+                    @if (!string.IsNullOrEmpty(Model.SubjectsAssigned))
+                    {
+                        <p class="mb-0">
+                            @foreach (var subject in Model.SubjectsAssigned.Split(','))
+                            {
+                                <span class="badge bg-info me-1">@subject.Trim()</span>
+                            }
+                        </p>
+                    }
+                    else
+                    {
+                        <p class="mb-0 text-muted">No subjects assigned</p>
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
