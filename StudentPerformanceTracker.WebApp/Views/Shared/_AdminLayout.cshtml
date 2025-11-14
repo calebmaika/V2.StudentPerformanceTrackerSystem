@@ -26,12 +26,23 @@
             --white: #ffffff;
             --sidebar-width: 260px;
             --topbar-height: 64px;
+            --border-color: #e2e8f0;
+        }
+
+        /* Dark mode variables */
+        [data-theme="dark"] {
+            --dark: #f1f5f9;
+            --gray: #cbd5e1;
+            --light-gray: #1e293b;
+            --white: #0f172a;
+            --border-color: #334155;
         }
 
         body {
             font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
             background: var(--light-gray);
             color: var(--dark);
+            transition: background-color 0.3s ease, color 0.3s ease;
         }
 
         /* Sidebar */
@@ -42,7 +53,7 @@
             height: 100vh;
             width: var(--sidebar-width);
             background: var(--white);
-            border-right: 1px solid #e2e8f0;
+            border-right: 1px solid var(--border-color);
             z-index: 1000;
             transition: all 0.3s ease;
         }
@@ -52,7 +63,7 @@
             display: flex;
             align-items: center;
             padding: 0 24px;
-            border-bottom: 1px solid #e2e8f0;
+            border-bottom: 1px solid var(--border-color);
         }
 
         .brand-icon {
@@ -67,7 +78,7 @@
         }
 
         .brand-icon i {
-            color: var(--white);
+            color: #ffffff;
             font-size: 18px;
         }
 
@@ -132,6 +143,10 @@
             color: var(--primary);
         }
 
+        [data-theme="dark"] .nav-link.active {
+            background: #1e3a8a;
+        }
+
         .nav-link.active::before {
             content: '';
             position: absolute;
@@ -151,7 +166,7 @@
         .nav-badge {
             margin-left: auto;
             background: var(--primary);
-            color: var(--white);
+            color: #ffffff;
             font-size: 11px;
             font-weight: 600;
             padding: 2px 8px;
@@ -164,7 +179,7 @@
             left: 0;
             width: 100%;
             padding: 16px 24px;
-            border-top: 1px solid #e2e8f0;
+            border-top: 1px solid var(--border-color);
             background: var(--white);
         }
 
@@ -181,7 +196,7 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            color: var(--white);
+            color: #ffffff;
             font-weight: 600;
             font-size: 14px;
             margin-right: 12px;
@@ -209,7 +224,7 @@
         .topbar {
             height: var(--topbar-height);
             background: var(--white);
-            border-bottom: 1px solid #e2e8f0;
+            border-bottom: 1px solid var(--border-color);
             display: flex;
             align-items: center;
             justify-content: space-between;
@@ -261,6 +276,54 @@
             background: #ef4444;
             border-radius: 50%;
             border: 2px solid var(--white);
+        }
+
+        /* Dark Mode Toggle Button */
+        .theme-toggle {
+            width: 40px;
+            height: 40px;
+            border-radius: 8px;
+            border: none;
+            background: var(--light-gray);
+            color: var(--dark);
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .theme-toggle:hover {
+            background: var(--primary);
+            color: #ffffff;
+            transform: scale(1.05);
+        }
+
+        .theme-toggle i {
+            position: absolute;
+            transition: all 0.3s ease;
+        }
+
+        .theme-toggle .fa-sun {
+            opacity: 1;
+            transform: rotate(0deg) scale(1);
+        }
+
+        .theme-toggle .fa-moon {
+            opacity: 0;
+            transform: rotate(180deg) scale(0);
+        }
+
+        [data-theme="dark"] .theme-toggle .fa-sun {
+            opacity: 0;
+            transform: rotate(-180deg) scale(0);
+        }
+
+        [data-theme="dark"] .theme-toggle .fa-moon {
+            opacity: 1;
+            transform: rotate(0deg) scale(1);
         }
 
         .logout-btn {
@@ -354,12 +417,65 @@
         }
 
         .sidebar-nav::-webkit-scrollbar-thumb {
-            background: #e2e8f0;
+            background: var(--border-color);
             border-radius: 3px;
         }
 
         .sidebar-nav::-webkit-scrollbar-thumb:hover {
-            background: #cbd5e1;
+            background: var(--gray);
+        }
+
+        /* Cards dark mode support */
+        .card {
+            background: var(--white);
+            border-color: var(--border-color);
+            color: var(--dark);
+        }
+
+        .card-header {
+            border-color: var(--border-color);
+        }
+
+        /* Tables dark mode support */
+        .table {
+            color: var(--dark);
+        }
+
+        .table-light {
+            background-color: var(--light-gray);
+            color: var(--dark);
+        }
+
+        /* Form controls dark mode */
+        .form-control, .form-select {
+            background-color: var(--white);
+            border-color: var(--border-color);
+            color: var(--dark);
+        }
+
+        .form-control:focus, .form-select:focus {
+            background-color: var(--white);
+            color: var(--dark);
+            border-color: var(--primary);
+        }
+
+        /* Alerts dark mode */
+        [data-theme="dark"] .alert-success {
+            background-color: #064e3b;
+            border-color: #065f46;
+            color: #a7f3d0;
+        }
+
+        [data-theme="dark"] .alert-danger {
+            background-color: #7f1d1d;
+            border-color: #991b1b;
+            color: #fecaca;
+        }
+
+        [data-theme="dark"] .alert-info {
+            background-color: #1e3a8a;
+            border-color: #1e40af;
+            color: #bfdbfe;
         }
     </style>
 </head>
@@ -386,7 +502,7 @@
                 <div class="nav-section-title">Main</div>
                 <ul>
                     <li class="nav-item">
-                        <a href="/Admin/Dashboard" class="nav-link active">
+                        <a href="/Admin/Dashboard" class="nav-link">
                             <i class="fas fa-th-large"></i>
                             <span>Dashboard</span>
                         </a>
@@ -460,6 +576,12 @@
                 <h2>@ViewData["Title"]</h2>
             </div>
             <div class="topbar-right">
+                <!-- Dark Mode Toggle -->
+                <button class="theme-toggle" id="themeToggle" title="Toggle Dark Mode">
+                    <i class="fas fa-sun"></i>
+                    <i class="fas fa-moon"></i>
+                </button>
+
                 <!-- Notifications -->
                 <button class="topbar-btn">
                     <i class="fas fa-bell"></i>
@@ -505,6 +627,28 @@
         sidebarOverlay?.addEventListener('click', () => {
             sidebar.classList.remove('active');
             sidebarOverlay.classList.remove('active');
+        });
+
+        // Dark Mode Toggle
+        const themeToggle = document.getElementById('themeToggle');
+        const htmlElement = document.documentElement;
+
+        // Check for saved theme preference or default to light mode
+        const currentTheme = localStorage.getItem('theme') || 'light';
+        htmlElement.setAttribute('data-theme', currentTheme);
+
+        themeToggle.addEventListener('click', () => {
+            const currentTheme = htmlElement.getAttribute('data-theme');
+            const newTheme = currentTheme === 'light' ? 'dark' : 'light';
+            
+            htmlElement.setAttribute('data-theme', newTheme);
+            localStorage.setItem('theme', newTheme);
+            
+            // Optional: Add a subtle animation
+            themeToggle.style.transform = 'rotate(360deg)';
+            setTimeout(() => {
+                themeToggle.style.transform = 'rotate(0deg)';
+            }, 300);
         });
 
         // Set active nav link based on current URL
