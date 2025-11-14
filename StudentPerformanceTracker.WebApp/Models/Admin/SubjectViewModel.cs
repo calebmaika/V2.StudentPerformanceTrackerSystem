@@ -24,27 +24,6 @@ namespace StudentPerformanceTracker.WebApp.Models.Admin
         [DataType(DataType.MultilineText)]
         public string? Description { get; set; }
 
-        [Required(ErrorMessage = "Units is required")]
-        [Range(1, 10, ErrorMessage = "Units must be between 1 and 10")]
-        [Display(Name = "Units/Credits")]
-        public int Units { get; set; } = 3;
-
-        [StringLength(100, ErrorMessage = "Category cannot exceed 100 characters")]
-        [Display(Name = "Category")]
-        public string? Category { get; set; }
-
-        [StringLength(100, ErrorMessage = "Level cannot exceed 100 characters")]
-        [Display(Name = "Academic Level")]
-        public string? Level { get; set; }
-
-        [StringLength(50, ErrorMessage = "Semester cannot exceed 50 characters")]
-        [Display(Name = "Semester")]
-        public string? Semester { get; set; }
-
-        [StringLength(20, ErrorMessage = "School year cannot exceed 20 characters")]
-        [Display(Name = "School Year")]
-        public string? SchoolYear { get; set; }
-
         [Display(Name = "Active")]
         public bool IsActive { get; set; } = true;
     }

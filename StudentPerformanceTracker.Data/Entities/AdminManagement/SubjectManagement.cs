@@ -35,36 +35,6 @@ namespace StudentPerformanceTracker.Data.Entities.AdminManagement
         public string? Description { get; set; }
 
         /// <summary>
-        /// Number of units/credits
-        /// </summary>
-        [Required]
-        public int Units { get; set; } = 3;
-
-        /// <summary>
-        /// Subject category (e.g., "Core", "Elective", "Major")
-        /// </summary>
-        [MaxLength(100)]
-        public string? Category { get; set; }
-
-        /// <summary>
-        /// Academic level (e.g., "Grade 7", "Grade 8", "Year 1")
-        /// </summary>
-        [MaxLength(100)]
-        public string? Level { get; set; }
-
-        /// <summary>
-        /// Semester (e.g., "1st Semester", "2nd Semester")
-        /// </summary>
-        [MaxLength(50)]
-        public string? Semester { get; set; }
-
-        /// <summary>
-        /// School year (e.g., "2024-2025")
-        /// </summary>
-        [MaxLength(20)]
-        public string? SchoolYear { get; set; }
-
-        /// <summary>
         /// When this subject record was created
         /// </summary>
         public DateTime CreatedAt { get; set; } = DateTime.UtcNow;

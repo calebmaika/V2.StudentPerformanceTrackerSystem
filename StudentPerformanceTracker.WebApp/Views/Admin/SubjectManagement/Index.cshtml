@@ -18,35 +18,6 @@
         box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1);
     }
 
-    .subject-badge {
-        display: inline-block;
-        padding: 6px 12px;
-        border-radius: 8px;
-        font-size: 12px;
-        font-weight: 600;
-        text-transform: uppercase;
-    }
-
-    .badge-core {
-        background: #dbeafe;
-        color: #1e40af;
-    }
-
-    .badge-elective {
-        background: #fef3c7;
-        color: #92400e;
-    }
-
-    .badge-major {
-        background: #d1fae5;
-        color: #065f46;
-    }
-
-    .badge-minor {
-        background: #e9d5ff;
-        color: #6b21a8;
-    }
-
     .filter-section {
         background: var(--white);
         border-radius: 12px;
@@ -104,25 +75,6 @@
         margin: 4px 0;
         font-size: 14px;
         color: var(--gray);
-    }
-
-    .subject-meta {
-        display: flex;
-        gap: 16px;
-        flex-wrap: wrap;
-        margin-top: 12px;
-    }
-
-    .subject-meta-item {
-        display: flex;
-        align-items: center;
-        gap: 6px;
-        font-size: 13px;
-        color: var(--gray);
-    }
-
-    .subject-meta-item i {
-        color: var(--primary);
     }
 
     .subject-actions {
@@ -193,7 +145,7 @@
             <h2 class="mb-1">
                 <i class="fas fa-book text-primary"></i> Subject Management
             </h2>
-            <p class="text-muted mb-0">Manage all subjects and courses in the system</p>
+            <p class="text-muted mb-0">Manage all subjects in the system</p>
         </div>
         <a asp-action="Create" class="btn btn-primary">
             <i class="fas fa-plus"></i> Add New Subject
@@ -219,24 +171,14 @@
     <!-- Filter Section -->
     <div class="filter-section">
         <div class="row align-items-end">
-            <div class="col-md-4 mb-3 mb-md-0">
+            <div class="col-md-6 mb-3 mb-md-0">
                 <label class="form-label small fw-semibold">Search</label>
                 <div class="input-group">
                     <span class="input-group-text bg-white">
                         <i class="fas fa-search"></i>
                     </span>
-                    <input type="text" id="searchInput" class="form-control" placeholder="Search by code, name, or category...">
+                    <input type="text" id="searchInput" class="form-control" placeholder="Search by code or name...">
                 </div>
-            </div>
-            <div class="col-md-2 mb-3 mb-md-0">
-                <label class="form-label small fw-semibold">Category</label>
-                <select id="categoryFilter" class="form-select">
-                    <option value="">All Categories</option>
-                    <option value="core">Core</option>
-                    <option value="elective">Elective</option>
-                    <option value="major">Major</option>
-                    <option value="minor">Minor</option>
-                </select>
             </div>
             <div class="col-md-2 mb-3 mb-md-0">
                 <label class="form-label small fw-semibold">Status</label>
@@ -253,8 +195,6 @@
                     <option value="code-desc">Code (Z-A)</option>
                     <option value="name">Name (A-Z)</option>
                     <option value="name-desc">Name (Z-A)</option>
-                    <option value="units">Units (Low to High)</option>
-                    <option value="units-desc">Units (High to Low)</option>
                 </select>
             </div>
             <div class="col-md-2 text-end">
@@ -285,19 +225,11 @@
                 <div class="subject-card" 
                      data-code="@subject.SubjectCode.ToLower()" 
                      data-name="@subject.SubjectName.ToLower()" 
-                     data-category="@(subject.Category?.ToLower() ?? "")"
-                     data-status="@(subject.IsActive ? "active" : "inactive")"
-                     data-units="@subject.Units">
+                     data-status="@(subject.IsActive ? "active" : "inactive")">
                     <div class="subject-content">
                         <!-- Badge Container -->
                         <div class="subject-badge-container">
-                            <span class="badge bg-primary d-block mb-2">@subject.SubjectCode</span>
-                            @if (!string.IsNullOrEmpty(subject.Category))
-                            {
-                                <span class="subject-badge badge-@(subject.Category.ToLower()) d-block">
-                                    @subject.Category
-                                </span>
-                            }
+                            <span class="badge bg-primary d-block">@subject.SubjectCode</span>
                         </div>
 
                         <!-- Info -->
@@ -317,34 +249,6 @@
                             {
                                 <p class="text-muted small mb-0">@subject.Description</p>
                             }
-                            
-                            <div class="subject-meta">
-                                <div class="subject-meta-item">
-                                    <i class="fas fa-book-open"></i>
-                                    <span>@subject.Units Units</span>
-                                </div>
-                                @if (!string.IsNullOrEmpty(subject.Level))
-                                {
-                                    <div class="subject-meta-item">
-                                        <i class="fas fa-layer-group"></i>
-                                        <span>@subject.Level</span>
-                                    </div>
-                                }
-                                @if (!string.IsNullOrEmpty(subject.Semester))
-                                {
-                                    <div class="subject-meta-item">
-                                        <i class="fas fa-calendar"></i>
-                                        <span>@subject.Semester</span>
-                                    </div>
-                                }
-                                @if (!string.IsNullOrEmpty(subject.SchoolYear))
-                                {
-                                    <div class="subject-meta-item">
-                                        <i class="fas fa-graduation-cap"></i>
-                                        <span>@subject.SchoolYear</span>
-                                    </div>
-                                }
-                            </div>
                         </div>
 
                         <!-- Actions -->
@@ -417,20 +321,16 @@
         let allCards = [];
         let filteredCards = [];
 
-        // Initialize
         document.addEventListener('DOMContentLoaded', function() {
             allCards = Array.from(document.querySelectorAll('.subject-card'));
             filteredCards = [...allCards];
             applyFilters();
         });
 
-        // Search and filter
         document.getElementById('searchInput').addEventListener('input', applyFilters);
-        document.getElementById('categoryFilter').addEventListener('change', applyFilters);
         document.getElementById('statusFilter').addEventListener('change', applyFilters);
         document.getElementById('sortBy').addEventListener('change', applyFilters);
 
-        // View toggle
         document.querySelectorAll('.view-toggle-btn').forEach(btn => {
             btn.addEventListener('click', function() {
                 const view = this.getAttribute('data-view');
@@ -444,29 +344,23 @@
 
         function applyFilters() {
             const searchTerm = document.getElementById('searchInput').value.toLowerCase();
-            const categoryFilter = document.getElementById('categoryFilter').value.toLowerCase();
             const statusFilter = document.getElementById('statusFilter').value;
             const sortBy = document.getElementById('sortBy').value;
 
-            // Filter
             filteredCards = allCards.filter(card => {
                 const code = card.getAttribute('data-code');
                 const name = card.getAttribute('data-name');
-                const category = card.getAttribute('data-category');
                 const status = card.getAttribute('data-status');
 
                 const matchesSearch = !searchTerm || 
                     code.includes(searchTerm) || 
-                    name.includes(searchTerm) ||
-                    category.includes(searchTerm);
+                    name.includes(searchTerm);
                 
-                const matchesCategory = !categoryFilter || category === categoryFilter;
                 const matchesStatus = !statusFilter || status === statusFilter;
 
-                return matchesSearch && matchesCategory && matchesStatus;
+                return matchesSearch && matchesStatus;
             });
 
-            // Sort
             filteredCards.sort((a, b) => {
                 switch(sortBy) {
                     case 'code':
@@ -477,10 +371,6 @@
                         return a.getAttribute('data-name').localeCompare(b.getAttribute('data-name'));
                     case 'name-desc':
                         return b.getAttribute('data-name').localeCompare(a.getAttribute('data-name'));
-                    case 'units':
-                        return parseInt(a.getAttribute('data-units')) - parseInt(b.getAttribute('data-units'));
-                    case 'units-desc':
-                        return parseInt(b.getAttribute('data-units')) - parseInt(a.getAttribute('data-units'));
                     default:
                         return 0;
                 }
@@ -494,7 +384,6 @@
             const container = document.getElementById('subjectsContainer');
             const noResults = document.getElementById('noResults');
             
-            // Hide all cards
             allCards.forEach(card => card.style.display = 'none');
 
             if (filteredCards.length === 0) {
@@ -506,7 +395,6 @@
             container.style.display = container.classList.contains('grid-view') ? 'grid' : 'block';
             noResults.style.display = 'none';
 
-            // Show filtered cards
             filteredCards.forEach(card => {
                 card.style.display = '';
                 container.appendChild(card);
@@ -519,7 +407,6 @@
 
         function resetFilters() {
             document.getElementById('searchInput').value = '';
-            document.getElementById('categoryFilter').value = '';
             document.getElementById('statusFilter').value = '';
             document.getElementById('sortBy').value = 'code';
             applyFilters();
@@ -531,7 +418,6 @@
             new bootstrap.Modal(document.getElementById('deleteModal')).show();
         }
 
-        // Auto-hide alerts
         setTimeout(() => {
             const alerts = document.querySelectorAll('.alert');
             alerts.forEach(alert => {
