@@ -13,6 +13,7 @@ namespace StudentPerformanceTracker.Data.Context
 
         public DbSet<Admin> Admins { get; set; }
         public DbSet<TeacherManagement> Teachers { get; set; } 
+        public DbSet<SubjectManagement> Subjects { get; set; }
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
@@ -36,6 +37,13 @@ namespace StudentPerformanceTracker.Data.Context
                 entity.HasKey(e => e.TeacherId);
                 entity.HasIndex(e => e.Username).IsUnique();
                 entity.ToTable("Teachers");
+            });
+
+            modelBuilder.Entity<SubjectManagement>(entity =>
+            {
+                entity.HasKey(e => e.SubjectId);
+                entity.HasIndex(e => e.SubjectCode).IsUnique();
+                entity.ToTable("Subjects");
             });
 
             modelBuilder.Entity<Admin>().HasData(

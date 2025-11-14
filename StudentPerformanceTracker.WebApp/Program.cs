@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Authentication.Cookies;
 using StudentPerformanceTracker.Data.Context;
 using StudentPerformanceTracker.Services.Authentication;
 using StudentPerformanceTracker.Services.Teachers;
+using StudentPerformanceTracker.Services.Subject;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -33,6 +34,7 @@ builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationSc
 builder.Services.AddScoped<IPasswordService, PasswordService>();
 builder.Services.AddScoped<IAdminAuthenticationService, AuthenticationService>();
 builder.Services.AddScoped<ITeacherService, TeacherService>();
+builder.Services.AddScoped<ISubjectService, SubjectService>();
 
 // Add Session support (optional but useful)
 builder.Services.AddSession(options =>
@@ -87,3 +89,10 @@ using (var scope = app.Services.CreateScope())
 }
 
 app.Run();
+
+
+//add migration
+//dotnet ef migrations add <migrationName> --project StudentPerformanceTracker.Data --startup-project StudentPerformanceTracker.WebApp
+
+// Update database
+//dotnet ef database update --project StudentPerformanceTracker.Data --startup-project StudentPerformanceTracker.WebApp
