@@ -66,13 +66,118 @@ namespace StudentPerformanceTracker.Data.Migrations
                         new
                         {
                             AdminId = 1,
-                            CreatedAt = new DateTime(2025, 11, 14, 13, 27, 49, 752, DateTimeKind.Utc).AddTicks(4490),
+                            CreatedAt = new DateTime(2025, 11, 14, 15, 17, 49, 446, DateTimeKind.Utc).AddTicks(4665),
                             Email = "admin@studenttracker.com",
                             FullName = "System Administrator",
                             IsActive = true,
                             PasswordHash = "$2a$11$xN8PkDz7Y.X/VGqKb6Cv3e8YqJH8xZGxHvZHKYNJzKvNx6mW5yTCq",
                             Username = "admin"
                         });
+                });
+
+            modelBuilder.Entity("StudentPerformanceTracker.Data.Entities.AdminManagement.CurriculumManagement", b =>
+                {
+                    b.Property<int>("CurriculumId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("INTEGER");
+
+                    b.Property<string>("AcademicYear")
+                        .IsRequired()
+                        .HasMaxLength(20)
+                        .HasColumnType("TEXT");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("CurriculumCode")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("CurriculumName")
+                        .IsRequired()
+                        .HasMaxLength(200)
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("Description")
+                        .HasMaxLength(1000)
+                        .HasColumnType("TEXT");
+
+                    b.Property<int>("GradeLevel")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<bool>("IsActive")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<string>("Semester")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("TEXT");
+
+                    b.Property<DateTime?>("UpdatedAt")
+                        .HasColumnType("TEXT");
+
+                    b.HasKey("CurriculumId");
+
+                    b.HasIndex("CurriculumCode")
+                        .IsUnique();
+
+                    b.ToTable("Curriculums", (string)null);
+                });
+
+            modelBuilder.Entity("StudentPerformanceTracker.Data.Entities.AdminManagement.CurriculumStudent", b =>
+                {
+                    b.Property<int>("CurriculumStudentId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("INTEGER");
+
+                    b.Property<int>("CurriculumId")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<DateTime>("EnrolledAt")
+                        .HasColumnType("TEXT");
+
+                    b.Property<int>("StudentId")
+                        .HasColumnType("INTEGER");
+
+                    b.HasKey("CurriculumStudentId");
+
+                    b.HasIndex("StudentId");
+
+                    b.HasIndex("CurriculumId", "StudentId")
+                        .IsUnique();
+
+                    b.ToTable("CurriculumStudents", (string)null);
+                });
+
+            modelBuilder.Entity("StudentPerformanceTracker.Data.Entities.AdminManagement.CurriculumSubject", b =>
+                {
+                    b.Property<int>("CurriculumSubjectId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("INTEGER");
+
+                    b.Property<DateTime>("AssignedAt")
+                        .HasColumnType("TEXT");
+
+                    b.Property<int>("CurriculumId")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<int>("SubjectId")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<int>("TeacherId")
+                        .HasColumnType("INTEGER");
+
+                    b.HasKey("CurriculumSubjectId");
+
+                    b.HasIndex("SubjectId");
+
+                    b.HasIndex("TeacherId");
+
+                    b.HasIndex("CurriculumId", "SubjectId")
+                        .IsUnique();
+
+                    b.ToTable("CurriculumSubjects", (string)null);
                 });
 
             modelBuilder.Entity("StudentPerformanceTracker.Data.Entities.AdminManagement.StudentManagement", b =>
@@ -251,6 +356,52 @@ namespace StudentPerformanceTracker.Data.Migrations
                     b.ToTable("TeacherSubjects", (string)null);
                 });
 
+            modelBuilder.Entity("StudentPerformanceTracker.Data.Entities.AdminManagement.CurriculumStudent", b =>
+                {
+                    b.HasOne("StudentPerformanceTracker.Data.Entities.AdminManagement.CurriculumManagement", "Curriculum")
+                        .WithMany("CurriculumStudents")
+                        .HasForeignKey("CurriculumId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("StudentPerformanceTracker.Data.Entities.AdminManagement.StudentManagement", "Student")
+                        .WithMany()
+                        .HasForeignKey("StudentId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("Curriculum");
+
+                    b.Navigation("Student");
+                });
+
+            modelBuilder.Entity("StudentPerformanceTracker.Data.Entities.AdminManagement.CurriculumSubject", b =>
+                {
+                    b.HasOne("StudentPerformanceTracker.Data.Entities.AdminManagement.CurriculumManagement", "Curriculum")
+                        .WithMany("CurriculumSubjects")
+                        .HasForeignKey("CurriculumId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("StudentPerformanceTracker.Data.Entities.AdminManagement.SubjectManagement", "Subject")
+                        .WithMany()
+                        .HasForeignKey("SubjectId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("StudentPerformanceTracker.Data.Entities.AdminManagement.TeacherManagement", "Teacher")
+                        .WithMany()
+                        .HasForeignKey("TeacherId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("Curriculum");
+
+                    b.Navigation("Subject");
+
+                    b.Navigation("Teacher");
+                });
+
             modelBuilder.Entity("StudentPerformanceTracker.Data.Entities.AdminManagement.TeacherSubject", b =>
                 {
                     b.HasOne("StudentPerformanceTracker.Data.Entities.AdminManagement.SubjectManagement", "Subject")
@@ -268,6 +419,13 @@ namespace StudentPerformanceTracker.Data.Migrations
                     b.Navigation("Subject");
 
                     b.Navigation("Teacher");
+                });
+
+            modelBuilder.Entity("StudentPerformanceTracker.Data.Entities.AdminManagement.CurriculumManagement", b =>
+                {
+                    b.Navigation("CurriculumStudents");
+
+                    b.Navigation("CurriculumSubjects");
                 });
 
             modelBuilder.Entity("StudentPerformanceTracker.Data.Entities.AdminManagement.SubjectManagement", b =>

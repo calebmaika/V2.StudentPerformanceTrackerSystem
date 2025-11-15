@@ -5,6 +5,7 @@ using StudentPerformanceTracker.Services.Authentication;
 using StudentPerformanceTracker.Services.Teachers;
 using StudentPerformanceTracker.Services.Subject;
 using StudentPerformanceTracker.Services.Students;
+using StudentPerformanceTracker.Services.Curriculum;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -37,6 +38,7 @@ builder.Services.AddScoped<IAdminAuthenticationService, AuthenticationService>()
 builder.Services.AddScoped<ITeacherService, TeacherService>();
 builder.Services.AddScoped<ISubjectService, SubjectService>();
 builder.Services.AddScoped<IStudentService, StudentService>();
+builder.Services.AddScoped<ICurriculumService, CurriculumService>();
 
 // Add Session support (optional but useful)
 builder.Services.AddSession(options =>

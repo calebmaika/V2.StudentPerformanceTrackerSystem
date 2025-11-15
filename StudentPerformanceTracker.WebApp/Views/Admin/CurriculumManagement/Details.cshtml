@@ -1,0 +1,323 @@
+@model StudentPerformanceTracker.WebApp.Models.Admin.CurriculumViewModel
+
+@{
+    ViewData["Title"] = "Curriculum Details";
+    Layout = "~/Views/Shared/_AdminLayout.cshtml";
+}
+
+<style>
+    .info-card {
+        background: var(--card-bg);
+        border: 1px solid var(--border-color);
+        border-radius: 12px;
+        padding: 20px;
+        margin-bottom: 20px;
+    }
+
+    .info-card h5 {
+        font-size: 16px;
+        font-weight: 600;
+        color: var(--text-primary);
+        margin-bottom: 16px;
+        padding-bottom: 12px;
+        border-bottom: 2px solid var(--border-color);
+    }
+
+    .info-row {
+        display: flex;
+        justify-content: space-between;
+        padding: 12px 0;
+        border-bottom: 1px solid var(--border-color);
+    }
+
+    .info-row:last-child {
+        border-bottom: none;
+    }
+
+    .info-label {
+        font-weight: 500;
+        color: var(--text-muted);
+        font-size: 14px;
+    }
+
+    .info-value {
+        font-weight: 600;
+        color: var(--text-primary);
+        font-size: 14px;
+    }
+
+    .subject-teacher-list {
+        list-style: none;
+        padding: 0;
+        margin: 0;
+    }
+
+    .subject-teacher-item {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 12px;
+        background: var(--light-gray);
+        border-radius: 8px;
+        margin-bottom: 8px;
+    }
+
+    .subject-name {
+        font-weight: 600;
+        color: var(--text-primary);
+    }
+
+    .teacher-name {
+        color: var(--text-muted);
+        font-size: 14px;
+    }
+
+    .student-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+        gap: 12px;
+    }
+
+    .student-card {
+        padding: 12px;
+        background: var(--light-gray);
+        border-radius: 8px;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
+
+    .student-card i {
+        color: var(--primary);
+    }
+
+    .stat-box {
+        text-align: center;
+        padding: 20px;
+        background: var(--light-gray);
+        border-radius: 12px;
+    }
+
+    .stat-box h3 {
+        font-size: 32px;
+        font-weight: 700;
+        color: var(--primary);
+        margin: 0;
+    }
+
+    .stat-box p {
+        font-size: 14px;
+        color: var(--text-muted);
+        margin: 8px 0 0 0;
+    }
+
+    .action-buttons {
+        display: flex;
+        gap: 12px;
+    }
+</style>
+
+<div class="container-fluid">
+    <!-- Page Header -->
+    <div class="mb-4">
+        <nav aria-label="breadcrumb">
+            <ol class="breadcrumb">
+                <li class="breadcrumb-item"><a asp-action="Index">Curriculum</a></li>
+                <li class="breadcrumb-item active">Curriculum Details</li>
+            </ol>
+        </nav>
+        <div class="d-flex justify-content-between align-items-center">
+            <div>
+                <h2 class="mb-1">
+                    <i class="fas fa-clipboard-list text-info"></i> @Model.CurriculumName
+                </h2>
+                <div class="d-flex align-items-center gap-2 mt-2">
+                    <span class="badge bg-primary">@Model.CurriculumCode</span>
+                    @if (Model.IsActive)
+                    {
+                        <span class="badge bg-success">Active</span>
+                    }
+                    else
+                    {
+                        <span class="badge bg-danger">Inactive</span>
+                    }
+                </div>
+            </div>
+            <div class="action-buttons">
+                <a asp-action="Edit" asp-route-id="@Model.CurriculumId" class="btn btn-warning">
+                    <i class="fas fa-edit"></i> Edit
+                </a>
+                <button type="button" class="btn btn-danger" onclick="confirmDelete(@Model.CurriculumId, '@Model.CurriculumName')">
+                    <i class="fas fa-trash"></i> Delete
+                </button>
+                <a asp-action="Index" class="btn btn-secondary">
+                    <i class="fas fa-arrow-left"></i> Back to List
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <!-- Left Column -->
+        <div class="col-lg-4">
+            <!-- Quick Stats -->
+            <div class="row mb-4">
+                <div class="col-12 mb-3">
+                    <div class="stat-box">
+                        <h3>@Model.SubjectTeacherAssignments.Count</h3>
+                        <p>Subjects</p>
+                    </div>
+                </div>
+                <div class="col-12 mb-3">
+                    <div class="stat-box">
+                        <h3>@Model.SubjectTeacherAssignments.Select(s => s.TeacherId).Distinct().Count()</h3>
+                        <p>Teachers</p>
+                    </div>
+                </div>
+                <div class="col-12 mb-3">
+                    <div class="stat-box">
+                        <h3>@Model.SelectedStudentIds.Count</h3>
+                        <p>Students Enrolled</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Basic Information -->
+            <div class="info-card">
+                <h5><i class="fas fa-info-circle"></i> Basic Information</h5>
+                <div class="info-row">
+                    <span class="info-label">Curriculum Code</span>
+                    <span class="info-value">@Model.CurriculumCode</span>
+                </div>
+                <div class="info-row">
+                    <span class="info-label">Academic Year</span>
+                    <span class="info-value">@Model.AcademicYear</span>
+                </div>
+                <div class="info-row">
+                    <span class="info-label">Semester</span>
+                    <span class="info-value">@Model.Semester</span>
+                </div>
+                <div class="info-row">
+                    <span class="info-label">Grade Level</span>
+                    <span class="info-value">Grade @Model.GradeLevel</span>
+                </div>
+                <div class="info-row">
+                    <span class="info-label">Status</span>
+                    <span class="info-value">
+                        @if (Model.IsActive)
+                        {
+                            <span class="badge bg-success">Active</span>
+                        }
+                        else
+                        {
+                            <span class="badge bg-danger">Inactive</span>
+                        }
+                    </span>
+                </div>
+            </div>
+
+            @if (!string.IsNullOrEmpty(Model.Description))
+            {
+                <div class="info-card">
+                    <h5><i class="fas fa-align-left"></i> Description</h5>
+                    <p class="text-muted mb-0">@Model.Description</p>
+                </div>
+            }
+        </div>
+
+        <!-- Right Column -->
+        <div class="col-lg-8">
+            <!-- Subjects & Teachers -->
+            <div class="info-card mb-4">
+                <h5><i class="fas fa-chalkboard"></i> Subjects & Teachers</h5>
+                @if (Model.SubjectTeacherAssignments.Any())
+                {
+                    <ul class="subject-teacher-list">
+                        @foreach (var assignment in Model.SubjectTeacherAssignments)
+                        {
+                            <li class="subject-teacher-item">
+                                <div>
+                                    <div class="subject-name">
+                                        <i class="fas fa-book text-primary"></i>
+                                        @assignment.SubjectName
+                                    </div>
+                                </div>
+                                <div class="teacher-name">
+                                    <i class="fas fa-chalkboard-teacher"></i>
+                                    @assignment.TeacherName
+                                </div>
+                            </li>
+                        }
+                    </ul>
+                }
+                else
+                {
+                    <p class="text-muted mb-0">No subjects assigned yet.</p>
+                }
+            </div>
+
+            <!-- Enrolled Students -->
+            <div class="info-card">
+                <h5><i class="fas fa-users"></i> Enrolled Students (@Model.SelectedStudentIds.Count)</h5>
+                @inject StudentPerformanceTracker.Services.Students.IStudentService StudentService
+                @if (Model.SelectedStudentIds.Any())
+                {
+                    var allStudents = await StudentService.GetAllStudentsAsync();
+                    var enrolledStudents = allStudents.Where(s => Model.SelectedStudentIds.Contains(s.StudentId)).ToList();
+                    
+                    <div class="student-grid">
+                        @foreach (var student in enrolledStudents)
+                        {
+                            <div class="student-card">
+                                <i class="fas fa-user-graduate"></i>
+                                <div>
+                                    <div style="font-weight: 600; font-size: 14px;">@student.FullName</div>
+                                    <div style="font-size: 12px; color: var(--text-muted);">Grade @student.GradeLevel</div>
+                                </div>
+                            </div>
+                        }
+                    </div>
+                }
+                else
+                {
+                    <p class="text-muted mb-0">No students enrolled yet.</p>
+                }
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Delete Confirmation Modal -->
+<div class="modal fade" id="deleteModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Confirm Delete</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <p>Are you sure you want to delete <strong id="curriculumName"></strong>?</p>
+                <p class="text-danger mb-0">
+                    <i class="fas fa-exclamation-triangle"></i> This action cannot be undone and will remove all associated data.
+                </p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                <form id="deleteForm" method="post" class="d-inline">
+                    @Html.AntiForgeryToken()
+                    <button type="submit" class="btn btn-danger">Delete</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        function confirmDelete(curriculumId, curriculumName) {
+            document.getElementById('curriculumName').textContent = curriculumName;
+            document.getElementById('deleteForm').action = '/Admin/Curriculums/Delete/' + curriculumId;
+            new bootstrap.Modal(document.getElementById('deleteModal')).show();
+        }
+    </script>
+}

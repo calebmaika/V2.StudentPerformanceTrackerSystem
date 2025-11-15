@@ -1,0 +1,402 @@
+@model List<StudentPerformanceTracker.Data.Entities.AdminManagement.CurriculumManagement>
+
+@{
+    ViewData["Title"] = "Curriculum Management";
+    Layout = "~/Views/Shared/_AdminLayout.cshtml";
+}
+
+<style>
+    .curriculum-card {
+        transition: all 0.3s ease;
+        border: 1px solid var(--border-color);
+        background: var(--white);
+        border-radius: 12px;
+        margin-bottom: 20px;
+    }
+
+    .curriculum-card:hover {
+        transform: translateY(-4px);
+        box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1);
+    }
+
+    .curriculum-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 20px;
+        border-bottom: 1px solid var(--border-color);
+    }
+
+    .curriculum-info h5 {
+        margin: 0;
+        font-size: 18px;
+        font-weight: 600;
+        color: var(--dark);
+    }
+
+    .curriculum-meta {
+        display: flex;
+        gap: 12px;
+        margin-top: 8px;
+        flex-wrap: wrap;
+    }
+
+    .curriculum-meta-item {
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        font-size: 13px;
+        color: var(--gray);
+    }
+
+    .curriculum-meta-item i {
+        color: var(--primary);
+    }
+
+    .curriculum-body {
+        padding: 20px;
+    }
+
+    .curriculum-stats {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+        gap: 16px;
+        margin-bottom: 16px;
+    }
+
+    .stat-box {
+        text-align: center;
+        padding: 16px;
+        background: var(--light-gray);
+        border-radius: 8px;
+    }
+
+    .stat-box h6 {
+        font-size: 24px;
+        font-weight: 700;
+        color: var(--primary);
+        margin: 0;
+    }
+
+    .stat-box p {
+        font-size: 12px;
+        color: var(--text-muted);
+        margin: 4px 0 0 0;
+    }
+
+    .curriculum-actions {
+        display: flex;
+        gap: 8px;
+    }
+
+    .filter-section {
+        background: var(--white);
+        border-radius: 12px;
+        padding: 20px;
+        margin-bottom: 24px;
+        border: 1px solid var(--border-color);
+    }
+
+    .filter-badge {
+        background: var(--primary);
+        color: white;
+        padding: 4px 12px;
+        border-radius: 12px;
+        font-size: 12px;
+        font-weight: 600;
+    }
+</style>
+
+<div class="container-fluid">
+    <!-- Page Header -->
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h2 class="mb-1">
+                <i class="fas fa-clipboard-list text-primary"></i> Curriculum Management
+            </h2>
+            <p class="text-muted mb-0">Manage all curriculum programs in the system</p>
+        </div>
+        <a asp-action="Create" class="btn btn-primary">
+            <i class="fas fa-plus"></i> Create New Curriculum
+        </a>
+    </div>
+
+    <!-- Success/Error Messages -->
+    @if (TempData["SuccessMessage"] != null)
+    {
+        <div class="alert alert-success alert-dismissible fade show" role="alert">
+            <i class="fas fa-check-circle"></i> @TempData["SuccessMessage"]
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+    }
+    @if (TempData["ErrorMessage"] != null)
+    {
+        <div class="alert alert-danger alert-dismissible fade show" role="alert">
+            <i class="fas fa-exclamation-circle"></i> @TempData["ErrorMessage"]
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+    }
+
+    <!-- Filter Section -->
+    <div class="filter-section">
+        <div class="row align-items-end">
+            <div class="col-md-4 mb-3 mb-md-0">
+                <label class="form-label small fw-semibold">Search</label>
+                <div class="input-group">
+                    <span class="input-group-text bg-white">
+                        <i class="fas fa-search"></i>
+                    </span>
+                    <input type="text" id="searchInput" class="form-control" placeholder="Search by name or code...">
+                </div>
+            </div>
+            <div class="col-md-2 mb-3 mb-md-0">
+                <label class="form-label small fw-semibold">Grade Level</label>
+                <select id="gradeLevelFilter" class="form-select">
+                    <option value="">All Grades</option>
+                    <option value="7">Grade 7</option>
+                    <option value="8">Grade 8</option>
+                    <option value="9">Grade 9</option>
+                    <option value="10">Grade 10</option>
+                </select>
+            </div>
+            <div class="col-md-2 mb-3 mb-md-0">
+                <label class="form-label small fw-semibold">Status</label>
+                <select id="statusFilter" class="form-select">
+                    <option value="">All Status</option>
+                    <option value="active">Active</option>
+                    <option value="inactive">Inactive</option>
+                </select>
+            </div>
+            <div class="col-md-2 mb-3 mb-md-0">
+                <label class="form-label small fw-semibold">Academic Year</label>
+                <select id="yearFilter" class="form-select">
+                    <option value="">All Years</option>
+                    @{
+                        var currentYear = DateTime.Now.Year;
+                        for (int i = 0; i < 5; i++)
+                        {
+                            var year = currentYear - i;
+                            <option value="@($"{year}-{year + 1}")">@($"{year}-{year + 1}")</option>
+                        }
+                    }
+                </select>
+            </div>
+        </div>
+        <div class="mt-3 d-flex align-items-center gap-2">
+            <span class="small text-muted">Results:</span>
+            <span class="filter-badge" id="resultCount">@Model.Count</span>
+            <span class="small text-muted">curriculums found</span>
+        </div>
+    </div>
+
+    <!-- Curriculum List -->
+    <div id="curriculumContainer">
+        @if (Model.Any())
+        {
+            foreach (var curriculum in Model)
+            {
+                <div class="curriculum-card" 
+                     data-name="@curriculum.CurriculumName.ToLower()" 
+                     data-code="@curriculum.CurriculumCode.ToLower()"
+                     data-grade="@curriculum.GradeLevel"
+                     data-year="@curriculum.AcademicYear"
+                     data-status="@(curriculum.IsActive ? "active" : "inactive")">
+                    <div class="curriculum-header">
+                        <div class="curriculum-info flex-grow-1">
+                            <div class="d-flex align-items-center gap-2">
+                                <h5>@curriculum.CurriculumName</h5>
+                                <span class="badge bg-primary">@curriculum.CurriculumCode</span>
+                                @if (curriculum.IsActive)
+                                {
+                                    <span class="badge bg-success">Active</span>
+                                }
+                                else
+                                {
+                                    <span class="badge bg-danger">Inactive</span>
+                                }
+                            </div>
+                            <div class="curriculum-meta">
+                                <div class="curriculum-meta-item">
+                                    <i class="fas fa-calendar"></i>
+                                    <span>@curriculum.AcademicYear - @curriculum.Semester</span>
+                                </div>
+                                <div class="curriculum-meta-item">
+                                    <i class="fas fa-graduation-cap"></i>
+                                    <span>Grade @curriculum.GradeLevel</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="curriculum-actions">
+                            <a asp-action="Details" asp-route-id="@curriculum.CurriculumId" class="btn btn-info btn-sm">
+                                <i class="fas fa-eye"></i> View
+                            </a>
+                            <a asp-action="Edit" asp-route-id="@curriculum.CurriculumId" class="btn btn-warning btn-sm">
+                                <i class="fas fa-edit"></i> Edit
+                            </a>
+                            <button type="button" class="btn btn-danger btn-sm" onclick="confirmDelete(@curriculum.CurriculumId, '@curriculum.CurriculumName')">
+                                <i class="fas fa-trash"></i> Delete
+                            </button>
+                        </div>
+                    </div>
+                    <div class="curriculum-body">
+                        <div class="curriculum-stats">
+                            <div class="stat-box">
+                                <h6>@curriculum.CurriculumSubjects.Count</h6>
+                                <p>Subjects</p>
+                            </div>
+                            <div class="stat-box">
+                                <h6>@curriculum.CurriculumSubjects.Select(cs => cs.TeacherId).Distinct().Count()</h6>
+                                <p>Teachers</p>
+                            </div>
+                            <div class="stat-box">
+                                <h6>@curriculum.CurriculumStudents.Count</h6>
+                                <p>Students Enrolled</p>
+                            </div>
+                        </div>
+                        @if (!string.IsNullOrEmpty(curriculum.Description))
+                        {
+                            <p class="text-muted small mb-0">@curriculum.Description</p>
+                        }
+                    </div>
+                </div>
+            }
+        }
+        else
+        {
+            <div class="text-center py-5">
+                <i class="fas fa-clipboard-list fa-4x text-muted mb-3"></i>
+                <h4 class="text-muted">No Curriculums Found</h4>
+                <p class="text-muted">Get started by creating your first curriculum program.</p>
+                <a asp-action="Create" class="btn btn-primary mt-3">
+                    <i class="fas fa-plus"></i> Create First Curriculum
+                </a>
+            </div>
+        }
+    </div>
+
+    <!-- No Results Message -->
+    <div id="noResults" class="text-center py-5" style="display: none;">
+        <i class="fas fa-search fa-4x text-muted mb-3"></i>
+        <h4 class="text-muted">No Curriculums Match Your Search</h4>
+        <p class="text-muted">Try adjusting your filters or search terms.</p>
+        <button class="btn btn-secondary mt-3" onclick="resetFilters()">
+            <i class="fas fa-redo"></i> Reset Filters
+        </button>
+    </div>
+</div>
+
+<!-- Delete Confirmation Modal -->
+<div class="modal fade" id="deleteModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Confirm Delete</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <p>Are you sure you want to delete <strong id="curriculumName"></strong>?</p>
+                <p class="text-danger mb-0">
+                    <i class="fas fa-exclamation-triangle"></i> This action cannot be undone and will remove all associated data.
+                </p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                <form id="deleteForm" method="post" class="d-inline">
+                    @Html.AntiForgeryToken()
+                    <button type="submit" class="btn btn-danger">Delete</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        let allCards = [];
+        let filteredCards = [];
+
+        document.addEventListener('DOMContentLoaded', function() {
+            allCards = Array.from(document.querySelectorAll('.curriculum-card'));
+            filteredCards = [...allCards];
+            applyFilters();
+        });
+
+        document.getElementById('searchInput').addEventListener('input', applyFilters);
+        document.getElementById('gradeLevelFilter').addEventListener('change', applyFilters);
+        document.getElementById('statusFilter').addEventListener('change', applyFilters);
+        document.getElementById('yearFilter').addEventListener('change', applyFilters);
+
+        function applyFilters() {
+            const searchTerm = document.getElementById('searchInput').value.toLowerCase();
+            const gradeLevelFilter = document.getElementById('gradeLevelFilter').value;
+            const statusFilter = document.getElementById('statusFilter').value;
+            const yearFilter = document.getElementById('yearFilter').value;
+
+            filteredCards = allCards.filter(card => {
+                const name = card.getAttribute('data-name');
+                const code = card.getAttribute('data-code');
+                const grade = card.getAttribute('data-grade');
+                const year = card.getAttribute('data-year');
+                const status = card.getAttribute('data-status');
+
+                const matchesSearch = !searchTerm || name.includes(searchTerm) || code.includes(searchTerm);
+                const matchesGrade = !gradeLevelFilter || grade === gradeLevelFilter;
+                const matchesStatus = !statusFilter || status === statusFilter;
+                const matchesYear = !yearFilter || year === yearFilter;
+
+                return matchesSearch && matchesGrade && matchesStatus && matchesYear;
+            });
+
+            displayResults();
+            updateResultCount();
+        }
+
+        function displayResults() {
+            const container = document.getElementById('curriculumContainer');
+            const noResults = document.getElementById('noResults');
+
+            allCards.forEach(card => card.style.display = 'none');
+
+            if (filteredCards.length === 0) {
+                container.style.display = 'none';
+                noResults.style.display = 'block';
+                return;
+            }
+
+            container.style.display = 'block';
+            noResults.style.display = 'none';
+
+            filteredCards.forEach(card => {
+                card.style.display = 'block';
+            });
+        }
+
+        function updateResultCount() {
+            document.getElementById('resultCount').textContent = filteredCards.length;
+        }
+
+        function resetFilters() {
+            document.getElementById('searchInput').value = '';
+            document.getElementById('gradeLevelFilter').value = '';
+            document.getElementById('statusFilter').value = '';
+            document.getElementById('yearFilter').value = '';
+            applyFilters();
+        }
+
+        function confirmDelete(curriculumId, curriculumName) {
+            document.getElementById('curriculumName').textContent = curriculumName;
+            document.getElementById('deleteForm').action = '/Admin/Curriculums/Delete/' + curriculumId;
+            new bootstrap.Modal(document.getElementById('deleteModal')).show();
+        }
+
+        // Auto-hide alerts
+        setTimeout(() => {
+            const alerts = document.querySelectorAll('.alert');
+            alerts.forEach(alert => {
+                alert.style.transition = 'opacity 0.5s';
+                alert.style.opacity = '0';
+                setTimeout(() => alert.remove(), 500);
+            });
+        }, 5000);
+    </script>
+}

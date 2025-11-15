@@ -1,0 +1,430 @@
+@model StudentPerformanceTracker.WebApp.Models.Admin.CurriculumViewModel
+
+@{
+    ViewData["Title"] = "Edit Curriculum";
+    Layout = "~/Views/Shared/_AdminLayout.cshtml";
+}
+
+<style>
+    .student-selection-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+        gap: 12px;
+        max-height: 400px;
+        overflow-y: auto;
+        padding: 12px;
+        background: var(--light-gray);
+        border-radius: 8px;
+    }
+
+    .student-checkbox-item {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        padding: 8px;
+        background: var(--white);
+        border-radius: 6px;
+        cursor: pointer;
+        transition: all 0.2s;
+    }
+
+    .student-checkbox-item:hover {
+        background: var(--primary);
+        color: white;
+    }
+
+    .student-checkbox-item input[type="checkbox"] {
+        cursor: pointer;
+    }
+
+    .student-checkbox-item label {
+        cursor: pointer;
+        margin: 0;
+        flex: 1;
+        font-size: 14px;
+    }
+
+    .selected-count {
+        background: var(--primary);
+        color: white;
+        padding: 4px 12px;
+        border-radius: 12px;
+        font-size: 12px;
+        font-weight: 600;
+    }
+
+    .add-subject-btn {
+        width: 100%;
+        border: 2px dashed var(--border-color);
+        background: transparent;
+        color: var(--primary);
+        padding: 12px;
+        border-radius: 8px;
+        cursor: pointer;
+        transition: all 0.2s;
+    }
+
+    .add-subject-btn:hover {
+        background: var(--light-gray);
+        border-color: var(--primary);
+    }
+
+    #subjectTeacherTable tbody tr {
+        vertical-align: middle;
+    }
+
+    #subjectTeacherTable tbody tr:hover {
+        background-color: var(--light-gray);
+    }
+
+    .subject-code-display {
+        font-weight: 600;
+        color: var(--primary);
+        font-size: 14px;
+    }
+
+    .subject-name-display {
+        color: var(--text-primary);
+        font-weight: 500;
+    }
+
+    .table-responsive {
+        border: 1px solid var(--border-color);
+        border-radius: 8px;
+        overflow: hidden;
+    }
+</style>
+
+<div class="container-fluid">
+    <!-- Page Header -->
+    <div class="mb-4">
+        <nav aria-label="breadcrumb">
+            <ol class="breadcrumb">
+                <li class="breadcrumb-item"><a asp-action="Index">Curriculum</a></li>
+                <li class="breadcrumb-item active">Edit Curriculum</li>
+            </ol>
+        </nav>
+        <h2 class="mb-1">
+            <i class="fas fa-edit text-warning"></i> Edit Curriculum
+        </h2>
+        <p class="text-muted">Update curriculum information</p>
+    </div>
+
+    <!-- Form Card -->
+    <div class="row">
+        <div class="col-lg-10">
+            <div class="card shadow-sm">
+                <div class="card-body p-4">
+                    <form asp-action="Edit" method="post" id="editCurriculumForm">
+                        <input type="hidden" asp-for="CurriculumId" />
+                        <div asp-validation-summary="ModelOnly" class="alert alert-danger"></div>
+
+                        <!-- Basic Information Section -->
+                        <h5 class="mb-3 pb-2 border-bottom">
+                            <i class="fas fa-info-circle"></i> Basic Information
+                        </h5>
+                        
+                        <div class="row mb-4">
+                            <div class="col-md-6 mb-3">
+                                <label asp-for="CurriculumName" class="form-label"></label>
+                                <input asp-for="CurriculumName" class="form-control">
+                                <span asp-validation-for="CurriculumName" class="text-danger"></span>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label asp-for="CurriculumCode" class="form-label"></label>
+                                <input asp-for="CurriculumCode" class="form-control" style="text-transform: uppercase;">
+                                <span asp-validation-for="CurriculumCode" class="text-danger"></span>
+                            </div>
+                        </div>
+
+                        <div class="row mb-4">
+                            <div class="col-md-4 mb-3">
+                                <label asp-for="AcademicYear" class="form-label"></label>
+                                <input asp-for="AcademicYear" class="form-control">
+                                <span asp-validation-for="AcademicYear" class="text-danger"></span>
+                            </div>
+                            <div class="col-md-4 mb-3">
+                                <label asp-for="Semester" class="form-label"></label>
+                                <select asp-for="Semester" class="form-select">
+                                    <option value="">Select Semester</option>
+                                    <option value="First Semester">First Semester</option>
+                                    <option value="Second Semester">Second Semester</option>
+                                </select>
+                                <span asp-validation-for="Semester" class="text-danger"></span>
+                            </div>
+                            <div class="col-md-4 mb-3">
+                                <label asp-for="GradeLevel" class="form-label"></label>
+                                <select asp-for="GradeLevel" class="form-select">
+                                    <option value="">Select Grade Level</option>
+                                    <option value="7">Grade 7</option>
+                                    <option value="8">Grade 8</option>
+                                    <option value="9">Grade 9</option>
+                                    <option value="10">Grade 10</option>
+                                </select>
+                                <span asp-validation-for="GradeLevel" class="text-danger"></span>
+                            </div>
+                        </div>
+
+                        <div class="mb-4">
+                            <label asp-for="Description" class="form-label"></label>
+                            <textarea asp-for="Description" class="form-control" rows="3"></textarea>
+                            <span asp-validation-for="Description" class="text-danger"></span>
+                        </div>
+
+                        <!-- Subject-Teacher Assignment Section -->
+                        <h5 class="mb-3 pb-2 border-bottom">
+                            <i class="fas fa-chalkboard"></i> Subject & Teacher Assignment
+                        </h5>
+                        
+                        <div class="table-responsive mb-4">
+                            <table class="table table-bordered" id="subjectTeacherTable">
+                                <thead class="table-light">
+                                    <tr>
+                                        <th style="width: 50px;">#</th>
+                                        <th>Subject Code</th>
+                                        <th>Subject Name</th>
+                                        <th>Assigned Teacher</th>
+                                        <th style="width: 80px;">Action</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="subjectAssignmentsContainer">
+                                    <!-- Existing subject assignments will be loaded here -->
+                                </tbody>
+                            </table>
+                        </div>
+
+                        <button type="button" class="add-subject-btn mb-4" onclick="addSubjectAssignment()">
+                            <i class="fas fa-plus-circle"></i> Add Subject
+                        </button>
+
+                        <!-- Student Selection Section -->
+                        <h5 class="mb-3 pb-2 border-bottom">
+                            <i class="fas fa-users"></i> Student Enrollment 
+                            <span class="selected-count" id="selectedCount">0 selected</span>
+                        </h5>
+                        
+                        <div class="mb-3">
+                            <input type="text" id="studentSearch" class="form-control" placeholder="Search students...">
+                        </div>
+
+                        <div class="student-selection-grid" id="studentGrid">
+                            @if (ViewBag.Students != null)
+                            {
+                                foreach (var student in ViewBag.Students)
+                                {
+                                    var isSelected = Model.SelectedStudentIds.Contains(int.Parse(student.Value));
+                                    <div class="student-checkbox-item" data-name="@student.Text.ToLower()">
+                                        <input type="checkbox" name="SelectedStudentIds" value="@student.Value" id="student_@student.Value" @(isSelected ? "checked" : "")>
+                                        <label for="student_@student.Value">@student.Text</label>
+                                    </div>
+                                }
+                            }
+                            else
+                            {
+                                <p class="text-muted">No students available</p>
+                            }
+                        </div>
+
+                        <!-- Status -->
+                        <div class="my-4">
+                            <div class="form-check form-switch">
+                                <input asp-for="IsActive" class="form-check-input" type="checkbox">
+                                <label asp-for="IsActive" class="form-check-label"></label>
+                            </div>
+                        </div>
+
+                        <!-- Form Actions -->
+                        <div class="d-flex justify-content-end gap-2 pt-3 border-top">
+                            <a asp-action="Index" class="btn btn-secondary">
+                                <i class="fas fa-times"></i> Cancel
+                            </a>
+                            <button type="submit" class="btn btn-warning">
+                                <i class="fas fa-save"></i> Update Curriculum
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script src="~/lib/jquery-validation/dist/jquery.validate.min.js"></script>
+    <script src="~/lib/jquery-validation-unobtrusive/jquery.validate.unobtrusive.min.js"></script>
+    <script>
+        // Store available subjects and teachers
+        const subjects = @Html.Raw(Json.Serialize(ViewBag.Subjects));
+        const teachers = @Html.Raw(Json.Serialize(ViewBag.Teachers));
+        
+        // Existing assignments from model
+        const existingAssignments = @Html.Raw(Json.Serialize(Model.SubjectTeacherAssignments));
+        
+        let assignmentIndex = 0;
+        let rowNumber = 1;
+
+        // Auto-uppercase curriculum code
+        document.querySelector('input[name="CurriculumCode"]').addEventListener('input', function() {
+            this.value = this.value.toUpperCase();
+        });
+
+        // Add subject assignment
+        function addSubjectAssignment(subjectId = '', teacherId = '') {
+            const container = document.getElementById('subjectAssignmentsContainer');
+            const index = assignmentIndex++;
+            const currentRow = rowNumber++;
+
+            const row = document.createElement('tr');
+            row.id = `assignment-row-${index}`;
+            
+            if (subjectId && teacherId) {
+                // For existing assignments - show them already selected
+                const selectedSubject = subjects.find(s => s.value == subjectId);
+                const selectedTeacher = teachers.find(t => t.value == teacherId);
+                
+                if (selectedSubject) {
+                    const subjectCode = selectedSubject.text.split(' - ')[0];
+                    const subjectName = selectedSubject.text.split(' - ')[1] || selectedSubject.text;
+                    
+                    row.innerHTML = `
+                        <td class="text-center">${currentRow}</td>
+                        <td>
+                            <span class="subject-code-display">${subjectCode}</span>
+                            <input type="hidden" name="SubjectTeacherAssignments[${index}].SubjectId" value="${subjectId}">
+                        </td>
+                        <td>
+                            <span class="subject-name-display">${subjectName}</span>
+                        </td>
+                        <td>
+                            <select name="SubjectTeacherAssignments[${index}].TeacherId" class="form-select form-select-sm" required>
+                                <option value="">Select Teacher</option>
+                                ${teachers.map(t => `<option value="${t.value}" ${t.value == teacherId ? 'selected' : ''}>${t.text}</option>`).join('')}
+                            </select>
+                        </td>
+                        <td class="text-center">
+                            <button type="button" class="btn btn-danger btn-sm" onclick="removeSubjectAssignment(${index})">
+                                <i class="fas fa-trash"></i>
+                            </button>
+                        </td>
+                    `;
+                }
+            } else {
+                // For new assignments - show dropdowns
+                row.innerHTML = `
+                    <td class="text-center">${currentRow}</td>
+                    <td>
+                        <select name="SubjectTeacherAssignments[${index}].SubjectId" class="form-select form-select-sm" required onchange="updateSubjectDisplay(${index})">
+                            <option value="">Select Subject</option>
+                            ${subjects.map(s => `<option value="${s.value}" data-code="${s.text.split(' - ')[0]}" data-name="${s.text.split(' - ')[1] || s.text}">${s.text}</option>`).join('')}
+                        </select>
+                    </td>
+                    <td>
+                        <span id="subject-name-display-${index}" class="subject-name-display">-</span>
+                    </td>
+                    <td>
+                        <select name="SubjectTeacherAssignments[${index}].TeacherId" class="form-select form-select-sm" required>
+                            <option value="">Select Teacher</option>
+                            ${teachers.map(t => `<option value="${t.value}">${t.text}</option>`).join('')}
+                        </select>
+                    </td>
+                    <td class="text-center">
+                        <button type="button" class="btn btn-danger btn-sm" onclick="removeSubjectAssignment(${index})">
+                            <i class="fas fa-trash"></i>
+                        </button>
+                    </td>
+                `;
+            }
+
+            container.appendChild(row);
+        }
+
+        // Update subject display when subject is selected
+        function updateSubjectDisplay(index) {
+            const selectElement = document.querySelector(`select[name="SubjectTeacherAssignments[${index}].SubjectId"]`);
+            const selectedOption = selectElement.options[selectElement.selectedIndex];
+            
+            if (selectedOption.value) {
+                const subjectCode = selectedOption.getAttribute('data-code') || selectedOption.text.split(' - ')[0];
+                const subjectName = selectedOption.getAttribute('data-name') || selectedOption.text.split(' - ')[1] || selectedOption.text;
+                
+                // Update the subject code cell
+                const subjectCodeCell = selectElement.closest('td');
+                subjectCodeCell.innerHTML = `
+                    <span class="subject-code-display">${subjectCode}</span>
+                    <input type="hidden" name="SubjectTeacherAssignments[${index}].SubjectId" value="${selectedOption.value}">
+                `;
+                
+                // Update the subject name display
+                document.getElementById(`subject-name-display-${index}`).textContent = subjectName;
+            }
+        }
+
+        // Remove subject assignment
+        function removeSubjectAssignment(index) {
+            const row = document.getElementById(`assignment-row-${index}`);
+            if (row) {
+                row.remove();
+                updateRowNumbers();
+            }
+        }
+
+        // Update row numbers after deletion
+        function updateRowNumbers() {
+            const rows = document.querySelectorAll('#subjectAssignmentsContainer tr');
+            rows.forEach((row, idx) => {
+                row.querySelector('td:first-child').textContent = idx + 1;
+            });
+            rowNumber = rows.length + 1;
+        }
+
+        // Student search functionality
+        document.getElementById('studentSearch').addEventListener('input', function() {
+            const searchTerm = this.value.toLowerCase();
+            const studentItems = document.querySelectorAll('.student-checkbox-item');
+            
+            studentItems.forEach(item => {
+                const name = item.getAttribute('data-name');
+                if (name.includes(searchTerm)) {
+                    item.style.display = 'flex';
+                } else {
+                    item.style.display = 'none';
+                }
+            });
+        });
+
+        // Update selected count
+        function updateSelectedCount() {
+            const checkedBoxes = document.querySelectorAll('input[name="SelectedStudentIds"]:checked');
+            document.getElementById('selectedCount').textContent = `${checkedBoxes.length} selected`;
+        }
+
+        // Listen to checkbox changes
+        document.addEventListener('change', function(e) {
+            if (e.target.name === 'SelectedStudentIds') {
+                updateSelectedCount();
+            }
+        });
+
+        // Load existing assignments on page load
+        document.addEventListener('DOMContentLoaded', function() {
+            // Load existing subject-teacher assignments
+            if (existingAssignments && existingAssignments.length > 0) {
+                existingAssignments.forEach(assignment => {
+                    addSubjectAssignment(assignment.subjectId, assignment.teacherId);
+                });
+            } else {
+                // Add at least one empty assignment if none exist
+                addSubjectAssignment();
+            }
+
+            updateSelectedCount();
+        });
+
+        // Disable submit button after form submission
+        document.getElementById('editCurriculumForm').addEventListener('submit', function(e) {
+            const submitBtn = this.querySelector('button[type="submit"]');
+            submitBtn.disabled = true;
+            submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Updating...';
+        });
+    </script>
+}

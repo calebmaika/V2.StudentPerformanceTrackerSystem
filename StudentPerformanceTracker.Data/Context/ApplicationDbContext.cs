@@ -15,7 +15,10 @@ namespace StudentPerformanceTracker.Data.Context
         public DbSet<TeacherManagement> Teachers { get; set; } 
         public DbSet<SubjectManagement> Subjects { get; set; }
         public DbSet<TeacherSubject> TeacherSubjects { get; set; }
-        public DbSet<StudentManagement> Students { get; set; }  // ← ADD THIS
+        public DbSet<StudentManagement> Students { get; set; }
+        public DbSet<CurriculumManagement> Curriculums { get; set; }
+        public DbSet<CurriculumSubject> CurriculumSubjects { get; set; }
+        public DbSet<CurriculumStudent> CurriculumStudents { get; set; }
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
@@ -66,11 +69,61 @@ namespace StudentPerformanceTracker.Data.Context
                 entity.HasIndex(e => new { e.TeacherId, e.SubjectId }).IsUnique();
             });
 
-            // StudentManagement
             modelBuilder.Entity<StudentManagement>(entity =>
             {
                 entity.HasKey(e => e.StudentId);
                 entity.ToTable("Students");
+            });
+
+            // Curriculum
+            modelBuilder.Entity<CurriculumManagement>(entity =>
+            {
+                entity.HasKey(e => e.CurriculumId);
+                entity.HasIndex(e => e.CurriculumCode).IsUnique();
+                entity.ToTable("Curriculums");
+            });
+
+            // CurriculumSubject
+            modelBuilder.Entity<CurriculumSubject>(entity =>
+            {
+                entity.HasKey(e => e.CurriculumSubjectId);
+                entity.ToTable("CurriculumSubjects");
+
+                entity.HasOne(cs => cs.Curriculum)
+                    .WithMany(c => c.CurriculumSubjects)
+                    .HasForeignKey(cs => cs.CurriculumId)
+                    .OnDelete(DeleteBehavior.Cascade);
+
+                entity.HasOne(cs => cs.Subject)
+                    .WithMany()
+                    .HasForeignKey(cs => cs.SubjectId)
+                    .OnDelete(DeleteBehavior.Restrict);
+
+                entity.HasOne(cs => cs.Teacher)
+                    .WithMany()
+                    .HasForeignKey(cs => cs.TeacherId)
+                    .OnDelete(DeleteBehavior.Restrict);
+
+                entity.HasIndex(e => new { e.CurriculumId, e.SubjectId }).IsUnique();
+            });
+
+            // CurriculumStudent
+            modelBuilder.Entity<CurriculumStudent>(entity =>
+            {
+                entity.HasKey(e => e.CurriculumStudentId);
+                entity.ToTable("CurriculumStudents");
+
+                entity.HasOne(cs => cs.Curriculum)
+                    .WithMany(c => c.CurriculumStudents)
+                    .HasForeignKey(cs => cs.CurriculumId)
+                    .OnDelete(DeleteBehavior.Cascade);
+
+                entity.HasOne(cs => cs.Student)
+                    .WithMany()
+                    .HasForeignKey(cs => cs.StudentId)
+                    .OnDelete(DeleteBehavior.Restrict);
+
+                entity.HasIndex(e => new { e.CurriculumId, e.StudentId }).IsUnique();
             });
 
             modelBuilder.Entity<Admin>().HasData(
