@@ -1,119 +1,544 @@
+@inject StudentPerformanceTracker.Services.Teachers.ITeacherService TeacherService
+@inject StudentPerformanceTracker.Services.Students.IStudentService StudentService
+@inject StudentPerformanceTracker.Services.Subject.ISubjectService SubjectService
+@inject StudentPerformanceTracker.Services.Curriculum.ICurriculumService CurriculumService
+
 @{
     ViewData["Title"] = "Dashboard";
-    Layout = "~/Views/Shared/_AdminLayout.cshtml";  // ← Use new admin layout
+    Layout = "~/Views/Shared/_AdminLayout.cshtml";
+    
+    // Get all data
+    var teachers = await TeacherService.GetAllTeachersAsync();
+    var students = await StudentService.GetAllStudentsAsync();
+    var subjects = await SubjectService.GetAllSubjectsAsync();
+    var curriculums = await CurriculumService.GetAllCurriculumsAsync();
+    
+    // Calculate statistics
+    var totalTeachers = teachers.Count;
+    var activeTeachers = teachers.Count(t => t.IsActive);
+    var totalStudents = students.Count;
+    var activeStudents = students.Count(s => s.IsActive);
+    var totalSubjects = subjects.Count;
+    var activeSubjects = subjects.Count(s => s.IsActive);
+    var totalCurriculums = curriculums.Count;
+    var activeCurriculums = curriculums.Count(c => c.IsActive);
+    
+    // Grade distribution
+    var grade7Count = students.Count(s => s.GradeLevel == 7);
+    var grade8Count = students.Count(s => s.GradeLevel == 8);
+    var grade9Count = students.Count(s => s.GradeLevel == 9);
+    var grade10Count = students.Count(s => s.GradeLevel == 10);
 }
 
-<div class="row g-3">
-    <!-- Stats Cards -->
-    <div class="col-md-3">
-        <div class="card border-0 shadow-sm">
-            <div class="card-body text-center p-4">
-                <div class="mb-3">
-                    <i class="fas fa-users fa-2x text-primary"></i>
+<style>
+    .stat-card {
+        background: var(--card-bg);
+        border: 1px solid var(--border-color);
+        border-radius: 12px;
+        padding: 24px;
+        transition: all 0.3s ease;
+        position: relative;
+        overflow: hidden;
+    }
+
+    .stat-card:hover {
+        transform: translateY(-4px);
+        box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1);
+        border-color: var(--primary);
+    }
+
+    .stat-card-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 16px;
+    }
+
+    .stat-icon {
+        width: 48px;
+        height: 48px;
+        border-radius: 10px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 24px;
+        background: var(--light-gray);
+        color: var(--primary);
+    }
+
+    .stat-number {
+        font-size: 32px;
+        font-weight: 700;
+        margin: 0;
+        color: var(--text-primary);
+    }
+
+    .stat-label {
+        font-size: 13px;
+        color: var(--text-muted);
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        margin: 8px 0;
+        font-weight: 600;
+    }
+
+    .stat-details {
+        display: flex;
+        gap: 16px;
+        margin-top: 12px;
+        padding-top: 12px;
+        border-top: 1px solid var(--border-color);
+        font-size: 13px;
+    }
+
+    .stat-detail-item {
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        color: var(--text-muted);
+    }
+
+    .stat-detail-item i {
+        font-size: 12px;
+    }
+
+    .stat-detail-item.active {
+        color: #22c55e;
+    }
+
+    .stat-detail-item.inactive {
+        color: #ef4444;
+    }
+
+    .chart-card {
+        background: var(--card-bg);
+        border-radius: 12px;
+        padding: 24px;
+        border: 1px solid var(--border-color);
+        height: 100%;
+    }
+
+    .chart-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 24px;
+        padding-bottom: 16px;
+        border-bottom: 1px solid var(--border-color);
+    }
+
+    .chart-title {
+        font-size: 16px;
+        font-weight: 600;
+        color: var(--text-primary);
+        margin: 0;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
+
+    .grade-bar-container {
+        margin-bottom: 16px;
+    }
+
+    .grade-bar-label {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 8px;
+        font-size: 14px;
+    }
+
+    .grade-bar-name {
+        font-weight: 600;
+        color: var(--text-primary);
+    }
+
+    .grade-bar-count {
+        font-weight: 600;
+        color: var(--text-muted);
+    }
+
+    .grade-bar-bg {
+        height: 8px;
+        background: var(--light-gray);
+        border-radius: 4px;
+        overflow: hidden;
+    }
+
+    .grade-bar-fill {
+        height: 100%;
+        background: var(--primary);
+        border-radius: 4px;
+        transition: width 0.5s ease;
+    }
+
+    .activity-item {
+        display: flex;
+        align-items: start;
+        padding: 16px;
+        border-radius: 8px;
+        margin-bottom: 12px;
+        background: var(--light-gray);
+        transition: all 0.2s ease;
+    }
+
+    .activity-item:hover {
+        background: var(--border-color);
+    }
+
+    .activity-icon {
+        width: 40px;
+        height: 40px;
+        border-radius: 8px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin-right: 16px;
+        font-size: 16px;
+        flex-shrink: 0;
+    }
+
+    .activity-icon.success {
+        background: rgba(34, 197, 94, 0.1);
+        color: #22c55e;
+    }
+
+    .activity-icon.info {
+        background: rgba(37, 99, 235, 0.1);
+        color: var(--primary);
+    }
+
+    .activity-content {
+        flex: 1;
+    }
+
+    .activity-title {
+        font-weight: 600;
+        color: var(--text-primary);
+        margin: 0 0 4px 0;
+        font-size: 14px;
+    }
+
+    .activity-time {
+        font-size: 12px;
+        color: var(--text-muted);
+        margin: 0;
+    }
+
+    .quick-action-card {
+        background: var(--card-bg);
+        border: 1px solid var(--border-color);
+        border-radius: 12px;
+        padding: 20px;
+        text-align: center;
+        transition: all 0.3s ease;
+        cursor: pointer;
+        text-decoration: none;
+        display: block;
+        color: var(--text-primary);
+    }
+
+    .quick-action-card:hover {
+        border-color: var(--primary);
+        background: var(--light-gray);
+        transform: translateY(-4px);
+        box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1);
+    }
+
+    .quick-action-icon {
+        width: 48px;
+        height: 48px;
+        border-radius: 10px;
+        background: var(--light-gray);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin: 0 auto 12px;
+        font-size: 24px;
+        color: var(--primary);
+    }
+
+    .quick-action-card:hover .quick-action-icon {
+        background: var(--primary);
+        color: white;
+    }
+
+    .quick-action-title {
+        font-weight: 600;
+        margin: 0;
+        font-size: 14px;
+        color: var(--text-primary);
+    }
+
+    /* Dark theme adjustments */
+    [data-theme="dark"] .stat-card:hover {
+        box-shadow: 0 8px 16px rgba(0, 0, 0, 0.4);
+    }
+
+    [data-theme="dark"] .quick-action-card:hover {
+        box-shadow: 0 8px 16px rgba(0, 0, 0, 0.4);
+    }
+</style>
+
+<!-- Welcome Section -->
+<div class="mb-4">
+    <h2 class="mb-1">
+        <i class="fas fa-chart-line text-primary"></i> Dashboard Overview
+    </h2>
+    <p class="text-muted mb-0">Welcome back! Here's what's happening in your system today.</p>
+</div>
+
+<!-- Statistics Cards -->
+<div class="row g-4 mb-4">
+    <!-- Teachers Card -->
+    <div class="col-xl-3 col-md-6">
+        <div class="stat-card">
+            <div class="stat-card-header">
+                <div>
+                    <div class="stat-label">Total Teachers</div>
+                    <h3 class="stat-number">@totalTeachers</h3>
                 </div>
-                <h3 class="mb-1" style="color: #2563eb; font-weight: 700;">150</h3>
-                <p class="text-muted mb-0" style="font-size: 14px;">Total Students</p>
+                <div class="stat-icon">
+                    <i class="fas fa-chalkboard-teacher"></i>
+                </div>
+            </div>
+            <div class="stat-details">
+                <div class="stat-detail-item active">
+                    <i class="fas fa-check-circle"></i>
+                    <span>@activeTeachers Active</span>
+                </div>
+                @if (totalTeachers - activeTeachers > 0)
+                {
+                    <div class="stat-detail-item inactive">
+                        <i class="fas fa-times-circle"></i>
+                        <span>@(totalTeachers - activeTeachers) Inactive</span>
+                    </div>
+                }
             </div>
         </div>
     </div>
-    
-    <div class="col-md-3">
-        <div class="card border-0 shadow-sm">
-            <div class="card-body text-center p-4">
-                <div class="mb-3">
-                    <i class="fas fa-chalkboard-teacher fa-2x" style="color: #1d4ed8;"></i>
+
+    <!-- Students Card -->
+    <div class="col-xl-3 col-md-6">
+        <div class="stat-card">
+            <div class="stat-card-header">
+                <div>
+                    <div class="stat-label">Total Students</div>
+                    <h3 class="stat-number">@totalStudents</h3>
                 </div>
-                <h3 class="mb-1" style="color: #1d4ed8; font-weight: 700;">25</h3>
-                <p class="text-muted mb-0" style="font-size: 14px;">Total Teachers</p>
+                <div class="stat-icon">
+                    <i class="fas fa-user-graduate"></i>
+                </div>
+            </div>
+            <div class="stat-details">
+                <div class="stat-detail-item active">
+                    <i class="fas fa-check-circle"></i>
+                    <span>@activeStudents Active</span>
+                </div>
+                @if (totalStudents - activeStudents > 0)
+                {
+                    <div class="stat-detail-item inactive">
+                        <i class="fas fa-times-circle"></i>
+                        <span>@(totalStudents - activeStudents) Inactive</span>
+                    </div>
+                }
             </div>
         </div>
     </div>
-    
-    <div class="col-md-3">
-        <div class="card border-0 shadow-sm">
-            <div class="card-body text-center p-4">
-                <div class="mb-3">
-                    <i class="fas fa-book fa-2x" style="color: #0f172a;"></i>
+
+    <!-- Subjects Card -->
+    <div class="col-xl-3 col-md-6">
+        <div class="stat-card">
+            <div class="stat-card-header">
+                <div>
+                    <div class="stat-label">Total Subjects</div>
+                    <h3 class="stat-number">@totalSubjects</h3>
                 </div>
-                <h3 class="mb-1" style="color: #0f172a; font-weight: 700;">12</h3>
-                <p class="text-muted mb-0" style="font-size: 14px;">Active Subjects</p>
+                <div class="stat-icon">
+                    <i class="fas fa-book"></i>
+                </div>
+            </div>
+            <div class="stat-details">
+                <div class="stat-detail-item active">
+                    <i class="fas fa-check-circle"></i>
+                    <span>@activeSubjects Active</span>
+                </div>
+                @if (totalSubjects - activeSubjects > 0)
+                {
+                    <div class="stat-detail-item inactive">
+                        <i class="fas fa-times-circle"></i>
+                        <span>@(totalSubjects - activeSubjects) Inactive</span>
+                    </div>
+                }
             </div>
         </div>
     </div>
-    
-    <div class="col-md-3">
-        <div class="card border-0 shadow-sm">
-            <div class="card-body text-center p-4">
-                <div class="mb-3">
-                    <i class="fas fa-chart-line fa-2x" style="color: #64748b;"></i>
+
+    <!-- Curriculums Card -->
+    <div class="col-xl-3 col-md-6">
+        <div class="stat-card">
+            <div class="stat-card-header">
+                <div>
+                    <div class="stat-label">Total Curriculums</div>
+                    <h3 class="stat-number">@totalCurriculums</h3>
                 </div>
-                <h3 class="mb-1" style="color: #64748b; font-weight: 700;">89%</h3>
-                <p class="text-muted mb-0" style="font-size: 14px;">Average Grade</p>
+                <div class="stat-icon">
+                    <i class="fas fa-clipboard-list"></i>
+                </div>
+            </div>
+            <div class="stat-details">
+                <div class="stat-detail-item active">
+                    <i class="fas fa-check-circle"></i>
+                    <span>@activeCurriculums Active</span>
+                </div>
+                @if (totalCurriculums - activeCurriculums > 0)
+                {
+                    <div class="stat-detail-item inactive">
+                        <i class="fas fa-times-circle"></i>
+                        <span>@(totalCurriculums - activeCurriculums) Inactive</span>
+                    </div>
+                }
             </div>
         </div>
     </div>
 </div>
 
-<div class="row g-3 mt-3">
-    <div class="col-md-8">
-        <div class="card border-0 shadow-sm">
-            <div class="card-header bg-white border-bottom" style="padding: 20px;">
-                <h5 class="mb-0" style="font-weight: 600; color: #0f172a;">
-                    <i class="fas fa-chart-bar me-2" style="color: #2563eb;"></i>
-                    Performance Overview
+<div class="row g-4">
+    <!-- Grade Distribution -->
+    <div class="col-lg-8">
+        <div class="chart-card">
+            <div class="chart-header">
+                <h5 class="chart-title">
+                    <i class="fas fa-chart-bar"></i>
+                    Student Distribution by Grade Level
                 </h5>
             </div>
-            <div class="card-body p-4">
-                <p class="text-muted">Chart will go here...</p>
+            
+            @{
+                var maxStudents = new[] { grade7Count, grade8Count, grade9Count, grade10Count }.Max();
+                if (maxStudents == 0) maxStudents = 1; // Prevent division by zero
+            }
+
+            <div class="grade-bar-container">
+                <div class="grade-bar-label">
+                    <span class="grade-bar-name"><i class="fas fa-users"></i> Grade 7</span>
+                    <span class="grade-bar-count">@grade7Count Students</span>
+                </div>
+                <div class="grade-bar-bg">
+                    <div class="grade-bar-fill" style="width: @((grade7Count * 100.0 / maxStudents))%"></div>
+                </div>
             </div>
-        </div>
-    </div>
-    
-    <div class="col-md-4">
-        <div class="card border-0 shadow-sm">
-            <div class="card-header bg-white border-bottom" style="padding: 20px;">
-                <h5 class="mb-0" style="font-weight: 600; color: #0f172a;">
-                    <i class="fas fa-bell me-2" style="color: #2563eb;"></i>
-                    Recent Activities
-                </h5>
+
+            <div class="grade-bar-container">
+                <div class="grade-bar-label">
+                    <span class="grade-bar-name"><i class="fas fa-users"></i> Grade 8</span>
+                    <span class="grade-bar-count">@grade8Count Students</span>
+                </div>
+                <div class="grade-bar-bg">
+                    <div class="grade-bar-fill" style="width: @((grade8Count * 100.0 / maxStudents))%"></div>
+                </div>
             </div>
-            <div class="card-body p-0">
-                <div class="list-group list-group-flush">
-                    <div class="list-group-item border-0 py-3">
-                        <div class="d-flex align-items-start">
-                            <div class="flex-shrink-0">
-                                <i class="fas fa-user-plus" style="color: #2563eb;"></i>
-                            </div>
-                            <div class="flex-grow-1 ms-3">
-                                <p class="mb-0" style="font-size: 13px; color: #0f172a;">New student registered</p>
-                                <small class="text-muted">2 minutes ago</small>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="list-group-item border-0 py-3">
-                        <div class="d-flex align-items-start">
-                            <div class="flex-shrink-0">
-                                <i class="fas fa-edit" style="color: #1d4ed8;"></i>
-                            </div>
-                            <div class="flex-grow-1 ms-3">
-                                <p class="mb-0" style="font-size: 13px; color: #0f172a;">Grade updated</p>
-                                <small class="text-muted">15 minutes ago</small>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="list-group-item border-0 py-3">
-                        <div class="d-flex align-items-start">
-                            <div class="flex-shrink-0">
-                                <i class="fas fa-book" style="color: #64748b;"></i>
-                            </div>
-                            <div class="flex-grow-1 ms-3">
-                                <p class="mb-0" style="font-size: 13px; color: #0f172a;">New subject added</p>
-                                <small class="text-muted">1 hour ago</small>
-                            </div>
-                        </div>
-                    </div>
+
+            <div class="grade-bar-container">
+                <div class="grade-bar-label">
+                    <span class="grade-bar-name"><i class="fas fa-users"></i> Grade 9</span>
+                    <span class="grade-bar-count">@grade9Count Students</span>
+                </div>
+                <div class="grade-bar-bg">
+                    <div class="grade-bar-fill" style="width: @((grade9Count * 100.0 / maxStudents))%"></div>
+                </div>
+            </div>
+
+            <div class="grade-bar-container">
+                <div class="grade-bar-label">
+                    <span class="grade-bar-name"><i class="fas fa-users"></i> Grade 10</span>
+                    <span class="grade-bar-count">@grade10Count Students</span>
+                </div>
+                <div class="grade-bar-bg">
+                    <div class="grade-bar-fill" style="width: @((grade10Count * 100.0 / maxStudents))%"></div>
                 </div>
             </div>
         </div>
+    </div>
+
+    <!-- System Status -->
+    <div class="col-lg-4">
+        <div class="chart-card">
+            <div class="chart-header">
+                <h5 class="chart-title">
+                    <i class="fas fa-server"></i>
+                    System Status
+                </h5>
+            </div>
+            <div class="activity-item">
+                <div class="activity-icon success">
+                    <i class="fas fa-check"></i>
+                </div>
+                <div class="activity-content">
+                    <p class="activity-title">System Running Smoothly</p>
+                    <p class="activity-time">All services operational</p>
+                </div>
+            </div>
+            <div class="activity-item">
+                <div class="activity-icon info">
+                    <i class="fas fa-database"></i>
+                </div>
+                <div class="activity-content">
+                    <p class="activity-title">Database Connected</p>
+                    <p class="activity-time">Last backup: Today</p>
+                </div>
+            </div>
+            <div class="activity-item">
+                <div class="activity-icon success">
+                    <i class="fas fa-users"></i>
+                </div>
+                <div class="activity-content">
+                    <p class="activity-title">Active Users</p>
+                    <p class="activity-time">@(activeTeachers + activeStudents) total active accounts</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Quick Actions -->
+<div class="row g-4 mt-3">
+    <div class="col-12">
+        <h5 class="mb-3">
+            <i class="fas fa-bolt text-primary"></i> Quick Actions
+        </h5>
+    </div>
+    <div class="col-lg-3 col-md-6">
+        <a href="/Admin/Teachers/Create" class="quick-action-card">
+            <div class="quick-action-icon">
+                <i class="fas fa-user-plus"></i>
+            </div>
+            <p class="quick-action-title">Add New Teacher</p>
+        </a>
+    </div>
+    <div class="col-lg-3 col-md-6">
+        <a href="/Admin/Students/Create" class="quick-action-card">
+            <div class="quick-action-icon">
+                <i class="fas fa-user-graduate"></i>
+            </div>
+            <p class="quick-action-title">Add New Student</p>
+        </a>
+    </div>
+    <div class="col-lg-3 col-md-6">
+        <a href="/Admin/Subjects/Create" class="quick-action-card">
+            <div class="quick-action-icon">
+                <i class="fas fa-book"></i>
+            </div>
+            <p class="quick-action-title">Add New Subject</p>
+        </a>
+    </div>
+    <div class="col-lg-3 col-md-6">
+        <a href="/Admin/Curriculums/Create" class="quick-action-card">
+            <div class="quick-action-icon">
+                <i class="fas fa-clipboard-list"></i>
+            </div>
+            <p class="quick-action-title">Create Curriculum</p>
+        </a>
     </div>
 </div>
