@@ -13,7 +13,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("StudentPerformanceTracker.WebApp")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+b3ea144395e289331827b053be06935c950feb43")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+9c7dc59f49814c0f59afb67c3e2767a370fd5044")]
 [assembly: System.Reflection.AssemblyProductAttribute("StudentPerformanceTracker.WebApp")]
 [assembly: System.Reflection.AssemblyTitleAttribute("StudentPerformanceTracker.WebApp")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]

@@ -90,11 +90,25 @@
     }
 
     .filter-section {
-        background: var(--white);
+        background: var(--card-bg);
         border-radius: 12px;
-        padding: 20px;
+        padding: 24px;
         margin-bottom: 24px;
         border: 1px solid var(--border-color);
+    }
+
+    .filter-section .form-label {
+        margin-bottom: 8px;
+        display: block;
+        font-size: 12px;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+    }
+
+    .filter-section .form-control,
+    .filter-section .form-select {
+        height: 42px;
+        border-radius: 8px;
     }
 
     .filter-badge {
@@ -102,8 +116,133 @@
         color: white;
         padding: 4px 12px;
         border-radius: 12px;
-        font-size: 12px;
+        font-size: 13px;
         font-weight: 600;
+    }
+
+    .report-dropdown {
+        position: relative;
+    }
+
+    .report-btn {
+        width: 100%;
+        height: 42px;
+        padding: 0 16px;
+        border-radius: 8px;
+        border: 1px solid var(--border-color);
+        background: var(--card-bg);
+        color: var(--text-primary);
+        font-weight: 500;
+        font-size: 14px;
+        cursor: pointer;
+        transition: all 0.2s;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+    }
+
+    .report-btn:hover {
+        background: var(--primary);
+        color: white;
+        border-color: var(--primary);
+    }
+
+    .report-btn i:first-child {
+        font-size: 16px;
+    }
+
+    .report-btn i:last-child {
+        font-size: 12px;
+        transition: transform 0.2s;
+    }
+
+    .report-btn:hover i:last-child {
+        transform: rotate(180deg);
+    }
+
+    .report-menu {
+        position: absolute;
+        top: calc(100% + 8px);
+        left: 0;
+        right: 0;
+        background: var(--card-bg);
+        border: 1px solid var(--border-color);
+        border-radius: 8px;
+        box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
+        z-index: 1000;
+        display: none;
+        overflow: hidden;
+    }
+
+    .report-menu.active {
+        display: block;
+        animation: slideDown 0.2s ease;
+    }
+
+    @@keyframes slideDown {
+        from {
+            opacity: 0;
+            transform: translateY(-10px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
+    .report-menu-item {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        padding: 12px 16px;
+        cursor: pointer;
+        transition: all 0.2s;
+        color: var(--text-primary);
+        text-decoration: none;
+        font-size: 14px;
+        border-bottom: 1px solid var(--border-color);
+    }
+
+    .report-menu-item:last-child {
+        border-bottom: none;
+    }
+
+    .report-menu-item:hover {
+        background: var(--light-gray);
+        padding-left: 20px;
+    }
+
+    .report-menu-item i {
+        width: 20px;
+        text-align: center;
+        font-size: 16px;
+    }
+
+    .report-menu-item.pdf i { color: #ef4444; }
+    .report-menu-item.excel i { color: #10b981; }
+    .report-menu-item.csv i { color: #3b82f6; }
+    .report-menu-item.jpg i { color: #f59e0b; }
+
+    [data-theme="dark"] .curriculum-card {
+        background-color: var(--card-bg);
+        border-color: var(--border-color);
+    }
+    [data-theme="dark"] .curriculum-info h5 {
+        color: var(--text-primary);
+    }
+
+    [data-theme="dark"] .report-menu {
+        box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
+    }
+
+    @@media (max-width: 768px) {
+        .filter-section {
+            padding: 16px;
+        }
+
+        .filter-section .form-label {
+            font-size: 11px;
+        }
     }
 </style>
 
@@ -139,18 +278,20 @@
 
     <!-- Filter Section -->
     <div class="filter-section">
-        <div class="row align-items-end">
-            <div class="col-md-4 mb-3 mb-md-0">
-                <label class="form-label small fw-semibold">Search</label>
-                <div class="input-group">
-                    <span class="input-group-text bg-white">
-                        <i class="fas fa-search"></i>
-                    </span>
-                    <input type="text" id="searchInput" class="form-control" placeholder="Search by name or code...">
-                </div>
+        <div class="row g-3 align-items-end">
+            <!-- Search -->
+            <div class="col-lg-3 col-md-6">
+                <label class="form-label small fw-semibold text-muted mb-2">
+                    <i class="fas fa-search me-1"></i> Search
+                </label>
+                <input type="text" id="searchInput" class="form-control" placeholder="Search by name or code...">
             </div>
-            <div class="col-md-2 mb-3 mb-md-0">
-                <label class="form-label small fw-semibold">Grade Level</label>
+
+            <!-- Grade Level -->
+            <div class="col-lg-2 col-md-6">
+                <label class="form-label small fw-semibold text-muted mb-2">
+                    <i class="fas fa-graduation-cap me-1"></i> Grade Level
+                </label>
                 <select id="gradeLevelFilter" class="form-select">
                     <option value="">All Grades</option>
                     <option value="7">Grade 7</option>
@@ -159,16 +300,24 @@
                     <option value="10">Grade 10</option>
                 </select>
             </div>
-            <div class="col-md-2 mb-3 mb-md-0">
-                <label class="form-label small fw-semibold">Status</label>
+
+            <!-- Status -->
+            <div class="col-lg-2 col-md-6">
+                <label class="form-label small fw-semibold text-muted mb-2">
+                    <i class="fas fa-filter me-1"></i> Status
+                </label>
                 <select id="statusFilter" class="form-select">
                     <option value="">All Status</option>
                     <option value="active">Active</option>
                     <option value="inactive">Inactive</option>
                 </select>
             </div>
-            <div class="col-md-2 mb-3 mb-md-0">
-                <label class="form-label small fw-semibold">Academic Year</label>
+
+            <!-- Academic Year -->
+            <div class="col-lg-2 col-md-6">
+                <label class="form-label small fw-semibold text-muted mb-2">
+                    <i class="fas fa-calendar me-1"></i> Academic Year
+                </label>
                 <select id="yearFilter" class="form-select">
                     <option value="">All Years</option>
                     @{
@@ -181,11 +330,46 @@
                     }
                 </select>
             </div>
+
+            <!-- Export Report -->
+            <div class="col-lg-3 col-md-12">
+                <label class="form-label small fw-semibold text-muted mb-2">
+                    <i class="fas fa-file-export me-1"></i> Export
+                </label>
+                <div class="report-dropdown w-100">
+                    <button class="report-btn w-100" id="reportBtn">
+                        <i class="fas fa-download"></i>
+                        <span>Generate Report</span>
+                        <i class="fas fa-chevron-down ms-auto"></i>
+                    </button>
+                    <div class="report-menu" id="reportMenu">
+                        <a href="#" class="report-menu-item pdf" onclick="generateReport('pdf'); return false;">
+                            <i class="fas fa-file-pdf"></i>
+                            <span>Export as PDF</span>
+                        </a>
+                        <a href="#" class="report-menu-item excel" onclick="generateReport('excel'); return false;">
+                            <i class="fas fa-file-excel"></i>
+                            <span>Export as Excel</span>
+                        </a>
+                        <a href="#" class="report-menu-item csv" onclick="generateReport('csv'); return false;">
+                            <i class="fas fa-file-csv"></i>
+                            <span>Export as CSV</span>
+                        </a>
+                        <a href="#" class="report-menu-item jpg" onclick="generateReport('jpg'); return false;">
+                            <i class="fas fa-file-image"></i>
+                            <span>Export as Image</span>
+                        </a>
+                    </div>
+                </div>
+            </div>
         </div>
+
+        <!-- Results Count -->
         <div class="mt-3 d-flex align-items-center gap-2">
-            <span class="small text-muted">Results:</span>
+            <i class="fas fa-info-circle text-primary"></i>
+            <span class="small text-muted">Showing</span>
             <span class="filter-badge" id="resultCount">@Model.Count</span>
-            <span class="small text-muted">curriculums found</span>
+            <span class="small text-muted">of @Model.Count curriculums</span>
         </div>
     </div>
 
@@ -200,7 +384,13 @@
                      data-code="@curriculum.CurriculumCode.ToLower()"
                      data-grade="@curriculum.GradeLevel"
                      data-year="@curriculum.AcademicYear"
-                     data-status="@(curriculum.IsActive ? "active" : "inactive")">
+                     data-status="@(curriculum.IsActive ? "active" : "inactive")"
+                     data-id="@curriculum.CurriculumId"
+                     data-semester="@curriculum.Semester"
+                     data-subjects="@curriculum.CurriculumSubjects.Count"
+                     data-teachers="@curriculum.CurriculumSubjects.Select(cs => cs.TeacherId).Distinct().Count()"
+                     data-students="@curriculum.CurriculumStudents.Count"
+                     data-description="@(curriculum.Description ?? "")">
                     <div class="curriculum-header">
                         <div class="curriculum-info flex-grow-1">
                             <div class="d-flex align-items-center gap-2">
@@ -311,6 +501,12 @@
 </div>
 
 @section Scripts {
+    <!-- Add these libraries for export functionality -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.31/jspdf.plugin.autotable.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+
     <script>
         let allCards = [];
         let filteredCards = [];
@@ -319,6 +515,20 @@
             allCards = Array.from(document.querySelectorAll('.curriculum-card'));
             filteredCards = [...allCards];
             applyFilters();
+        });
+
+        // Report dropdown toggle
+        document.getElementById('reportBtn').addEventListener('click', function(e) {
+            e.stopPropagation();
+            document.getElementById('reportMenu').classList.toggle('active');
+        });
+
+        // Close dropdown when clicking outside
+        document.addEventListener('click', function(e) {
+            const reportDropdown = document.querySelector('.report-dropdown');
+            if (!reportDropdown.contains(e.target)) {
+                document.getElementById('reportMenu').classList.remove('active');
+            }
         });
 
         document.getElementById('searchInput').addEventListener('input', applyFilters);
@@ -372,7 +582,9 @@
         }
 
         function updateResultCount() {
+            const totalCount = @Model.Count;
             document.getElementById('resultCount').textContent = filteredCards.length;
+            document.querySelector('.mt-3 .small.text-muted:last-child').textContent = `of ${totalCount} curriculums`;
         }
 
         function resetFilters() {
@@ -387,6 +599,132 @@
             document.getElementById('curriculumName').textContent = curriculumName;
             document.getElementById('deleteForm').action = '/Admin/Curriculums/Delete/' + curriculumId;
             new bootstrap.Modal(document.getElementById('deleteModal')).show();
+        }
+
+        // Generate Report Function
+        function generateReport(format) {
+            document.getElementById('reportMenu').classList.remove('active');
+
+            const reportData = filteredCards.map(card => {
+                return {
+                    id: card.getAttribute('data-id'),
+                    code: card.getAttribute('data-code').toUpperCase(),
+                    name: card.querySelector('.curriculum-info h5').textContent.trim(),
+                    grade: 'Grade ' + card.getAttribute('data-grade'),
+                    year: card.getAttribute('data-year'),
+                    semester: card.getAttribute('data-semester'),
+                    status: card.getAttribute('data-status') === 'active' ? 'Active' : 'Inactive',
+                    subjects: card.getAttribute('data-subjects'),
+                    teachers: card.getAttribute('data-teachers'),
+                    students: card.getAttribute('data-students'),
+                    description: card.getAttribute('data-description') || 'N/A'
+                };
+            });
+
+            switch(format) {
+                case 'pdf':
+                    generatePDF(reportData);
+                    break;
+                case 'excel':
+                    generateExcel(reportData);
+                    break;
+                case 'csv':
+                    generateCSV(reportData);
+                    break;
+                case 'jpg':
+                    generateImage();
+                    break;
+            }
+        }
+
+        // Generate PDF
+        function generatePDF(data) {
+            const { jsPDF } = window.jspdf;
+            const doc = new jsPDF('l', 'mm', 'a4'); // Landscape orientation
+
+            doc.setFontSize(18);
+            doc.text('Curriculum Management Report', 14, 20);
+            
+            doc.setFontSize(11);
+            doc.text(`Generated on: ${new Date().toLocaleDateString()}`, 14, 28);
+            doc.text(`Total Curriculums: ${data.length}`, 14, 35);
+
+            doc.autoTable({
+                startY: 45,
+                head: [['ID', 'Code', 'Name', 'Grade', 'Year', 'Semester', 'Status', 'Subjects', 'Teachers', 'Students']],
+                body: data.map(c => [c.id, c.code, c.name, c.grade, c.year, c.semester, c.status, c.subjects, c.teachers, c.students]),
+                theme: 'striped',
+                headStyles: { fillColor: [37, 99, 235] },
+                styles: { fontSize: 9 },
+                columnStyles: {
+                    0: { cellWidth: 15 },
+                    1: { cellWidth: 25 },
+                    2: { cellWidth: 50 },
+                    3: { cellWidth: 20 },
+                    4: { cellWidth: 30 },
+                    5: { cellWidth: 25 },
+                    6: { cellWidth: 20 },
+                    7: { cellWidth: 20 },
+                    8: { cellWidth: 20 },
+                    9: { cellWidth: 20 }
+                }
+            });
+
+            doc.save('curriculum-report.pdf');
+        }
+
+        // Generate Excel
+        function generateExcel(data) {
+            const worksheet = XLSX.utils.json_to_sheet(data.map(c => ({
+                'ID': c.id,
+                'Code': c.code,
+                'Name': c.name,
+                'Grade Level': c.grade,
+                'Academic Year': c.year,
+                'Semester': c.semester,
+                'Status': c.status,
+                'Subjects': c.subjects,
+                'Teachers': c.teachers,
+                'Students': c.students,
+                'Description': c.description
+            })));
+
+            const workbook = XLSX.utils.book_new();
+            XLSX.utils.book_append_sheet(workbook, worksheet, 'Curriculums');
+            XLSX.writeFile(workbook, 'curriculum-report.xlsx');
+        }
+
+        // Generate CSV
+        function generateCSV(data) {
+            const headers = ['ID', 'Code', 'Name', 'Grade Level', 'Academic Year', 'Semester', 'Status', 'Subjects', 'Teachers', 'Students', 'Description'];
+            const rows = data.map(c => [c.id, c.code, c.name, c.grade, c.year, c.semester, c.status, c.subjects, c.teachers, c.students, c.description]);
+            
+            let csv = headers.join(',') + '\n';
+            rows.forEach(row => {
+                csv += row.map(cell => `"${cell}"`).join(',') + '\n';
+            });
+
+            const blob = new Blob([csv], { type: 'text/csv' });
+            const url = window.URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'curriculum-report.csv';
+            a.click();
+        }
+
+        // Generate Image
+        function generateImage() {
+            const container = document.getElementById('curriculumContainer');
+            
+            html2canvas(container, {
+                backgroundColor: getComputedStyle(document.documentElement).getPropertyValue('--bg'),
+                scale: 2
+            }).then(canvas => {
+                const link = document.createElement('a');
+                link.download = 'curriculum-report.jpg';
+                link.href = canvas.toDataURL('image/jpeg', 0.9);
+                link.click();
+            });
         }
 
         // Auto-hide alerts
