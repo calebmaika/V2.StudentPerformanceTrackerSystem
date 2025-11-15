@@ -2,6 +2,7 @@ using Microsoft.EntityFrameworkCore;
 using StudentPerformanceTracker.Data.Context;
 using StudentPerformanceTracker.Data.Entities.AdminManagement; 
 using StudentPerformanceTracker.Services.Authentication;
+using Microsoft.Extensions.Logging;
 
 namespace StudentPerformanceTracker.Services.Teachers
 {
@@ -20,11 +21,65 @@ namespace StudentPerformanceTracker.Services.Teachers
     {
         private readonly ApplicationDbContext _context;
         private readonly IPasswordService _passwordService;
+        private readonly ILogger<TeacherService> _logger;
 
-        public TeacherService(ApplicationDbContext context, IPasswordService passwordService)
+
+        public TeacherService(ApplicationDbContext context, IPasswordService passwordService, ILogger<TeacherService> logger)
         {
             _context = context;
             _passwordService = passwordService;
+            _logger = logger;  // ✅ Now it works!
+        }
+
+        public async Task<TeacherManagement> CreateTeacherAsync(
+            TeacherManagement teacher, 
+            string password, 
+            List<int> subjectIds)
+        {
+            try
+            {
+                // Check for duplicate username
+                if (await UsernameExistsAsync(teacher.Username))
+                {
+                    _logger.LogWarning("Attempted to create teacher with duplicate username: {Username}", teacher.Username);
+                    throw new InvalidOperationException($"Username '{teacher.Username}' already exists");
+                }
+
+                teacher.PasswordHash = _passwordService.HashPassword(password);
+                teacher.CreatedAt = DateTime.UtcNow;
+
+                _context.Teachers.Add(teacher);
+                await _context.SaveChangesAsync();
+
+                _logger.LogInformation("Teacher created successfully: {TeacherId} - {Username}", 
+                    teacher.TeacherId, teacher.Username);
+
+                // Assign subjects
+                if (subjectIds != null && subjectIds.Any())
+                {
+                    foreach (var subjectId in subjectIds)
+                    {
+                        var teacherSubject = new TeacherSubject
+                        {
+                            TeacherId = teacher.TeacherId,
+                            SubjectId = subjectId,
+                            AssignedAt = DateTime.UtcNow
+                        };
+                        _context.TeacherSubjects.Add(teacherSubject);
+                    }
+                    await _context.SaveChangesAsync();
+                    
+                    _logger.LogInformation("Assigned {Count} subjects to teacher {TeacherId}", 
+                        subjectIds.Count, teacher.TeacherId);
+                }
+
+                return teacher;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error creating teacher with username: {Username}", teacher.Username);
+                throw;
+            }
         }
 
         public async Task<List<TeacherManagement>> GetAllTeachersAsync()
@@ -45,32 +100,32 @@ namespace StudentPerformanceTracker.Services.Teachers
                 .FirstOrDefaultAsync(t => t.TeacherId == id);
         }
 
-        public async Task<TeacherManagement> CreateTeacherAsync(TeacherManagement teacher, string password, List<int> subjectIds)
-        {
-            teacher.PasswordHash = _passwordService.HashPassword(password);
-            teacher.CreatedAt = DateTime.UtcNow;
+        // public async Task<TeacherManagement> CreateTeacherAsync(TeacherManagement teacher, string password, List<int> subjectIds)
+        // {
+        //     teacher.PasswordHash = _passwordService.HashPassword(password);
+        //     teacher.CreatedAt = DateTime.UtcNow;
 
-            _context.Teachers.Add(teacher);
-            await _context.SaveChangesAsync();
+        //     _context.Teachers.Add(teacher);
+        //     await _context.SaveChangesAsync();
 
-            // Assign subjects
-            if (subjectIds != null && subjectIds.Any())
-            {
-                foreach (var subjectId in subjectIds)
-                {
-                    var teacherSubject = new TeacherSubject
-                    {
-                        TeacherId = teacher.TeacherId,
-                        SubjectId = subjectId,
-                        AssignedAt = DateTime.UtcNow
-                    };
-                    _context.TeacherSubjects.Add(teacherSubject);
-                }
-                await _context.SaveChangesAsync();
-            }
+        //     // Assign subjects
+        //     if (subjectIds != null && subjectIds.Any())
+        //     {
+        //         foreach (var subjectId in subjectIds)
+        //         {
+        //             var teacherSubject = new TeacherSubject
+        //             {
+        //                 TeacherId = teacher.TeacherId,
+        //                 SubjectId = subjectId,
+        //                 AssignedAt = DateTime.UtcNow
+        //             };
+        //             _context.TeacherSubjects.Add(teacherSubject);
+        //         }
+        //         await _context.SaveChangesAsync();
+        //     }
 
-            return teacher;
-        }
+        //     return teacher;
+        // }
 
         public async Task<TeacherManagement> UpdateTeacherAsync(TeacherManagement teacher, List<int> subjectIds)
         {
@@ -104,15 +159,26 @@ namespace StudentPerformanceTracker.Services.Teachers
 
         public async Task<bool> DeleteTeacherAsync(int id)
         {
-            var teacher = await _context.Teachers.FindAsync(id);
-            if (teacher == null)
-                return false;
+            try
+            {
+                var teacher = await _context.Teachers.FindAsync(id);
+                if (teacher == null)
+                {
+                    _logger.LogWarning("Attempted to delete non-existent teacher: {TeacherId}", id);
+                    return false;
+                }
 
-            // Remove subject assignments (will be done automatically by cascade delete)
-            _context.Teachers.Remove(teacher);
-            await _context.SaveChangesAsync();
+                _context.Teachers.Remove(teacher);
+                await _context.SaveChangesAsync();
 
-            return true;
+                _logger.LogInformation("Teacher deleted successfully: {TeacherId}", id);
+                return true;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error deleting teacher: {TeacherId}", id);
+                throw;
+            }
         }
 
         public async Task<bool> UsernameExistsAsync(string username, int? excludeTeacherId = null)

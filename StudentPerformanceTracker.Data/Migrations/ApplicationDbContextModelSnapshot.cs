@@ -66,7 +66,7 @@ namespace StudentPerformanceTracker.Data.Migrations
                         new
                         {
                             AdminId = 1,
-                            CreatedAt = new DateTime(2025, 11, 14, 15, 17, 49, 446, DateTimeKind.Utc).AddTicks(4665),
+                            CreatedAt = new DateTime(2025, 11, 15, 10, 28, 8, 605, DateTimeKind.Utc).AddTicks(5099),
                             Email = "admin@studenttracker.com",
                             FullName = "System Administrator",
                             IsActive = true,
@@ -354,6 +354,46 @@ namespace StudentPerformanceTracker.Data.Migrations
                         .IsUnique();
 
                     b.ToTable("TeacherSubjects", (string)null);
+                });
+
+            modelBuilder.Entity("StudentPerformanceTracker.Data.Entities.Auditing.AuditLog", b =>
+                {
+                    b.Property<int>("AuditLogId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("INTEGER");
+
+                    b.Property<string>("Action")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("Details")
+                        .HasMaxLength(1000)
+                        .HasColumnType("TEXT");
+
+                    b.Property<int>("EntityId")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<string>("EntityType")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("TEXT");
+
+                    b.Property<DateTime>("Timestamp")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("Username")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("TEXT");
+
+                    b.HasKey("AuditLogId");
+
+                    b.HasIndex("Timestamp");
+
+                    b.HasIndex("EntityType", "EntityId");
+
+                    b.ToTable("AuditLogs", (string)null);
                 });
 
             modelBuilder.Entity("StudentPerformanceTracker.Data.Entities.AdminManagement.CurriculumStudent", b =>

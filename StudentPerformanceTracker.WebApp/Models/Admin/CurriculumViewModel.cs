@@ -1,4 +1,5 @@
 using System.ComponentModel.DataAnnotations;
+using StudentPerformanceTracker.WebApp.Validation;
 
 namespace StudentPerformanceTracker.WebApp.Models.Admin
 {
@@ -7,12 +8,13 @@ namespace StudentPerformanceTracker.WebApp.Models.Admin
         public int CurriculumId { get; set; }
 
         [Required(ErrorMessage = "Curriculum name is required")]
-        [StringLength(200, ErrorMessage = "Curriculum name cannot exceed 200 characters")]
+        [StringLength(200, MinimumLength = 3, ErrorMessage = "Curriculum name must be between 3 and 200 characters")]
         [Display(Name = "Curriculum Name")]
         public string CurriculumName { get; set; } = string.Empty;
 
         [Required(ErrorMessage = "Curriculum code is required")]
-        [StringLength(50, ErrorMessage = "Curriculum code cannot exceed 50 characters")]
+        [StringLength(50, MinimumLength = 2, ErrorMessage = "Curriculum code must be between 2 and 50 characters")]
+        [RegularExpression(@"^[A-Z0-9-]+$", ErrorMessage = "Curriculum code can only contain uppercase letters, numbers, and hyphens")]
         [Display(Name = "Curriculum Code")]
         public string CurriculumCode { get; set; } = string.Empty;
 
@@ -22,7 +24,7 @@ namespace StudentPerformanceTracker.WebApp.Models.Admin
         public string? Description { get; set; }
 
         [Required(ErrorMessage = "Academic year is required")]
-        [StringLength(20, ErrorMessage = "Academic year cannot exceed 20 characters")]
+        [AcademicYearFormat]
         [Display(Name = "Academic Year")]
         public string AcademicYear { get; set; } = string.Empty;
 
@@ -39,19 +41,21 @@ namespace StudentPerformanceTracker.WebApp.Models.Admin
         [Display(Name = "Active")]
         public bool IsActive { get; set; } = true;
 
-        // Subject-Teacher assignments
         [Display(Name = "Subjects with Teachers")]
+        [MinLength(1, ErrorMessage = "At least one subject must be assigned")]
         public List<SubjectTeacherAssignment> SubjectTeacherAssignments { get; set; } = new List<SubjectTeacherAssignment>();
 
-        // Students enrolled
         [Display(Name = "Enrolled Students")]
         public List<int> SelectedStudentIds { get; set; } = new List<int>();
     }
 
     public class SubjectTeacherAssignment
     {
+        [Required]
         public int SubjectId { get; set; }
         public string SubjectName { get; set; } = string.Empty;
+        
+        [Required]
         public int TeacherId { get; set; }
         public string TeacherName { get; set; } = string.Empty;
     }

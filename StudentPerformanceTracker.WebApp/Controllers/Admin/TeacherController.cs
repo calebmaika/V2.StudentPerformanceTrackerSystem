@@ -6,6 +6,7 @@ using StudentPerformanceTracker.Services.Teachers;
 using StudentPerformanceTracker.Services.Authentication;
 using StudentPerformanceTracker.Services.Subject;
 using StudentPerformanceTracker.WebApp.Models.Admin;
+using StudentPerformanceTracker.Services.Auditing;
 
 namespace StudentPerformanceTracker.WebApp.Controllers.Admin
 {
@@ -17,17 +18,20 @@ namespace StudentPerformanceTracker.WebApp.Controllers.Admin
         private readonly ISubjectService _subjectService;
         private readonly IPasswordService _passwordService;
         private readonly IWebHostEnvironment _environment;
+        private readonly IAuditService _auditService;
 
         public TeachersController(
             ITeacherService teacherService,
             ISubjectService subjectService,
             IPasswordService passwordService,
-            IWebHostEnvironment environment)
+            IWebHostEnvironment environment,
+            IAuditService auditService)
         {
             _teacherService = teacherService;
             _subjectService = subjectService;
             _passwordService = passwordService;
             _environment = environment;
+            _auditService = auditService;
         }
 
         [HttpGet("")]
@@ -53,9 +57,34 @@ namespace StudentPerformanceTracker.WebApp.Controllers.Admin
         }
 
         [HttpPost("Create")]
-        [ValidateAntiForgeryToken]
+        [ValidateAntiForgeryToken]  
         public async Task<IActionResult> Create(TeacherViewModel model)
         {
+            // Server-side validation: Check username uniqueness
+            if (await _teacherService.UsernameExistsAsync(model.Username))
+            {
+                ModelState.AddModelError("Username", "This username is already taken");
+            }
+
+            // Server-side validation: Validate profile picture
+            if (model.ProfilePictureFile != null)
+            {
+                var allowedExtensions = new[] { ".jpg", ".jpeg", ".png", ".gif" };
+                var extension = Path.GetExtension(model.ProfilePictureFile.FileName).ToLower();
+                
+                if (!allowedExtensions.Contains(extension))
+                {
+                    ModelState.AddModelError("ProfilePictureFile", "Only image files (JPG, PNG, GIF) are allowed");
+                }
+                
+                // Check file size (max 5MB)
+                if (model.ProfilePictureFile.Length > 5 * 1024 * 1024)
+                {
+                    ModelState.AddModelError("ProfilePictureFile", "File size cannot exceed 5MB");
+                }
+            }
+
+            // If validation fails, return to form
             if (!ModelState.IsValid)
             {
                 var subjects = await _subjectService.GetAllSubjectsAsync();
@@ -68,9 +97,48 @@ namespace StudentPerformanceTracker.WebApp.Controllers.Admin
                 return View("~/Views/Admin/TeacherManagement/Create.cshtml", model);
             }
 
-            if (await _teacherService.UsernameExistsAsync(model.Username))
+            try
             {
-                ModelState.AddModelError("Username", "Username already exists");
+                string? profilePicturePath = null;
+                if (model.ProfilePictureFile != null)
+                {
+                    profilePicturePath = await SaveProfilePicture(model.ProfilePictureFile);
+                }
+
+                var age = CalculateAge(model.DateOfBirth);
+
+                var teacher = new TeacherManagement
+                {
+                    Username = model.Username,
+                    ProfilePicture = profilePicturePath,
+                    FirstName = model.FirstName,
+                    MiddleName = model.MiddleName,
+                    LastName = model.LastName,
+                    DateOfBirth = model.DateOfBirth,
+                    Age = age,
+                    Address = model.Address,
+                    IsActive = model.IsActive
+                };
+
+                await _teacherService.CreateTeacherAsync(teacher, model.Password!, model.SelectedSubjectIds);
+
+                // Log the audit action
+                await _auditService.LogActionAsync(
+                    action: "Create",
+                    entityType: "Teacher",
+                    entityId: teacher.TeacherId,
+                    username: User.Identity?.Name ?? "Unknown",
+                    details: $"Created teacher: {teacher.FullName} (Username: {teacher.Username})"
+                );
+
+                TempData["SuccessMessage"] = "Teacher created successfully!";
+                return RedirectToAction("Index");
+            }
+            catch (Exception ex)
+            {
+                // Log the exception (we'll implement logging next)
+                TempData["ErrorMessage"] = $"Error creating teacher: {ex.Message}";
+                
                 var subjects = await _subjectService.GetAllSubjectsAsync();
                 ViewBag.Subjects = subjects.Where(s => s.IsActive)
                     .Select(s => new SelectListItem
@@ -78,34 +146,9 @@ namespace StudentPerformanceTracker.WebApp.Controllers.Admin
                         Value = s.SubjectId.ToString(),
                         Text = $"{s.SubjectCode} - {s.SubjectName}"
                     }).ToList();
+                
                 return View("~/Views/Admin/TeacherManagement/Create.cshtml", model);
             }
-
-            string? profilePicturePath = null;
-            if (model.ProfilePictureFile != null)
-            {
-                profilePicturePath = await SaveProfilePicture(model.ProfilePictureFile);
-            }
-
-            var age = CalculateAge(model.DateOfBirth);
-
-            var teacher = new TeacherManagement
-            {
-                Username = model.Username,
-                ProfilePicture = profilePicturePath,
-                FirstName = model.FirstName,
-                MiddleName = model.MiddleName,
-                LastName = model.LastName,
-                DateOfBirth = model.DateOfBirth,
-                Age = age,
-                Address = model.Address,
-                IsActive = model.IsActive
-            };
-
-            await _teacherService.CreateTeacherAsync(teacher, model.Password!, model.SelectedSubjectIds);
-
-            TempData["SuccessMessage"] = "Teacher created successfully!";
-            return RedirectToAction("Index");
         }
 
         [HttpGet("Edit/{id}")]
@@ -217,6 +260,15 @@ namespace StudentPerformanceTracker.WebApp.Controllers.Admin
 
             await _teacherService.UpdateTeacherAsync(teacher, model.SelectedSubjectIds);
 
+            // Log the audit action
+            await _auditService.LogActionAsync(
+                action: "Update",
+                entityType: "Teacher",
+                entityId: teacher.TeacherId,
+                username: User.Identity?.Name ?? "Unknown",
+                details: $"Updated teacher: {teacher.FullName} (Username: {teacher.Username})"
+            );
+
             TempData["SuccessMessage"] = "Teacher updated successfully!";
             return RedirectToAction("Index");
         }
@@ -264,9 +316,24 @@ namespace StudentPerformanceTracker.WebApp.Controllers.Admin
                     DeleteProfilePicture(teacher.ProfilePicture);
                 }
 
+                // Store teacher info before deletion for audit log
+                var teacherName = teacher.FullName;
+                var teacherUsername = teacher.Username;
+
                 await _teacherService.DeleteTeacherAsync(id);
+
+                // Log the audit action
+                await _auditService.LogActionAsync(
+                    action: "Delete",
+                    entityType: "Teacher",
+                    entityId: id,
+                    username: User.Identity?.Name ?? "Unknown",
+                    details: $"Deleted teacher: {teacherName} (Username: {teacherUsername})"
+                );
+
                 TempData["SuccessMessage"] = "Teacher deleted successfully!";
             }
+            
             else
             {
                 TempData["ErrorMessage"] = "Teacher not found";

@@ -6,93 +6,159 @@ using StudentPerformanceTracker.Services.Teachers;
 using StudentPerformanceTracker.Services.Subject;
 using StudentPerformanceTracker.Services.Students;
 using StudentPerformanceTracker.Services.Curriculum;
+using StudentPerformanceTracker.WebApp.Middleware;
+using StudentPerformanceTracker.Services.Auditing;
+using Serilog;
+using Serilog.Events; 
+using AspNetCoreRateLimit;
 
-var builder = WebApplication.CreateBuilder(args);
+// Configure Serilog BEFORE building the app
+Log.Logger = new LoggerConfiguration()
+    .MinimumLevel.Information()
+    .MinimumLevel.Override("Microsoft", LogEventLevel.Warning)
+    .MinimumLevel.Override("Microsoft.EntityFrameworkCore", LogEventLevel.Warning)
+    .Enrich.FromLogContext()
+    .WriteTo.Console()
+    .WriteTo.File(
+        path: "Logs/log-.txt",
+        rollingInterval: RollingInterval.Day,
+        outputTemplate: "{Timestamp:yyyy-MM-dd HH:mm:ss.fff zzz} [{Level:u3}] {Message:lj}{NewLine}{Exception}")
+    .CreateLogger();
 
-// Add services to the container
-builder.Services.AddControllersWithViews();
+try
+{
+    Log.Information("Starting Student Performance Tracker application");
 
-// Configure SQLite Database
-// Connection string is in appsettings.json
-builder.Services.AddDbContext<ApplicationDbContext>(options =>
-    options.UseSqlite(builder.Configuration.GetConnectionString("DefaultConnection")));
+    var builder = WebApplication.CreateBuilder(args);
 
-// Configure Cookie Authentication
-builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
-    .AddCookie(options =>
+    // Use Serilog for logging
+    builder.Host.UseSerilog();
+
+    // Add services to the container
+    builder.Services.AddControllersWithViews();
+
+    // Configure SQLite Database
+    builder.Services.AddDbContext<ApplicationDbContext>(options =>
+        options.UseSqlite(builder.Configuration.GetConnectionString("DefaultConnection")));
+
+    // Configure Cookie Authentication
+    builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
+        .AddCookie(options =>
+        {
+            options.LoginPath = "/Admin/Account/Login";
+            options.LogoutPath = "/Admin/Account/Logout";
+            options.AccessDeniedPath = "/Admin/Account/AccessDenied";
+            options.ExpireTimeSpan = TimeSpan.FromHours(2);
+            options.SlidingExpiration = true;
+            options.Cookie.HttpOnly = true;
+            options.Cookie.SecurePolicy = CookieSecurePolicy.Always;
+            options.Cookie.SameSite = SameSiteMode.Lax;
+        });
+
+    // Register services
+    builder.Services.AddScoped<IPasswordService, PasswordService>();
+    builder.Services.AddScoped<IAdminAuthenticationService, AuthenticationService>();
+    builder.Services.AddScoped<ITeacherService, TeacherService>();
+    builder.Services.AddScoped<ISubjectService, SubjectService>();
+    builder.Services.AddScoped<IStudentService, StudentService>();
+    builder.Services.AddScoped<ICurriculumService, CurriculumService>();
+    builder.Services.AddScoped<IAuditService, AuditService>();
+
+    // Add Session support
+    builder.Services.AddSession(options =>
     {
-        options.LoginPath = "/Admin/Account/Login";  // Where to redirect if not logged in
-        options.LogoutPath = "/Admin/Account/Logout";  // Logout URL
-        options.AccessDeniedPath = "/Admin/Account/AccessDenied";  // Access denied URL
-        options.ExpireTimeSpan = TimeSpan.FromHours(2);  // Cookie expires in 2 hours
-        options.SlidingExpiration = true;  // Refresh expiration on each request
-        options.Cookie.HttpOnly = true;  // Cookie not accessible via JavaScript (security)
-        options.Cookie.SecurePolicy = CookieSecurePolicy.Always;  // Only send over HTTPS
-        options.Cookie.SameSite = SameSiteMode.Lax;  // CSRF protection
+        options.IdleTimeout = TimeSpan.FromMinutes(30);
+        options.Cookie.HttpOnly = true;
+        options.Cookie.IsEssential = true;
     });
 
-// Register our custom services
-// Scoped = new instance per request
-builder.Services.AddScoped<IPasswordService, PasswordService>();
-builder.Services.AddScoped<IAdminAuthenticationService, AuthenticationService>();
-builder.Services.AddScoped<ITeacherService, TeacherService>();
-builder.Services.AddScoped<ISubjectService, SubjectService>();
-builder.Services.AddScoped<IStudentService, StudentService>();
-builder.Services.AddScoped<ICurriculumService, CurriculumService>();
+    // Add rate limiting
+    builder.Services.AddMemoryCache();
+    builder.Services.Configure<IpRateLimitOptions>(builder.Configuration.GetSection("IpRateLimiting"));
+    builder.Services.AddInMemoryRateLimiting();
+    builder.Services.AddSingleton<IRateLimitConfiguration, RateLimitConfiguration>();
 
-// Add Session support (optional but useful)
-builder.Services.AddSession(options =>
-{
-    options.IdleTimeout = TimeSpan.FromMinutes(30);
-    options.Cookie.HttpOnly = true;
-    options.Cookie.IsEssential = true;
-});
+    var app = builder.Build();
 
-var app = builder.Build();
+    // Configure the HTTP request pipeline
+    if (!app.Environment.IsDevelopment())
+    {
+        app.UseExceptionHandler("/Error");
+        app.UseHsts();
+    }
 
-// Configure the HTTP request pipeline
-if (!app.Environment.IsDevelopment())
-{
-    app.UseExceptionHandler("/Home/Error");
-    app.UseHsts();
+
+    // ... in app configuration ...
+
+    // Add security headers middleware
+    app.UseMiddleware<SecurityHeadersMiddleware>();
+
+    // Add rate limiting
+    app.UseIpRateLimiting();
+
+    // Add Serilog request logging
+    app.UseSerilogRequestLogging();
+
+    // Add custom exception handling middleware
+    app.UseMiddleware<ExceptionHandlingMiddleware>();
+
+    // Status code pages
+    app.UseStatusCodePagesWithReExecute("/Error/{0}");
+
+    app.UseHttpsRedirection();
+    app.UseStaticFiles();
+
+    app.UseRouting();
+
+    app.UseAuthentication();
+    app.UseAuthorization();
+
+    app.UseSession();
+
+    // Configure routes
+    app.MapControllerRoute(
+        name: "admin_default",
+        pattern: "Admin/{controller=Account}/{action=Login}/{id?}");
+
+    app.MapControllerRoute(
+        name: "teacher_default",
+        pattern: "Teacher/{controller=Account}/{action=Login}/{id?}");
+
+    app.MapControllerRoute(
+        name: "student_default",
+        pattern: "Student/{controller=Account}/{action=Login}/{id?}");
+
+    app.MapControllerRoute(
+        name: "default",
+        pattern: "{controller=Home}/{action=Index}/{id?}");
+
+    // Apply database migrations
+    using (var scope = app.Services.CreateScope())
+    {
+        var dbContext = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
+        
+        try
+        {
+            dbContext.Database.Migrate();
+            Log.Information("Database migration completed successfully");
+        }
+        catch (Exception ex)
+        {
+            Log.Fatal(ex, "An error occurred while migrating the database");
+            throw;
+        }
+    }
+
+    app.Run();
 }
-
-app.UseHttpsRedirection();
-app.UseStaticFiles();  // Serve files from wwwroot
-
-app.UseRouting();
-
-app.UseAuthentication();  // IMPORTANT: Must come before UseAuthorization
-app.UseAuthorization();
-
-app.UseSession();
-
-// Configure routes
-// Configure routes
-app.MapControllerRoute(
-    name: "admin_default",
-    pattern: "Admin/{controller=Account}/{action=Login}/{id?}");
-
-app.MapControllerRoute(
-    name: "teacher_default",
-    pattern: "Teacher/{controller=Account}/{action=Login}/{id?}");
-
-app.MapControllerRoute(
-    name: "student_default",
-    pattern: "Student/{controller=Account}/{action=Login}/{id?}");
-
-app.MapControllerRoute(
-    name: "default",
-    pattern: "{controller=Home}/{action=Index}/{id?}");
-
-// Apply database migrations automatically on startup
-using (var scope = app.Services.CreateScope())
+catch (Exception ex)
 {
-    var dbContext = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
-    dbContext.Database.Migrate();  // Creates database if it doesn't exist
+    Log.Fatal(ex, "Application terminated unexpectedly");
 }
-
-app.Run();
+finally
+{
+    Log.CloseAndFlush();
+}
 
 
 //add migration

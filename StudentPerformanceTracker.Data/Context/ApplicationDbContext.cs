@@ -1,6 +1,7 @@
 using Microsoft.EntityFrameworkCore;
 using StudentPerformanceTracker.Data.Entities;
 using StudentPerformanceTracker.Data.Entities.AdminManagement;
+using StudentPerformanceTracker.Data.Entities.Auditing;
 
 namespace StudentPerformanceTracker.Data.Context
 {
@@ -19,6 +20,7 @@ namespace StudentPerformanceTracker.Data.Context
         public DbSet<CurriculumManagement> Curriculums { get; set; }
         public DbSet<CurriculumSubject> CurriculumSubjects { get; set; }
         public DbSet<CurriculumStudent> CurriculumStudents { get; set; }
+        public DbSet<AuditLog> AuditLogs { get; set; }
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
@@ -124,6 +126,15 @@ namespace StudentPerformanceTracker.Data.Context
                     .OnDelete(DeleteBehavior.Restrict);
 
                 entity.HasIndex(e => new { e.CurriculumId, e.StudentId }).IsUnique();
+            });
+
+            //AuditLog
+            modelBuilder.Entity<AuditLog>(entity =>
+            {
+                entity.HasKey(e => e.AuditLogId);
+                entity.HasIndex(e => e.Timestamp);
+                entity.HasIndex(e => new { e.EntityType, e.EntityId });
+                entity.ToTable("AuditLogs");
             });
 
             modelBuilder.Entity<Admin>().HasData(

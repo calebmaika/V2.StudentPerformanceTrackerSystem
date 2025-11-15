@@ -11,6 +11,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "StudentPerformanceTracker.S
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "StudentPerformanceTracker.WebApp", "StudentPerformanceTracker.WebApp\StudentPerformanceTracker.WebApp.csproj", "{07634F5C-B9B9-4906-B51B-3B2A4AC5D044}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "StudentPerformanceTracker.Tests", "StudentPerformanceTracker.Tests\StudentPerformanceTracker.Tests.csproj", "{B6470B1C-CD39-408D-BAF5-97FC65A2D034}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -69,6 +71,18 @@ Global
 		{07634F5C-B9B9-4906-B51B-3B2A4AC5D044}.Release|x64.Build.0 = Release|Any CPU
 		{07634F5C-B9B9-4906-B51B-3B2A4AC5D044}.Release|x86.ActiveCfg = Release|Any CPU
 		{07634F5C-B9B9-4906-B51B-3B2A4AC5D044}.Release|x86.Build.0 = Release|Any CPU
+		{B6470B1C-CD39-408D-BAF5-97FC65A2D034}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{B6470B1C-CD39-408D-BAF5-97FC65A2D034}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{B6470B1C-CD39-408D-BAF5-97FC65A2D034}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{B6470B1C-CD39-408D-BAF5-97FC65A2D034}.Debug|x64.Build.0 = Debug|Any CPU
+		{B6470B1C-CD39-408D-BAF5-97FC65A2D034}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{B6470B1C-CD39-408D-BAF5-97FC65A2D034}.Debug|x86.Build.0 = Debug|Any CPU
+		{B6470B1C-CD39-408D-BAF5-97FC65A2D034}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{B6470B1C-CD39-408D-BAF5-97FC65A2D034}.Release|Any CPU.Build.0 = Release|Any CPU
+		{B6470B1C-CD39-408D-BAF5-97FC65A2D034}.Release|x64.ActiveCfg = Release|Any CPU
+		{B6470B1C-CD39-408D-BAF5-97FC65A2D034}.Release|x64.Build.0 = Release|Any CPU
+		{B6470B1C-CD39-408D-BAF5-97FC65A2D034}.Release|x86.ActiveCfg = Release|Any CPU
+		{B6470B1C-CD39-408D-BAF5-97FC65A2D034}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
