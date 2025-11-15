@@ -40,9 +40,23 @@
     .filter-section {
         background: var(--card-bg);
         border-radius: 12px;
-        padding: 20px;
+        padding: 24px;
         margin-bottom: 24px;
         border: 1px solid var(--border-color);
+    }
+
+    .filter-section .form-label {
+        margin-bottom: 8px;
+        display: block;
+        font-size: 12px;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+    }
+
+    .filter-section .form-control,
+    .filter-section .form-select {
+        height: 42px;
+        border-radius: 8px;
     }
 
     .filter-badge {
@@ -50,50 +64,78 @@
         color: white;
         padding: 4px 12px;
         border-radius: 12px;
-        font-size: 12px;
+        font-size: 13px;
         font-weight: 600;
     }
 
     .report-dropdown {
         position: relative;
-        display: inline-block;
     }
 
     .report-btn {
-        padding: 0.5rem 1rem;
+        width: 100%;
+        height: 42px;
+        padding: 0 16px;
         border-radius: 8px;
         border: 1px solid var(--border-color);
         background: var(--card-bg);
         color: var(--text-primary);
         font-weight: 500;
+        font-size: 14px;
         cursor: pointer;
         transition: all 0.2s;
         display: flex;
         align-items: center;
-        gap: 0.5rem;
+        gap: 10px;
     }
 
     .report-btn:hover {
-        background: var(--light-gray);
+        background: var(--primary);
+        color: white;
         border-color: var(--primary);
+    }
+
+    .report-btn i:first-child {
+        font-size: 16px;
+    }
+
+    .report-btn i:last-child {
+        font-size: 12px;
+        transition: transform 0.2s;
+    }
+
+    .report-btn:hover i:last-child {
+        transform: rotate(180deg);
     }
 
     .report-menu {
         position: absolute;
-        top: 100%;
+        top: calc(100% + 8px);
+        left: 0;
         right: 0;
-        margin-top: 8px;
         background: var(--card-bg);
         border: 1px solid var(--border-color);
         border-radius: 8px;
-        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+        box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
         z-index: 1000;
-        min-width: 200px;
         display: none;
+        overflow: hidden;
     }
 
     .report-menu.active {
         display: block;
+        animation: slideDown 0.2s ease;
+    }
+
+    @@keyframes slideDown {
+        from {
+            opacity: 0;
+            transform: translateY(-10px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
     }
 
     .report-menu-item {
@@ -102,21 +144,20 @@
         gap: 12px;
         padding: 12px 16px;
         cursor: pointer;
-        transition: background 0.2s;
+        transition: all 0.2s;
         color: var(--text-primary);
         text-decoration: none;
-    }
-
-    .report-menu-item:first-child {
-        border-radius: 8px 8px 0 0;
+        font-size: 14px;
+        border-bottom: 1px solid var(--border-color);
     }
 
     .report-menu-item:last-child {
-        border-radius: 0 0 8px 8px;
+        border-bottom: none;
     }
 
     .report-menu-item:hover {
         background: var(--light-gray);
+        padding-left: 20px;
     }
 
     .report-menu-item i {
@@ -207,6 +248,20 @@
     [data-theme="dark"] .teacher-info p {
         color: var(--text-muted);
     }
+
+    [data-theme="dark"] .report-menu {
+        box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
+    }
+
+    @@media (max-width: 768px) {
+        .filter-section {
+            padding: 16px;
+        }
+
+        .filter-section .form-label {
+            font-size: 11px;
+        }
+    }
 </style>
 
 <div class="container-fluid">
@@ -241,26 +296,32 @@
 
     <!-- Filter Section -->
     <div class="filter-section">
-        <div class="row align-items-end">
-            <div class="col-md-4 mb-3 mb-md-0">
-                <label class="form-label small fw-semibold">Search</label>
-                <div class="input-group">
-                    <span class="input-group-text">
-                        <i class="fas fa-search"></i>
-                    </span>
-                    <input type="text" id="searchInput" class="form-control" placeholder="Search by name, username...">
-                </div>
+        <div class="row g-3 align-items-end">
+            <!-- Search -->
+            <div class="col-lg-4 col-md-6">
+                <label class="form-label small fw-semibold text-muted mb-2">
+                    <i class="fas fa-search me-1"></i> Search
+                </label>
+                <input type="text" id="searchInput" class="form-control" placeholder="Search by name, username...">
             </div>
-            <div class="col-md-2 mb-3 mb-md-0">
-                <label class="form-label small fw-semibold">Status</label>
+
+            <!-- Status Filter -->
+            <div class="col-lg-2 col-md-6">
+                <label class="form-label small fw-semibold text-muted mb-2">
+                    <i class="fas fa-filter me-1"></i> Status
+                </label>
                 <select id="statusFilter" class="form-select">
                     <option value="">All Status</option>
                     <option value="active">Active</option>
                     <option value="inactive">Inactive</option>
                 </select>
             </div>
-            <div class="col-md-2 mb-3 mb-md-0">
-                <label class="form-label small fw-semibold">Sort By</label>
+
+            <!-- Sort By -->
+            <div class="col-lg-2 col-md-6">
+                <label class="form-label small fw-semibold text-muted mb-2">
+                    <i class="fas fa-sort me-1"></i> Sort By
+                </label>
                 <select id="sortBy" class="form-select">
                     <option value="name">Name (A-Z)</option>
                     <option value="name-desc">Name (Z-A)</option>
@@ -270,8 +331,12 @@
                     <option value="age-desc">Age (High to Low)</option>
                 </select>
             </div>
-            <div class="col-md-2 mb-3 mb-md-0">
-                <label class="form-label small fw-semibold">Show</label>
+
+            <!-- Items Per Page -->
+            <div class="col-lg-2 col-md-6">
+                <label class="form-label small fw-semibold text-muted mb-2">
+                    <i class="fas fa-eye me-1"></i> Show
+                </label>
                 <select id="itemsPerPage" class="form-select">
                     <option value="6">6 per page</option>
                     <option value="12" selected>12 per page</option>
@@ -279,13 +344,17 @@
                     <option value="all">Show All</option>
                 </select>
             </div>
-            <div class="col-md-2 mb-3 mb-md-0">
-                <label class="form-label small fw-semibold d-block">Export</label>
-                <div class="report-dropdown">
-                    <button class="report-btn" id="reportBtn">
-                        <i class="fas fa-file-export"></i>
-                            <span>Export</span>
-                        <i class="fas fa-chevron-down ms-1"></i>
+
+            <!-- Export Report -->
+            <div class="col-lg-2 col-md-12">
+                <label class="form-label small fw-semibold text-muted mb-2">
+                    <i class="fas fa-file-export me-1"></i> Export
+                </label>
+                <div class="report-dropdown w-100">
+                    <button class="report-btn w-100" id="reportBtn">
+                        <i class="fas fa-download"></i>
+                        <span>Generate Report</span>
+                        <i class="fas fa-chevron-down ms-auto"></i>
                     </button>
                     <div class="report-menu" id="reportMenu">
                         <a href="#" class="report-menu-item pdf" onclick="generateReport('pdf'); return false;">
@@ -308,10 +377,13 @@
                 </div>
             </div>
         </div>
+
+        <!-- Results Count -->
         <div class="mt-3 d-flex align-items-center gap-2">
-            <span class="small text-muted">Results:</span>
+            <i class="fas fa-info-circle text-primary"></i>
+            <span class="small text-muted">Showing</span>
             <span class="filter-badge" id="resultCount">@Model.Count</span>
-            <span class="small text-muted">teachers found</span>
+            <span class="small text-muted">of @Model.Count teachers</span>
         </div>
     </div>
 
