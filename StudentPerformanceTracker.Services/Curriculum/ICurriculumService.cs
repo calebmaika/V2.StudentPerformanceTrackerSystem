@@ -12,6 +12,7 @@ namespace StudentPerformanceTracker.Services.Curriculum
         Task<bool> CurriculumCodeExistsAsync(string code, int? excludeId = null);
         Task<List<CurriculumSubject>> GetCurriculumSubjectsAsync(int curriculumId);
         Task<List<int>> GetCurriculumStudentIdsAsync(int curriculumId);
+        Task<List<CurriculumManagement>> GetCurriculumsByTeacherIdAsync(int teacherId);
     }
 
     public class CurriculumSubjectDto

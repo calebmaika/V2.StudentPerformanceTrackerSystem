@@ -144,5 +144,19 @@ namespace StudentPerformanceTracker.Services.Curriculum
                 .Select(cs => cs.StudentId)
                 .ToListAsync();
         }
+
+        public async Task<List<CurriculumManagement>> GetCurriculumsByTeacherIdAsync(int teacherId)
+        {
+            return await _context.Curriculums
+                .Include(c => c.CurriculumSubjects)
+                    .ThenInclude(cs => cs.Subject)
+                .Include(c => c.CurriculumSubjects)
+                    .ThenInclude(cs => cs.Teacher)
+                .Include(c => c.CurriculumStudents)
+                    .ThenInclude(cs => cs.Student)
+                .Where(c => c.CurriculumSubjects.Any(cs => cs.TeacherId == teacherId))
+                .OrderBy(c => c.CurriculumName)
+                .ToListAsync();
+        }
     }
 }

@@ -256,7 +256,6 @@
         const teachers = @Html.Raw(Json.Serialize(ViewBag.Teachers));
         
         let assignmentIndex = 0;
-        let rowNumber = 1;
 
         // Auto-uppercase curriculum code
         document.querySelector('input[name="CurriculumCode"]').addEventListener('input', function() {
@@ -267,18 +266,15 @@
         function addSubjectAssignment() {
             const container = document.getElementById('subjectAssignmentsContainer');
             const index = assignmentIndex++;
-            const currentRow = rowNumber++;
 
             const row = document.createElement('tr');
             row.id = `assignment-row-${index}`;
             row.innerHTML = `
-                @* <td class="text-center">${currentRow}</td> *@
                 <td>
                     <select name="SubjectTeacherAssignments[${index}].SubjectId" class="form-select form-select-sm" required onchange="updateSubjectDisplay(${index})">
                         <option value="">Select Subject</option>
                         ${subjects.map(s => `<option value="${s.value}" data-code="${s.text.split(' - ')[0]}" data-name="${s.text.split(' - ')[1] || s.text}">${s.text}</option>`).join('')}
                     </select>
-                    <input type="hidden" id="subject-code-${index}">
                 </td>
                 <td>
                     <span id="subject-name-display-${index}" class="subject-name-display">-</span>
@@ -325,17 +321,7 @@
             const row = document.getElementById(`assignment-row-${index}`);
             if (row) {
                 row.remove();
-                updateRowNumbers();
             }
-        }
-
-        // Update row numbers after deletion
-        function updateRowNumbers() {
-            const rows = document.querySelectorAll('#subjectAssignmentsContainer tr');
-            rows.forEach((row, idx) => {
-                row.querySelector('td:first-child').textContent = idx + 1;
-            });
-            rowNumber = rows.length + 1;
         }
 
         // Student search functionality
@@ -372,13 +358,36 @@
             updateSelectedCount();
         });
 
-        // Prevent form resubmission on page refresh
-        if (window.history.replaceState) {
-            window.history.replaceState(null, null, window.location.href);
-        }
-
-        // Disable submit button after form submission
+        // Disable submit button after form submission to prevent double-submit
         document.getElementById('createCurriculumForm').addEventListener('submit', function(e) {
+            // Validate that at least one subject is assigned
+            const subjectRows = document.querySelectorAll('#subjectAssignmentsContainer tr');
+            if (subjectRows.length === 0) {
+                e.preventDefault();
+                alert('Please add at least one subject with a teacher.');
+                return false;
+            }
+
+            // Check that all subjects have teachers selected
+            let allValid = true;
+            subjectRows.forEach(row => {
+                const subjectInput = row.querySelector('input[name*="SubjectId"]');
+                const teacherSelect = row.querySelector('select[name*="TeacherId"]');
+                
+                if (subjectInput && teacherSelect) {
+                    if (!subjectInput.value || !teacherSelect.value) {
+                        allValid = false;
+                    }
+                }
+            });
+
+            if (!allValid) {
+                e.preventDefault();
+                alert('Please select both subject and teacher for all assignments.');
+                return false;
+            }
+
+            // Disable button to prevent double submission
             const submitBtn = this.querySelector('button[type="submit"]');
             submitBtn.disabled = true;
             submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Creating...';

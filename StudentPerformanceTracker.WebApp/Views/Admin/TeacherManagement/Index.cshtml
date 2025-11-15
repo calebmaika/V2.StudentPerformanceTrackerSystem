@@ -277,6 +277,11 @@
         </div>
     </div>
 
+
+    @inject StudentPerformanceTracker.Services.Curriculum.ICurriculumService CurriculumService
+    @{
+        var allCurriculums = await CurriculumService.GetAllCurriculumsAsync();
+    }
     <!-- Teachers List/Grid -->
     <div id="teachersContainer" class="list-view">
         @if (Model.Any())
@@ -333,11 +338,21 @@
                                     <i class="fas fa-map-marker-alt"></i>
                                     <span>@teacher.Address</span>
                                 </div>
-                                @if (teacher.TeacherSubjects != null && teacher.TeacherSubjects.Any())
+                                @* @if (teacher.TeacherSubjects != null && teacher.TeacherSubjects.Any())
                                 {
                                     <div class="teacher-meta-item">
                                         <i class="fas fa-book"></i>
                                         <span>@string.Join(", ", teacher.TeacherSubjects.Select(ts => ts.Subject.SubjectCode))</span>
+                                    </div>
+                                } *@
+                                @{
+                                    var teacherCurriculumsCount = allCurriculums.Count(c => c.CurriculumSubjects.Any(cs => cs.TeacherId == teacher.TeacherId));
+                                }
+                                @if (teacherCurriculumsCount > 0)
+                                {
+                                    <div class="teacher-meta-item">
+                                        <i class="fas fa-clipboard-list"></i>
+                                        <span>@teacherCurriculumsCount Curriculum@(teacherCurriculumsCount != 1 ? "s" : "")</span>
                                     </div>
                                 }
                             </div>

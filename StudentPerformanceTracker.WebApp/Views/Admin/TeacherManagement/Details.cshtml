@@ -158,7 +158,10 @@
                     </h5>
                 </div>
                 <div class="card-body">
-                    <small class="text-muted">Subjects Assigned</small>
+                    <!-- General Subject Assignments -->
+                    @* <h6 class="mb-2">
+                        <i class="fas fa-bookmark"></i> General Subjects Assigned
+                    </h6>
                     @inject StudentPerformanceTracker.Services.Subject.ISubjectService SubjectService
                     @{
                         var assignedSubjectIds = Model.SelectedSubjectIds;
@@ -167,7 +170,7 @@
                     }
                     @if (assignedSubjects != null && assignedSubjects.Any())
                     {
-                        <p class="mb-0">
+                        <p class="mb-3">
                             @foreach (var subject in assignedSubjects)
                             {
                                 <span class="badge bg-info me-1 mb-1">@subject.SubjectCode - @subject.SubjectName</span>
@@ -176,7 +179,71 @@
                     }
                     else
                     {
-                        <p class="mb-0 text-muted">No subjects assigned</p>
+                        <p class="mb-3 text-muted small">No general subjects assigned</p>
+                    } *@
+
+                    @* *@
+
+                    <!-- Curriculum-Specific Assignments -->
+                    <h6 class="mb-3">
+                        <i class="fas fa-clipboard-list"></i> Curriculum Teaching Assignments
+                    </h6>
+                    <hr class="my-3" />
+                    @inject StudentPerformanceTracker.Services.Curriculum.ICurriculumService CurriculumService
+                    @{
+                        var teacherCurriculums = await CurriculumService.GetCurriculumsByTeacherIdAsync(Model.TeacherId);
+                    }
+                    
+                    @if (teacherCurriculums.Any())
+                    {
+                        <div class="mb-2">
+                            <small class="text-muted">
+                                <i class="fas fa-info-circle"></i> 
+                                Teaching in @teacherCurriculums.Count curriculum@(teacherCurriculums.Count != 1 ? "s" : "")
+                            </small>
+                        </div>
+                        
+                        @foreach (var curriculum in teacherCurriculums)
+                        {
+                            var teacherSubjectsInCurriculum = curriculum.CurriculumSubjects
+                                .Where(cs => cs.TeacherId == Model.TeacherId)
+                                .ToList();
+                            
+                            <div class="list-group-item mb-2" style="border: 1px solid var(--border-color); border-radius: 8px; padding: 16px;">
+                                <div class="d-flex justify-content-between align-items-start">
+                                    <div class="flex-grow-1">
+                                        <h6 class="mb-2">
+                                            <span class="badge bg-primary me-2">@curriculum.CurriculumCode</span>
+                                            @curriculum.CurriculumName
+                                        </h6>
+                                        <div class="small text-muted mb-2">
+                                            <i class="fas fa-calendar"></i> @curriculum.AcademicYear - @curriculum.Semester
+                                            <span class="ms-3"><i class="fas fa-graduation-cap"></i> Grade @curriculum.GradeLevel</span>
+                                        </div>
+                                        <div>
+                                            <small class="text-muted d-block mb-1"><strong>Teaching:</strong></small>
+                                            @foreach (var cs in teacherSubjectsInCurriculum)
+                                            {
+                                                <span class="badge bg-success me-1 mb-1">
+                                                    <i class="fas fa-book"></i> @cs.Subject.SubjectCode - @cs.Subject.SubjectName
+                                                </span>
+                                            }
+                                        </div>
+                                    </div>
+                                    <a asp-controller="Curriculums" asp-action="Details" asp-route-id="@curriculum.CurriculumId" 
+                                       class="btn btn-sm btn-outline-primary ms-3">
+                                        <i class="fas fa-eye"></i> View
+                                    </a>
+                                </div>
+                            </div>
+                        }
+                    }
+                    else
+                    {
+                        <div class="alert alert-info mb-0">
+                            <i class="fas fa-info-circle"></i> 
+                            This teacher is not currently assigned to any curriculum.
+                        </div>
                     }
                 </div>
             </div>
