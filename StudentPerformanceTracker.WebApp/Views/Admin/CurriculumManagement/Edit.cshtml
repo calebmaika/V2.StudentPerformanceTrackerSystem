@@ -254,12 +254,13 @@
     <script src="~/lib/jquery-validation-unobtrusive/jquery.validate.unobtrusive.min.js"></script>
     <script>
         // Store available subjects and teachers
-        const subjects = @Html.Raw(Json.Serialize(ViewBag.Subjects));
+        const allSubjects = @Html.Raw(Json.Serialize(ViewBag.Subjects));
         const teachers = @Html.Raw(Json.Serialize(ViewBag.Teachers));
         
         // Existing assignments from model
         const existingAssignments = @Html.Raw(Json.Serialize(Model.SubjectTeacherAssignments));
         
+        let subjects = allSubjects; // This will hold filtered subjects
         let assignmentIndex = 0;
         let rowNumber = 1;
 
@@ -267,6 +268,50 @@
         document.querySelector('input[name="CurriculumCode"]').addEventListener('input', function() {
             this.value = this.value.toUpperCase();
         });
+
+        // Filter subjects when grade level changes
+        document.querySelector('select[name="GradeLevel"]').addEventListener('change', function() {
+            const selectedGrade = this.value;
+            
+            if (selectedGrade) {
+                // Filter subjects by grade level
+                subjects = allSubjects.filter(s => {
+                    const subjectText = s.text.toLowerCase();
+                    return subjectText.includes(`grade ${selectedGrade}`) || 
+                           subjectText.includes(`g${selectedGrade}`) ||
+                           subjectText.includes(`${selectedGrade}`);
+                });
+                
+                // If no subjects match, keep all subjects available
+                if (subjects.length === 0) {
+                    subjects = allSubjects;
+                }
+            } else {
+                subjects = allSubjects;
+            }
+            
+            // Update existing dropdowns with filtered subjects
+            updateExistingDropdowns();
+        });
+
+        // Update existing subject dropdowns when grade level changes
+        function updateExistingDropdowns() {
+            const subjectSelects = document.querySelectorAll('select[name*="SubjectId"]');
+            subjectSelects.forEach(select => {
+                const currentValue = select.value;
+                
+                // Rebuild options
+                select.innerHTML = `
+                    <option value="">Select Subject</option>
+                    ${subjects.map(s => `<option value="${s.value}" data-code="${s.text.split(' - ')[0]}" data-name="${s.text.split(' - ')[1] || s.text}">${s.text}</option>`).join('')}
+                `;
+                
+                // Restore previous selection if it exists in filtered list
+                if (currentValue) {
+                    select.value = currentValue;
+                }
+            });
+        }
 
         // Add subject assignment
         function addSubjectAssignment(subjectId = '', teacherId = '') {
@@ -279,7 +324,7 @@
             
             if (subjectId && teacherId) {
                 // For existing assignments - show them already selected
-                const selectedSubject = subjects.find(s => s.value == subjectId);
+                const selectedSubject = allSubjects.find(s => s.value == subjectId);
                 const selectedTeacher = teachers.find(t => t.value == teacherId);
                 
                 if (selectedSubject) {
@@ -309,7 +354,7 @@
                     `;
                 }
             } else {
-                // For new assignments - show dropdowns
+                // For new assignments - show dropdowns with filtered subjects
                 row.innerHTML = `
                     <td class="text-center">${currentRow}</td>
                     <td>

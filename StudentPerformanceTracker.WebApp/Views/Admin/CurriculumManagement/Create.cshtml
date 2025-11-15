@@ -174,27 +174,36 @@
                         <h5 class="mb-3 pb-2 border-bottom">
                             <i class="fas fa-chalkboard"></i> Subject & Teacher Assignment
                         </h5>
-                        
-                        <div class="table-responsive mb-4">
-                            <table class="table table-bordered" id="subjectTeacherTable">
-                                <thead class="table-light">
-                                    <tr>
-                                        @* <th style="width: 50px;">#</th> *@
-                                        <th>Subject Code</th>
-                                        <th>Subject Name</th>
-                                        <th>Assigned Teacher</th>
-                                        <th style="width: 80px;">Action</th>
-                                    </tr>
-                                </thead>
-                                <tbody id="subjectAssignmentsContainer">
-                                    <!-- Subject assignments will be added here dynamically -->
-                                </tbody>
-                            </table>
+
+                        <div class="alert alert-info" id="gradeNotSelectedAlert">
+                            <i class="fas fa-info-circle"></i> Please select a grade level first to see available subjects.
                         </div>
 
-                        <button type="button" class="add-subject-btn mb-4" onclick="addSubjectAssignment()">
+                        <div id="subjectAssignmentSection" style="display: none;">
+                            <div class="table-responsive mb-4">
+                                <table class="table table-bordered" id="subjectTeacherTable">
+                                    <thead class="table-light">
+                                        <tr>
+                                            <th>Subject Code</th>
+                                            <th>Subject Name</th>
+                                            <th>Assigned Teacher</th>
+                                            <th style="width: 80px;">Action</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="subjectAssignmentsContainer">
+                                        <!-- Subject assignments will be added here dynamically -->
+                                    </tbody>
+                                </table>
+                            </div>
+                            
+                            <button type="button" class="add-subject-btn mb-4" onclick="addManualSubject()">
+                                <i class="fas fa-plus-circle"></i> Add Subject
+                            </button>
+                        </div>
+
+                        @* <button type="button" class="add-subject-btn mb-4" onclick="addSubjectAssignment()">
                             <i class="fas fa-plus-circle"></i> Add Subject
-                        </button>
+                        </button> *@
 
                         <!-- Student Selection Section -->
                         <h5 class="mb-3 pb-2 border-bottom">
@@ -252,32 +261,123 @@
     <script src="~/lib/jquery-validation-unobtrusive/jquery.validate.unobtrusive.min.js"></script>
     <script>
         // Store available subjects and teachers
-        const subjects = @Html.Raw(Json.Serialize(ViewBag.Subjects));
+        const allSubjects = @Html.Raw(Json.Serialize(ViewBag.Subjects));
         const teachers = @Html.Raw(Json.Serialize(ViewBag.Teachers));
         
         let assignmentIndex = 0;
+        let currentGradeLevel = '';
+        let addedSubjectIds = new Set(); // Track already added subjects
 
         // Auto-uppercase curriculum code
         document.querySelector('input[name="CurriculumCode"]').addEventListener('input', function() {
             this.value = this.value.toUpperCase();
         });
 
-        // Add subject assignment
-        function addSubjectAssignment() {
+        // Filter and display subjects based on grade level
+        function loadSubjectsForGradeLevel(gradeLevel) {
+            const container = document.getElementById('subjectAssignmentsContainer');
+            const section = document.getElementById('subjectAssignmentSection');
+            const alert = document.getElementById('gradeNotSelectedAlert');
+            
+            // Clear existing assignments
+            container.innerHTML = '';
+            assignmentIndex = 0;
+            addedSubjectIds.clear();
+            currentGradeLevel = gradeLevel;
+            
+            if (!gradeLevel) {
+                section.style.display = 'none';
+                alert.style.display = 'block';
+                return;
+            }
+            
+            alert.style.display = 'none';
+            section.style.display = 'block';
+            
+            // Filter subjects by grade level
+            const filteredSubjects = allSubjects.filter(subject => {
+                const subjectText = subject.text.toUpperCase();
+                const subjectCode = subjectText.split(' - ')[0];
+                return subjectCode.includes(gradeLevel) || subjectCode.endsWith(gradeLevel);
+            });
+            
+            if (filteredSubjects.length === 0) {
+                container.innerHTML = '<tr><td colspan="4" class="text-center text-muted">No subjects found for Grade ' + gradeLevel + '. Use "Add Subject" to add subjects manually.</td></tr>';
+                return;
+            }
+            
+            // Add a row for each filtered subject
+            filteredSubjects.forEach(subject => {
+                addSubjectRow(subject, '', true);
+            });
+        }
+
+        // Add a single subject row (auto-loaded)
+        function addSubjectRow(subject, teacherId = '', isAuto = false) {
             const container = document.getElementById('subjectAssignmentsContainer');
             const index = assignmentIndex++;
+            
+            const subjectCode = subject.text.split(' - ')[0];
+            const subjectName = subject.text.split(' - ')[1] || subject.text;
+            
+            // Track this subject as added
+            addedSubjectIds.add(subject.value);
+            
+            const row = document.createElement('tr');
+            row.id = `assignment-row-${index}`;
+            row.setAttribute('data-subject-id', subject.value);
+            row.innerHTML = `
+                <td>
+                    <span class="subject-code-display">${subjectCode}</span>
+                    <input type="hidden" name="SubjectTeacherAssignments[${index}].SubjectId" value="${subject.value}">
+                </td>
+                <td>
+                    <span class="subject-name-display">${subjectName}</span>
+                </td>
+                <td>
+                    <select name="SubjectTeacherAssignments[${index}].TeacherId" class="form-select form-select-sm" required>
+                        <option value="">Select Teacher</option>
+                        ${teachers.map(t => `<option value="${t.value}" ${t.value == teacherId ? 'selected' : ''}>${t.text}</option>`).join('')}
+                    </select>
+                </td>
+                <td class="text-center">
+                    @* ${isAuto ? `<span class="badge bg-primary">Auto</span>` : ` *@
+                        <button type="button" class="btn btn-danger btn-sm" onclick="removeSubjectAssignment(${index}, '${subject.value}')">
+                            <i class="fas fa-trash"></i>
+                        </button>
+                    @* `} *@
+                </td>
+            `;
+            
+            container.appendChild(row);
+        }
 
+        // Add manual subject (with dropdown)
+        function addManualSubject() {
+            if (!currentGradeLevel) {
+                alert('Please select a grade level first.');
+                return;
+            }
+
+            const container = document.getElementById('subjectAssignmentsContainer');
+            const index = assignmentIndex++;
+            
+            // Get available subjects (not already added)
+            const availableSubjects = allSubjects.filter(s => !addedSubjectIds.has(s.value));
+            
+            if (availableSubjects.length === 0) {
+                alert('All subjects have been added.');
+                return;
+            }
+            
             const row = document.createElement('tr');
             row.id = `assignment-row-${index}`;
             row.innerHTML = `
-                <td>
-                    <select name="SubjectTeacherAssignments[${index}].SubjectId" class="form-select form-select-sm" required onchange="updateSubjectDisplay(${index})">
+                <td colspan="2">
+                    <select name="SubjectTeacherAssignments[${index}].SubjectId" class="form-select form-select-sm" required onchange="updateManualSubjectDisplay(${index})">
                         <option value="">Select Subject</option>
-                        ${subjects.map(s => `<option value="${s.value}" data-code="${s.text.split(' - ')[0]}" data-name="${s.text.split(' - ')[1] || s.text}">${s.text}</option>`).join('')}
+                        ${availableSubjects.map(s => `<option value="${s.value}" data-code="${s.text.split(' - ')[0]}" data-name="${s.text.split(' - ')[1] || s.text}">${s.text}</option>`).join('')}
                     </select>
-                </td>
-                <td>
-                    <span id="subject-name-display-${index}" class="subject-name-display">-</span>
                 </td>
                 <td>
                     <select name="SubjectTeacherAssignments[${index}].TeacherId" class="form-select form-select-sm" required>
@@ -286,43 +386,79 @@
                     </select>
                 </td>
                 <td class="text-center">
-                    <button type="button" class="btn btn-danger btn-sm" onclick="removeSubjectAssignment(${index})">
+                    <button type="button" class="btn btn-danger btn-sm" onclick="removeManualSubjectRow(${index})">
                         <i class="fas fa-trash"></i>
                     </button>
                 </td>
             `;
-
+            
             container.appendChild(row);
         }
 
-        // Update subject display when subject is selected
-        function updateSubjectDisplay(index) {
+        // Update display when manual subject is selected
+        function updateManualSubjectDisplay(index) {
             const selectElement = document.querySelector(`select[name="SubjectTeacherAssignments[${index}].SubjectId"]`);
             const selectedOption = selectElement.options[selectElement.selectedIndex];
+            const row = document.getElementById(`assignment-row-${index}`);
             
-            if (selectedOption.value) {
-                const subjectCode = selectedOption.getAttribute('data-code') || selectedOption.text.split(' - ')[0];
-                const subjectName = selectedOption.getAttribute('data-name') || selectedOption.text.split(' - ')[1] || selectedOption.text;
-                
-                // Update the subject code cell
-                const subjectCodeCell = selectElement.closest('td');
-                subjectCodeCell.innerHTML = `
+            if (!selectedOption.value) return;
+            
+            const subjectCode = selectedOption.getAttribute('data-code') || selectedOption.text.split(' - ')[0];
+            const subjectName = selectedOption.getAttribute('data-name') || selectedOption.text.split(' - ')[1] || selectedOption.text;
+            const subjectId = selectedOption.value;
+            
+            // Track this subject as added
+            addedSubjectIds.add(subjectId);
+            row.setAttribute('data-subject-id', subjectId);
+            
+            // Get teacher select value
+            const teacherSelect = row.querySelector('select[name*="TeacherId"]');
+            const teacherValue = teacherSelect.value;
+            
+            // Update the row to show selected subject
+            row.innerHTML = `
+                <td>
                     <span class="subject-code-display">${subjectCode}</span>
-                    <input type="hidden" name="SubjectTeacherAssignments[${index}].SubjectId" value="${selectedOption.value}">
-                `;
-                
-                // Update the subject name display
-                document.getElementById(`subject-name-display-${index}`).textContent = subjectName;
-            }
+                    <input type="hidden" name="SubjectTeacherAssignments[${index}].SubjectId" value="${subjectId}">
+                </td>
+                <td>
+                    <span class="subject-name-display">${subjectName}</span>
+                </td>
+                <td>
+                    <select name="SubjectTeacherAssignments[${index}].TeacherId" class="form-select form-select-sm" required>
+                        <option value="">Select Teacher</option>
+                        ${teachers.map(t => `<option value="${t.value}" ${t.value == teacherValue ? 'selected' : ''}>${t.text}</option>`).join('')}
+                    </select>
+                </td>
+                <td class="text-center">
+                    <button type="button" class="btn btn-danger btn-sm" onclick="removeSubjectAssignment(${index}, '${subjectId}')">
+                        <i class="fas fa-trash"></i>
+                    </button>
+                </td>
+            `;
         }
 
         // Remove subject assignment
-        function removeSubjectAssignment(index) {
+        function removeSubjectAssignment(index, subjectId) {
+            const row = document.getElementById(`assignment-row-${index}`);
+            if (row) {
+                row.remove();
+                addedSubjectIds.delete(subjectId);
+            }
+        }
+
+        // Remove manual subject row (before selection)
+        function removeManualSubjectRow(index) {
             const row = document.getElementById(`assignment-row-${index}`);
             if (row) {
                 row.remove();
             }
         }
+
+        // Listen to grade level changes
+        document.querySelector('select[name="GradeLevel"]').addEventListener('change', function() {
+            loadSubjectsForGradeLevel(this.value);
+        });
 
         // Student search functionality
         document.getElementById('studentSearch').addEventListener('input', function() {
@@ -352,38 +488,42 @@
             }
         });
 
-        // Add at least one subject assignment on page load
+        // Initialize on page load
         document.addEventListener('DOMContentLoaded', function() {
-            addSubjectAssignment();
             updateSelectedCount();
         });
 
-        // Disable submit button after form submission to prevent double-submit
+        // Form submission validation
         document.getElementById('createCurriculumForm').addEventListener('submit', function(e) {
+            // Validate that grade level is selected
+            const gradeLevel = document.querySelector('select[name="GradeLevel"]').value;
+            if (!gradeLevel) {
+                e.preventDefault();
+                alert('Please select a grade level.');
+                return false;
+            }
+
             // Validate that at least one subject is assigned
             const subjectRows = document.querySelectorAll('#subjectAssignmentsContainer tr');
             if (subjectRows.length === 0) {
                 e.preventDefault();
-                alert('Please add at least one subject with a teacher.');
+                alert('Please add at least one subject.');
                 return false;
             }
 
-            // Check that all subjects have teachers selected
+            // Validate that all subjects have teachers assigned
+            const teacherSelects = document.querySelectorAll('select[name*="TeacherId"]');
             let allValid = true;
-            subjectRows.forEach(row => {
-                const subjectInput = row.querySelector('input[name*="SubjectId"]');
-                const teacherSelect = row.querySelector('select[name*="TeacherId"]');
-                
-                if (subjectInput && teacherSelect) {
-                    if (!subjectInput.value || !teacherSelect.value) {
-                        allValid = false;
-                    }
+            
+            teacherSelects.forEach(select => {
+                if (!select.value) {
+                    allValid = false;
                 }
             });
 
             if (!allValid) {
                 e.preventDefault();
-                alert('Please select both subject and teacher for all assignments.');
+                alert('Please assign a teacher to all subjects.');
                 return false;
             }
 
