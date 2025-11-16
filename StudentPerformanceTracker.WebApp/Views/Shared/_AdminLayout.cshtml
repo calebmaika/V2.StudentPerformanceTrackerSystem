@@ -325,9 +325,26 @@
             font-weight: 600;
         }
 
+        /* Dark mode card header styling */
+        [data-theme="dark"] .card-header {
+            background-color: rgba(255, 255, 255, 0.05) !important;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        /* Light mode card header styling */
+        [data-theme="light"] .card-header,
+        .card-header {
+            background-color: #ffffff;
+            border-bottom: 1px solid rgba(0, 0, 0, 0.125);
+        }
+
         .card-body {
             color: var(--text-primary);
         }
+
+        
+
+
 
         /* ===================================
            FORM CONTROLS - DARK MODE FIX

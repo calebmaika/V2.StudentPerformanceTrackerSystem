@@ -93,6 +93,34 @@
         border-radius: 8px;
         overflow: hidden;
     }
+
+    /* Dark mode table header fix */
+    [data-theme="dark"] .table-light {
+        background-color: rgba(255, 255, 255, 0.08) !important;
+        color: var(--text-primary) !important;
+    }
+
+    [data-theme="dark"] .table-light th {
+        color: var(--text-primary) !important;
+        border-color: var(--border-color) !important;
+        background-color: rgba(255, 255, 255, 0.08) !important;
+    }
+
+    [data-theme="dark"] thead.table-light {
+        background-color: rgba(255, 255, 255, 0.08) !important;
+    }
+
+    [data-theme="dark"] thead.table-light th {
+        color: var(--text-primary) !important;
+        background-color: rgba(255, 255, 255, 0.08) !important;
+        border-color: var(--border-color) !important;
+    }
+
+    /* Table body in dark mode */
+    [data-theme="dark"] #subjectTeacherTable tbody td {
+        background-color: var(--card-bg);
+        border-color: var(--border-color) !important;
+    }
 </style>
 
 <div class="container-fluid">
@@ -180,7 +208,7 @@
                             <table class="table table-bordered" id="subjectTeacherTable">
                                 <thead class="table-light">
                                     <tr>
-                                        <th style="width: 50px;">#</th>
+                                        @* <th style="width: 50px;">#</th> *@
                                         <th>Subject Code</th>
                                         <th>Subject Name</th>
                                         <th>Assigned Teacher</th>
@@ -332,7 +360,7 @@
                     const subjectName = selectedSubject.text.split(' - ')[1] || selectedSubject.text;
                     
                     row.innerHTML = `
-                        <td class="text-center">${currentRow}</td>
+                        @* <td class="text-center">${currentRow}</td> *@
                         <td>
                             <span class="subject-code-display">${subjectCode}</span>
                             <input type="hidden" name="SubjectTeacherAssignments[${index}].SubjectId" value="${subjectId}">

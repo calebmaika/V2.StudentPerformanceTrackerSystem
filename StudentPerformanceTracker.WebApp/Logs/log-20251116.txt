@@ -1,0 +1,14 @@
+2025-11-16 18:13:43.248 +08:00 [INF] HTTP GET /Admin/Dashboard responded 302 in 8.3699 ms
+2025-11-16 18:13:43.395 +08:00 [INF] HTTP GET /Admin/Account/Login responded 200 in 118.8264 ms
+2025-11-16 18:13:43.579 +08:00 [INF] HTTP GET /lib/font-awesome/css/all.min.css responded 304 in 1.4017 ms
+2025-11-16 18:13:43.657 +08:00 [INF] HTTP GET /lib/jquery-validation/dist/jquery.validate.min.js responded 200 in 75.5646 ms
+2025-11-16 18:13:43.659 +08:00 [INF] HTTP GET /lib/bootstrap/js/bootstrap.bundle.min.js responded 200 in 184.3429 ms
+2025-11-16 18:13:43.688 +08:00 [INF] HTTP GET /lib/jquery/jquery.min.js responded 200 in 244.4473 ms
+2025-11-16 18:13:43.689 +08:00 [INF] HTTP GET /lib/jquery-validation-unobtrusive/jquery.validate.unobtrusive.min.js responded 200 in 105.0048 ms
+2025-11-16 18:13:43.733 +08:00 [INF] HTTP GET /lib/bootstrap/css/bootstrap.min.css responded 200 in 286.1564 ms
+2025-11-16 18:13:43.824 +08:00 [INF] HTTP GET /lib/font-awesome/webfonts/fa-solid-900.woff2 responded 304 in 0.8814 ms
+2025-11-16 18:13:43.927 +08:00 [INF] HTTP GET /favicon.ico responded 304 in 0.2282 ms
+2025-11-16 18:13:49.367 +08:00 [INF] HTTP POST /Admin/Account/Login responded 302 in 72.2534 ms
+2025-11-16 18:13:49.532 +08:00 [INF] HTTP GET /Admin/Dashboard/Index responded 200 in 111.5003 ms
+2025-11-16 18:13:49.617 +08:00 [INF] HTTP GET /lib/bootstrap/dist/css/bootstrap.min.css responded 304 in 0.5930 ms
+2025-11-16 18:13:49.629 +08:00 [INF] HTTP GET /lib/bootstrap/dist/js/bootstrap.bundle.min.js responded 304 in 0.1867 ms
