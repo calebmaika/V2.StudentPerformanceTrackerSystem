@@ -85,10 +85,30 @@
         display: flex;
         align-items: center;
         gap: 8px;
+        transition: all 0.2s;
+    }
+
+    .student-card:hover {
+        background: var(--primary);
+        color: white;
+        transform: translateY(-2px);
+    }
+
+    .student-card:hover i {
+        color: white !important;
+    }
+
+    .student-card:hover .student-grade {
+        color: rgba(255, 255, 255, 0.8) !important;
     }
 
     .student-card i {
         color: var(--primary);
+    }
+
+    .student-grade {
+        font-size: 12px;
+        color: var(--text-muted);
     }
 
     .stat-box {
@@ -114,6 +134,45 @@
     .action-buttons {
         display: flex;
         gap: 12px;
+    }
+
+    .sort-controls {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        margin-bottom: 16px;
+    }
+
+    .sort-btn {
+        padding: 8px 16px;
+        border: 1px solid var(--border-color);
+        background: var(--card-bg);
+        color: var(--text-primary);
+        border-radius: 6px;
+        cursor: pointer;
+        transition: all 0.2s;
+        font-size: 14px;
+        display: flex;
+        align-items: center;
+        gap: 6px;
+    }
+
+    .sort-btn:hover {
+        background: var(--primary);
+        color: white;
+        border-color: var(--primary);
+    }
+
+    .sort-btn.active {
+        background: var(--primary);
+        color: white;
+        border-color: var(--primary);
+    }
+
+    .sort-label {
+        font-size: 14px;
+        color: var(--text-muted);
+        font-weight: 500;
     }
 </style>
 
@@ -258,21 +317,41 @@
 
             <!-- Enrolled Students -->
             <div class="info-card">
-                <h5><i class="fas fa-users"></i> Enrolled Students (@Model.SelectedStudentIds.Count)</h5>
-                @inject StudentPerformanceTracker.Services.Students.IStudentService StudentService
+                <div class="d-flex justify-content-between align-items-center mb-3" style="padding-bottom: 12px; border-bottom: 2px solid var(--border-color);">
+                    <h5 class="mb-0"><i class="fas fa-users"></i> Enrolled Students (@Model.SelectedStudentIds.Count)</h5>
+                    
+                    @inject StudentPerformanceTracker.Services.Students.IStudentService StudentService
+                    @if (Model.SelectedStudentIds.Any())
+                    {
+                        <!-- Sort Controls -->
+                        <div class="sort-controls mb-0">
+                            <span class="sort-label">Sort:</span>
+                            <button class="sort-btn active" onclick="sortStudents('az')" id="sortAZ">
+                                <i class="fas fa-sort-alpha-down"></i> A-Z
+                            </button>
+                            <button class="sort-btn" onclick="sortStudents('za')" id="sortZA">
+                                <i class="fas fa-sort-alpha-up"></i> Z-A
+                            </button>
+                        </div>
+                    }
+                </div>
+                
                 @if (Model.SelectedStudentIds.Any())
                 {
                     var allStudents = await StudentService.GetAllStudentsAsync();
                     var enrolledStudents = allStudents.Where(s => Model.SelectedStudentIds.Contains(s.StudentId)).ToList();
                     
-                    <div class="student-grid">
-                        @foreach (var student in enrolledStudents)
+                    <div class="student-grid" id="studentGrid">
+                        @foreach (var student in enrolledStudents.OrderBy(s => s.FullName))
                         {
-                            <div class="student-card">
+                            var nameParts = student.FullName.Split(' ');
+                            var lastName = nameParts.Length > 0 ? nameParts[nameParts.Length - 1] : student.FullName;
+                            
+                            <div class="student-card" data-name="@student.FullName" data-lastname="@lastName">
                                 <i class="fas fa-user-graduate"></i>
                                 <div>
                                     <div style="font-weight: 600; font-size: 14px;">@student.FullName</div>
-                                    <div style="font-size: 12px; color: var(--text-muted);">Grade @student.GradeLevel</div>
+                                    <div class="student-grade">Grade @student.GradeLevel</div>
                                 </div>
                             </div>
                         }
@@ -318,6 +397,37 @@
             document.getElementById('curriculumName').textContent = curriculumName;
             document.getElementById('deleteForm').action = '/Admin/Curriculums/Delete/' + curriculumId;
             new bootstrap.Modal(document.getElementById('deleteModal')).show();
+        }
+
+        function sortStudents(order) {
+            const grid = document.getElementById('studentGrid');
+            const cards = Array.from(grid.getElementsByClassName('student-card'));
+            
+            // Sort the cards
+            cards.sort((a, b) => {
+                const nameA = a.getAttribute('data-name').toLowerCase();
+                const nameB = b.getAttribute('data-name').toLowerCase();
+                
+                if (order === 'az') {
+                    return nameA.localeCompare(nameB);
+                } else {
+                    return nameB.localeCompare(nameA);
+                }
+            });
+            
+            // Clear the grid and re-append sorted cards
+            grid.innerHTML = '';
+            cards.forEach(card => grid.appendChild(card));
+            
+            // Update active button state
+            document.getElementById('sortAZ').classList.remove('active');
+            document.getElementById('sortZA').classList.remove('active');
+            
+            if (order === 'az') {
+                document.getElementById('sortAZ').classList.add('active');
+            } else {
+                document.getElementById('sortZA').classList.add('active');
+            }
         }
     </script>
 }
