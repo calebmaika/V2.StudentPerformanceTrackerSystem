@@ -182,7 +182,7 @@
                             <div class="col-md-4 mb-3">
                                 <label asp-for="GradeLevel" class="form-label"></label>
                                 <select asp-for="GradeLevel" class="form-select">
-                                    <option value="">Select Grade Level</option>
+                                    <option value="" selected>Select Grade Level</option>
                                     <option value="7">Grade 7</option>
                                     <option value="8">Grade 8</option>
                                     <option value="9">Grade 9</option>
@@ -294,7 +294,7 @@
         
         let assignmentIndex = 0;
         let currentGradeLevel = '';
-        let addedSubjectIds = new Set(); // Track already added subjects
+        let addedSubjectIds = new Set(); 
 
         // Auto-uppercase curriculum code
         document.querySelector('input[name="CurriculumCode"]').addEventListener('input', function() {

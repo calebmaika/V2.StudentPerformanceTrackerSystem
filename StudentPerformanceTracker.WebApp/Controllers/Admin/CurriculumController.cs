@@ -43,7 +43,7 @@ namespace StudentPerformanceTracker.WebApp.Controllers.Admin
         public async Task<IActionResult> Create()
         {
             await LoadViewBagData();
-            return View("~/Views/Admin/CurriculumManagement/Create.cshtml", new CurriculumViewModel());
+            return View("~/Views/Admin/CurriculumManagement/Create.cshtml");
         }
 
         [HttpPost("Create")]
