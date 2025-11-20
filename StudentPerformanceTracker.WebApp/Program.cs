@@ -58,7 +58,6 @@ try
     // Register services
     builder.Services.AddScoped<IPasswordService, PasswordService>();
     builder.Services.AddScoped<IAdminAuthenticationService, AuthenticationService>();
-    builder.Services.AddScoped<ITeacherAuthenticationService, AuthenticationService>();
     builder.Services.AddScoped<ITeacherService, TeacherService>();
     builder.Services.AddScoped<ISubjectService, SubjectService>();
     builder.Services.AddScoped<IStudentService, StudentService>();
