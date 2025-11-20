@@ -2,18 +2,18 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using System.Security.Claims;
-using StudentPerformanceTracker.WebApp.Models.Admin;
+using StudentPerformanceTracker.WebApp.Models.Teacher;
 using StudentPerformanceTracker.Services.Authentication;
 
-namespace StudentPerformanceTracker.WebApp.Controllers.Admin
+namespace StudentPerformanceTracker.WebApp.Controllers.Teacher
 {
-    [Area("Admin")]
-    [Route("Admin/[controller]")]
+    [Area("Teacher")]
+    [Route("Teacher/[controller]")]
     public class AccountController : Controller
     {
-        private readonly IAdminAuthenticationService _authService;
+        private readonly ITeacherAuthenticationService _authService;
 
-        public AccountController(IAdminAuthenticationService authService)
+        public AccountController(ITeacherAuthenticationService authService)
         {
             _authService = authService;
         }
@@ -21,12 +21,13 @@ namespace StudentPerformanceTracker.WebApp.Controllers.Admin
         [HttpGet("Login")]
         public IActionResult Login()
         {
-            if (User.Identity?.IsAuthenticated == true && User.IsInRole("Admin"))
+            // If teacher is already logged in, redirect to dashboard
+            if (User.Identity?.IsAuthenticated == true && User.IsInRole("Teacher"))
             {
-                return RedirectToAction("Index", "Dashboard", new { area = "Admin" });
+                return RedirectToAction("Index", "Dashboard", new { area = "Teacher" });
             }
 
-            return View("~/Views/Admin/Login.cshtml");
+            return View("~/Views/Teacher/Login.cshtml");
         }
 
         [HttpPost("Login")]
@@ -35,23 +36,25 @@ namespace StudentPerformanceTracker.WebApp.Controllers.Admin
         {
             if (!ModelState.IsValid)
             {
-                return View("~/Views/Admin/Login.cshtml", model);
+                return View("~/Views/Teacher/Login.cshtml", model);
             }
 
-            // HARDCODED CREDENTIALS
-            if (model.Username != "admin" || model.Password != "Admin@123")
+            // Authenticate teacher
+            var teacher = await _authService.AuthenticateTeacherAsync(model.Username, model.Password);
+
+            if (teacher == null)
             {
                 ModelState.AddModelError(string.Empty, "Invalid username or password.");
-                return View("~/Views/Admin/Login.cshtml", model);
+                return View("~/Views/Teacher/Login.cshtml", model);
             }
 
+            // Create claims for authentication
             var claims = new List<Claim>
             {
-                new Claim(ClaimTypes.NameIdentifier, "1"),
-                new Claim(ClaimTypes.Name, "admin"),
-                new Claim(ClaimTypes.Email, "admin@studenttracker.com"),
-                new Claim("FullName", "System Administrator"),
-                new Claim(ClaimTypes.Role, "Admin")
+                new Claim(ClaimTypes.NameIdentifier, teacher.TeacherId.ToString()),
+                new Claim(ClaimTypes.Name, teacher.Username),
+                new Claim("FullName", teacher.FullName),
+                new Claim(ClaimTypes.Role, "Teacher")
             };
 
             var claimsIdentity = new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme);
@@ -70,7 +73,10 @@ namespace StudentPerformanceTracker.WebApp.Controllers.Admin
                 claimsPrincipal,
                 authProperties);
 
-            return RedirectToAction("Index", "Dashboard", new { area = "Admin" });
+            // Update last login
+            await _authService.UpdateLastLoginAsync(teacher.TeacherId);
+
+            return RedirectToAction("Index", "Dashboard", new { area = "Teacher" });
         }
 
         [HttpPost("Logout")]

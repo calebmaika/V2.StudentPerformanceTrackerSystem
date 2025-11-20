@@ -39,25 +39,52 @@ try
 
     // Configure SQLite Database
     builder.Services.AddDbContext<ApplicationDbContext>(options =>
-        options.UseSqlite(builder.Configuration.GetConnectionString("DefaultConnection")));
+    options.UseSqlite(builder.Configuration.GetConnectionString("DefaultConnection")));
 
     // Configure Cookie Authentication
-    builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
-        .AddCookie(options =>
-        {
-            options.LoginPath = "/Admin/Account/Login";
-            options.LogoutPath = "/Admin/Account/Logout";
-            options.AccessDeniedPath = "/Admin/Account/AccessDenied";
-            options.ExpireTimeSpan = TimeSpan.FromHours(2);
-            options.SlidingExpiration = true;
-            options.Cookie.HttpOnly = true;
-            options.Cookie.SecurePolicy = CookieSecurePolicy.Always;
-            options.Cookie.SameSite = SameSiteMode.Lax;
-        });
+    // Configure Cookie Authentication with MULTIPLE schemes
+    builder.Services.AddAuthentication(options =>
+    {
+        options.DefaultScheme = CookieAuthenticationDefaults.AuthenticationScheme;
+        options.DefaultChallengeScheme = CookieAuthenticationDefaults.AuthenticationScheme;
+    })
+    .AddCookie("AdminScheme", options =>
+    {
+        options.LoginPath = "/Admin/Account/Login";
+        options.LogoutPath = "/Admin/Account/Logout";
+        options.AccessDeniedPath = "/Admin/Account/AccessDenied";
+        options.ExpireTimeSpan = TimeSpan.FromHours(2);
+        options.SlidingExpiration = true;
+        options.Cookie.Name = "AdminAuth"; // Different cookie name
+        options.Cookie.HttpOnly = true;
+        options.Cookie.SecurePolicy = CookieSecurePolicy.Always;
+        options.Cookie.SameSite = SameSiteMode.Lax;
+    })
+    .AddCookie("TeacherScheme", options =>
+    {
+        options.LoginPath = "/Teacher/Account/Login";
+        options.LogoutPath = "/Teacher/Account/Logout";
+        options.AccessDeniedPath = "/Teacher/Account/Login";
+        options.ExpireTimeSpan = TimeSpan.FromHours(2);
+        options.SlidingExpiration = true;
+        options.Cookie.Name = "TeacherAuth"; // Different cookie name
+        options.Cookie.HttpOnly = true;
+        options.Cookie.SecurePolicy = CookieSecurePolicy.Always;
+        options.Cookie.SameSite = SameSiteMode.Lax;
+    })
+    .AddCookie(CookieAuthenticationDefaults.AuthenticationScheme, options =>
+    {
+        // Default fallback scheme
+        options.LoginPath = "/Home/Index";
+        options.ExpireTimeSpan = TimeSpan.FromHours(2);
+        options.Cookie.HttpOnly = true;
+        options.Cookie.SecurePolicy = CookieSecurePolicy.Always;
+    });
 
     // Register services
     builder.Services.AddScoped<IPasswordService, PasswordService>();
     builder.Services.AddScoped<IAdminAuthenticationService, AuthenticationService>();
+    builder.Services.AddScoped<ITeacherAuthenticationService, TeacherAuthenticationService>();
     builder.Services.AddScoped<ITeacherService, TeacherService>();
     builder.Services.AddScoped<ISubjectService, SubjectService>();
     builder.Services.AddScoped<IStudentService, StudentService>();
@@ -116,17 +143,26 @@ try
     app.UseSession();
 
     // Configure routes
+    // Configure routes - ORDER MATTERS! Most specific first
+    app.MapControllerRoute(
+        name: "admin_account",
+        pattern: "Admin/Account/{action=Login}",
+        defaults: new { controller = "Account", area = "Admin" },
+        constraints: new { action = "Login|Logout|AccessDenied" });
+
+    app.MapControllerRoute(
+        name: "teacher_account",
+        pattern: "Teacher/Account/{action=Login}",
+        defaults: new { controller = "Account", area = "Teacher" },
+        constraints: new { action = "Login|Logout" });
+
     app.MapControllerRoute(
         name: "admin_default",
-        pattern: "Admin/{controller=Account}/{action=Login}/{id?}");
+        pattern: "Admin/{controller=Dashboard}/{action=Index}/{id?}");
 
     app.MapControllerRoute(
         name: "teacher_default",
-        pattern: "Teacher/{controller=Account}/{action=Login}/{id?}");
-
-    app.MapControllerRoute(
-        name: "student_default",
-        pattern: "Student/{controller=Account}/{action=Login}/{id?}");
+        pattern: "Teacher/{controller=Dashboard}/{action=Index}/{id?}");
 
     app.MapControllerRoute(
         name: "default",

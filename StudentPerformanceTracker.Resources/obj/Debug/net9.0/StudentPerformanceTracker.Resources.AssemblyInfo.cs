@@ -13,7 +13,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("StudentPerformanceTracker.Resources")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+023a97fcffe85f9a0e1551ffb147ae94fe1ab38f")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+c909113c9b708f4c304c855ea1eb0982c7cbb1da")]
 [assembly: System.Reflection.AssemblyProductAttribute("StudentPerformanceTracker.Resources")]
 [assembly: System.Reflection.AssemblyTitleAttribute("StudentPerformanceTracker.Resources")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]

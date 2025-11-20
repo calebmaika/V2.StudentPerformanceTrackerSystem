@@ -7,6 +7,7 @@ namespace StudentPerformanceTracker.WebApp.Controllers.Admin
     /// Admin dashboard controller
     /// Route: /Admin/Dashboard/...
     /// </summary>
+    [Area("Admin")]
     [Authorize(Roles = "Admin")]
     [Route("Admin/Dashboard")]
     public class DashboardController : Controller
