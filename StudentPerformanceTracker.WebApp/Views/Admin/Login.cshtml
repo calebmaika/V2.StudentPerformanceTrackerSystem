@@ -202,8 +202,13 @@
             background: var(--card-bg);
         }
 
-        body.dark-mode .form-control:focus {
-            box-shadow: 0 0 0 3px rgba(129, 140, 248, 0.15);
+        body.dark-mode .form-control {
+            color: #f1f5f9;
+            background: #1e293b;
+        }
+
+        body.dark-mode .form-control::placeholder {
+            color: #94a3b8;
         }
 
         .form-control::placeholder {
