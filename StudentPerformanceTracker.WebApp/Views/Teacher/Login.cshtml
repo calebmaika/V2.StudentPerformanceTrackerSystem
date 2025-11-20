@@ -1,7 +1,7 @@
-@model StudentPerformanceTracker.WebApp.Models.Admin.LoginViewModel
+@model StudentPerformanceTracker.WebApp.Models.Teacher.LoginViewModel
 
 @{
-    ViewData["Title"] = "Admin Login";
+    ViewData["Title"] = "Teacher Login";
     Layout = null;
 }
 
@@ -12,9 +12,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>@ViewData["Title"] - Student Performance Tracker</title>
     
-    <!-- Bootstrap CSS -->
     <link rel="stylesheet" href="~/lib/bootstrap/css/bootstrap.min.css" />
-    <!-- Font Awesome Icons -->
     <link rel="stylesheet" href="~/lib/font-awesome/css/all.min.css" />
     
     <style>
@@ -25,8 +23,8 @@
         }
 
         :root {
-            --admin-color: #6366f1;
-            --admin-hover: #4f46e5;
+            --teacher-color: #ec4899;
+            --teacher-hover: #db2777;
             --bg: #f8f9fa;
             --card-bg: #ffffff;
             --text-primary: #1e293b;
@@ -35,8 +33,8 @@
         }
 
         body.dark-mode {
-            --admin-color: #818cf8;
-            --admin-hover: #6366f1;
+            --teacher-color: #f472b6;
+            --teacher-hover: #ec4899;
             --bg: #0f172a;
             --card-bg: #1e293b;
             --text-primary: #f1f5f9;
@@ -55,7 +53,6 @@
             transition: background-color 0.3s ease;
         }
 
-        /* Dark Mode Toggle Button */
         .theme-toggle {
             position: fixed;
             top: 24px;
@@ -76,8 +73,8 @@
 
         .theme-toggle:hover {
             transform: translateY(-2px);
-            background: var(--admin-color);
-            border-color: var(--admin-color);
+            background: var(--teacher-color);
+            border-color: var(--teacher-color);
         }
 
         .theme-toggle:hover i {
@@ -88,10 +85,6 @@
             font-size: 20px;
             color: var(--text-primary);
             transition: all 0.3s ease;
-        }
-
-        body.dark-mode .theme-toggle:hover i {
-            color: white;
         }
 
         .login-container {
@@ -107,7 +100,7 @@
         .brand-icon {
             width: 64px;
             height: 64px;
-            background: var(--admin-color);
+            background: var(--teacher-color);
             border-radius: 16px;
             display: flex;
             align-items: center;
@@ -164,7 +157,7 @@
 
         .user-type-badge {
             display: inline-block;
-            background: var(--admin-color);
+            background: var(--teacher-color);
             color: white;
             padding: 6px 16px;
             border-radius: 20px;
@@ -251,7 +244,7 @@
         }
 
         .password-toggle:hover {
-            color: var(--admin-color);
+            color: var(--teacher-color);
         }
 
         .input-group .form-control.has-toggle {
@@ -274,8 +267,8 @@
         }
 
         .form-check-input:checked {
-            background-color: var(--admin-color);
-            border-color: var(--admin-color);
+            background-color: var(--teacher-color);
+            border-color: var(--teacher-color);
         }
 
         .form-check-label {
@@ -289,7 +282,7 @@
         .btn-login {
             width: 100%;
             height: 48px;
-            background: var(--admin-color);
+            background: var(--teacher-color);
             border: none;
             border-radius: 10px;
             color: white;
@@ -302,12 +295,12 @@
 
         .btn-login:hover {
             transform: translateY(-2px);
-            box-shadow: 0 4px 12px rgba(99, 102, 241, 0.3);
-            background: var(--admin-hover);
+            box-shadow: 0 4px 12px rgba(236, 72, 153, 0.3);
+            background: var(--teacher-hover);
         }
 
         body.dark-mode .btn-login:hover {
-            box-shadow: 0 4px 12px rgba(129, 140, 248, 0.4);
+            box-shadow: 0 4px 12px rgba(244, 114, 182, 0.4);
         }
 
         .btn-login:active {
@@ -353,35 +346,13 @@
             transition: color 0.3s ease;
         }
 
-        .btn-login.loading {
-            pointer-events: none;
-            opacity: 0.7;
-        }
-
-        .btn-login.loading::after {
-            content: '';
-            width: 16px;
-            height: 16px;
-            border: 2px solid rgba(255, 255, 255, 0.3);
-            border-top-color: white;
-            border-radius: 50%;
-            display: inline-block;
-            margin-left: 8px;
-            animation: spin 0.6s linear infinite;
-        }
-
-        @@keyframes spin {
-            to { transform: rotate(360deg); }
-        }
-
-        /* Back to Home Link */
         .back-link {
             text-align: center;
             margin-top: 20px;
         }
 
         .back-link a {
-            color: var(--admin-color);
+            color: var(--teacher-color);
             text-decoration: none;
             font-size: 14px;
             font-weight: 500;
@@ -393,7 +364,7 @@
 
         .back-link a:hover {
             gap: 8px;
-            color: var(--admin-hover);
+            color: var(--teacher-hover);
         }
 
         @@media (max-width: 480px) {
@@ -424,7 +395,7 @@
         <!-- Brand -->
         <div class="brand">
             <div class="brand-icon">
-                <i class="fas fa-user-shield"></i>
+                <i class="fas fa-chalkboard-teacher"></i>
             </div>
             <h1>Student Tracker</h1>
             <p>Performance Management System</p>
@@ -433,9 +404,9 @@
         <!-- Login Card -->
         <div class="login-card">
             <div class="form-header">
-                <span class="user-type-badge">Administrator</span>
+                <span class="user-type-badge">Teacher Portal</span>
                 <h2>Welcome back</h2>
-                <p>Sign in to your admin account</p>
+                <p>Sign in to your teacher account</p>
             </div>
 
             <form asp-action="Login" method="post" id="loginForm">
@@ -463,14 +434,6 @@
                     <span asp-validation-for="Password" class="text-danger"></span>
                 </div>
                 
-                <!-- Remember Me -->
-                @* <div class="form-check mb-3">
-                    <input asp-for="RememberMe" class="form-check-input" type="checkbox" id="rememberMe" />
-                    <label asp-for="RememberMe" class="form-check-label" for="rememberMe">
-                        Remember me for 30 days
-                    </label>
-                </div>
-                 *@
                 <!-- Login Button -->
                 <button type="submit" class="btn-login" id="loginBtn">
                     Sign In
@@ -504,7 +467,6 @@
         const themeIcon = themeToggle.querySelector('i');
         const body = document.body;
 
-        // Check for saved theme preference or default to light mode
         const currentTheme = localStorage.getItem('theme') || 'light';
         if (currentTheme === 'dark') {
             body.classList.add('dark-mode');
@@ -512,7 +474,6 @@
             themeIcon.classList.add('fa-sun');
         }
 
-        // Toggle theme on button click
         themeToggle.addEventListener('click', function() {
             body.classList.toggle('dark-mode');
             
@@ -529,7 +490,7 @@
             }
         });
 
-        // Password toggle functionality
+        // Password toggle
         document.getElementById('togglePassword').addEventListener('click', function() {
             const passwordField = document.getElementById('passwordField');
             const icon = this;
@@ -547,11 +508,11 @@
             }
         });
 
-        // Add loading state to button on submit
+        // Loading state on submit
         document.getElementById('loginForm').addEventListener('submit', function() {
             var btn = document.getElementById('loginBtn');
-            btn.classList.add('loading');
-            btn.textContent = 'Signing in';
+            btn.disabled = true;
+            btn.textContent = 'Signing in...';
         });
     </script>
 </body>

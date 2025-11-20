@@ -1,5 +1,6 @@
 using StudentPerformanceTracker.Data.Context;
 using StudentPerformanceTracker.Data.Entities;
+using StudentPerformanceTracker.Data.Entities.AdminManagement;
 using Microsoft.EntityFrameworkCore;
 
 namespace StudentPerformanceTracker.Services.Authentication
@@ -24,11 +25,18 @@ namespace StudentPerformanceTracker.Services.Authentication
         Task UpdateLastLoginAsync(int adminId);
     }
 
+    // NEW: Add Teacher Authentication Interface
+    public interface ITeacherAuthenticationService
+    {
+        Task<TeacherManagement?> AuthenticateTeacherAsync(string username, string password);
+        Task UpdateLastLoginAsync(int teacherId);
+    }
+
     /// <summary>
     /// Service that handles admin authentication logic
     /// This is where the actual login validation happens
     /// </summary>
-    public class AuthenticationService : IAdminAuthenticationService
+    public class AuthenticationService : IAdminAuthenticationService, ITeacherAuthenticationService
 
     {
         // Database context to query the Admins table
@@ -101,6 +109,31 @@ namespace StudentPerformanceTracker.Services.Authentication
                 // Save changes to database
                 await _context.SaveChangesAsync();
             }
+        }
+
+        // NEW: Teacher Authentication
+        public async Task<TeacherManagement?> AuthenticateTeacherAsync(string username, string password)
+        {
+            var teacher = await _context.Teachers
+                .FirstOrDefaultAsync(t => t.Username == username && t.IsActive);
+
+            if (teacher == null)
+                return null;
+
+            bool isPasswordValid = _passwordService.VerifyPassword(password, teacher.PasswordHash);
+
+            if (!isPasswordValid)
+                return null;
+
+            return teacher;
+        }
+
+        // Teacher Last Login Update
+        Task ITeacherAuthenticationService.UpdateLastLoginAsync(int teacherId)
+        {
+            // You might want to add a LastLoginAt field to TeacherManagement entity
+            // For now, we'll just return a completed task
+            return Task.CompletedTask;
         }
     }
 }
