@@ -24,9 +24,29 @@
             box-sizing: border-box;
         }
 
+        :root {
+            --admin-color: #6366f1;
+            --admin-hover: #4f46e5;
+            --bg: #f8f9fa;
+            --card-bg: #ffffff;
+            --text-primary: #1e293b;
+            --text-secondary: #64748b;
+            --border-color: #e2e8f0;
+        }
+
+        body.dark-mode {
+            --admin-color: #818cf8;
+            --admin-hover: #6366f1;
+            --bg: #0f172a;
+            --card-bg: #1e293b;
+            --text-primary: #f1f5f9;
+            --text-secondary: #94a3b8;
+            --border-color: #334155;
+        }
+
         body {
             font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-            background: #f8f9fa;
+            background: var(--bg);
             min-height: 100vh;
             display: flex;
             align-items: center;
@@ -42,8 +62,8 @@
             right: 24px;
             width: 48px;
             height: 48px;
-            background: white;
-            border: 1px solid #e9ecef;
+            background: var(--card-bg);
+            border: 1px solid var(--border-color);
             border-radius: 12px;
             display: flex;
             align-items: center;
@@ -56,13 +76,22 @@
 
         .theme-toggle:hover {
             transform: translateY(-2px);
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+            background: var(--admin-color);
+            border-color: var(--admin-color);
+        }
+
+        .theme-toggle:hover i {
+            color: white;
         }
 
         .theme-toggle i {
             font-size: 20px;
-            color: #495057;
+            color: var(--text-primary);
             transition: all 0.3s ease;
+        }
+
+        body.dark-mode .theme-toggle:hover i {
+            color: white;
         }
 
         .login-container {
@@ -76,43 +105,42 @@
         }
 
         .brand-icon {
-            width: 56px;
-            height: 56px;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            width: 64px;
+            height: 64px;
+            background: var(--admin-color);
             border-radius: 16px;
             display: flex;
             align-items: center;
             justify-content: center;
             margin: 0 auto 16px;
-            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.2);
         }
 
         .brand-icon i {
-            font-size: 28px;
+            font-size: 32px;
             color: white;
         }
 
         .brand h1 {
             font-size: 24px;
             font-weight: 700;
-            color: #1a1a1a;
+            color: var(--text-primary);
             margin-bottom: 4px;
             transition: color 0.3s ease;
         }
 
         .brand p {
             font-size: 14px;
-            color: #6c757d;
+            color: var(--text-secondary);
             font-weight: 400;
             transition: color 0.3s ease;
         }
 
         .login-card {
-            background: white;
-            border-radius: 20px;
+            background: var(--card-bg);
+            border-radius: 16px;
             padding: 40px;
-            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
-            border: 1px solid #e9ecef;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+            border: 1px solid var(--border-color);
             transition: all 0.3s ease;
         }
 
@@ -123,20 +151,20 @@
         .form-header h2 {
             font-size: 20px;
             font-weight: 600;
-            color: #1a1a1a;
+            color: var(--text-primary);
             margin-bottom: 8px;
             transition: color 0.3s ease;
         }
 
         .form-header p {
             font-size: 14px;
-            color: #6c757d;
+            color: var(--text-secondary);
             transition: color 0.3s ease;
         }
 
         .user-type-badge {
             display: inline-block;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            background: var(--admin-color);
             color: white;
             padding: 6px 16px;
             border-radius: 20px;
@@ -150,7 +178,7 @@
         .form-label {
             font-size: 14px;
             font-weight: 500;
-            color: #495057;
+            color: var(--text-primary);
             margin-bottom: 8px;
             display: block;
             transition: color 0.3s ease;
@@ -160,22 +188,27 @@
             height: 48px;
             padding: 12px 16px;
             font-size: 15px;
-            border: 1.5px solid #dee2e6;
-            border-radius: 12px;
+            border: 1.5px solid var(--border-color);
+            border-radius: 10px;
             transition: all 0.2s ease;
-            background: #ffffff;
-            color: #1a1a1a;
+            background: var(--card-bg);
+            color: var(--text-primary);
         }
 
         .form-control:focus {
-            border-color: #667eea;
-            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+            border-color: var(--admin-color);
+            box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1);
             outline: none;
-            background: #ffffff;
+            background: var(--card-bg);
+        }
+
+        body.dark-mode .form-control:focus {
+            box-shadow: 0 0 0 3px rgba(129, 140, 248, 0.15);
         }
 
         .form-control::placeholder {
-            color: #adb5bd;
+            color: var(--text-secondary);
+            opacity: 0.7;
         }
 
         .input-group {
@@ -187,7 +220,7 @@
             left: 16px;
             top: 50%;
             transform: translateY(-50%);
-            color: #adb5bd;
+            color: var(--text-secondary);
             font-size: 16px;
             z-index: 1;
             pointer-events: none;
@@ -203,7 +236,7 @@
             right: 16px;
             top: 50%;
             transform: translateY(-50%);
-            color: #adb5bd;
+            color: var(--text-secondary);
             font-size: 16px;
             cursor: pointer;
             z-index: 1;
@@ -211,7 +244,7 @@
         }
 
         .password-toggle:hover {
-            color: #667eea;
+            color: var(--admin-color);
         }
 
         .input-group .form-control.has-toggle {
@@ -226,21 +259,21 @@
         .form-check-input {
             width: 18px;
             height: 18px;
-            border: 1.5px solid #dee2e6;
+            border: 1.5px solid var(--border-color);
             border-radius: 4px;
             margin-right: 8px;
             cursor: pointer;
-            transition: all 0.3s ease;
+            transition: all 0.2s ease;
         }
 
         .form-check-input:checked {
-            background-color: #667eea;
-            border-color: #667eea;
+            background-color: var(--admin-color);
+            border-color: var(--admin-color);
         }
 
         .form-check-label {
             font-size: 14px;
-            color: #495057;
+            color: var(--text-primary);
             cursor: pointer;
             user-select: none;
             transition: color 0.3s ease;
@@ -249,9 +282,9 @@
         .btn-login {
             width: 100%;
             height: 48px;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            background: var(--admin-color);
             border: none;
-            border-radius: 12px;
+            border-radius: 10px;
             color: white;
             font-size: 15px;
             font-weight: 600;
@@ -261,73 +294,37 @@
         }
 
         .btn-login:hover {
-            transform: translateY(-1px);
-            box-shadow: 0 6px 20px rgba(102, 126, 234, 0.3);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(99, 102, 241, 0.3);
+            background: var(--admin-hover);
+        }
+
+        body.dark-mode .btn-login:hover {
+            box-shadow: 0 4px 12px rgba(129, 140, 248, 0.4);
         }
 
         .btn-login:active {
             transform: translateY(0);
         }
 
-        .divider {
-            text-align: center;
-            margin: 24px 0;
-            position: relative;
-        }
-
-        .divider::before {
-            content: '';
-            position: absolute;
-            left: 0;
-            top: 50%;
-            width: 100%;
-            height: 1px;
-            background: #e9ecef;
-            transition: background 0.3s ease;
-        }
-
-        .divider span {
-            background: white;
-            padding: 0 16px;
-            position: relative;
-            font-size: 13px;
-            color: #adb5bd;
-            font-weight: 500;
-            transition: all 0.3s ease;
-        }
-
-        .help-text {
-            background: #f8f9fa;
-            border-radius: 12px;
-            padding: 16px;
-            text-align: center;
-            transition: all 0.3s ease;
-        }
-
-        .help-text p {
-            font-size: 13px;
-            color: #6c757d;
-            margin: 0;
-            transition: color 0.3s ease;
-        }
-
-        .help-text strong {
-            color: #495057;
-            font-weight: 600;
-            transition: color 0.3s ease;
-        }
-
         .alert {
             padding: 12px 16px;
-            border-radius: 12px;
+            border-radius: 10px;
             margin-bottom: 20px;
             border: none;
             font-size: 14px;
         }
 
         .alert-danger {
-            background: #fff5f5;
+            background: #fee;
             color: #dc3545;
+            border: 1px solid #fcc;
+        }
+
+        body.dark-mode .alert-danger {
+            background: #3d1f1f;
+            color: #f87171;
+            border-color: #4d2626;
         }
 
         .text-danger {
@@ -337,11 +334,15 @@
             display: block;
         }
 
+        body.dark-mode .text-danger {
+            color: #f87171;
+        }
+
         .footer-text {
             text-align: center;
             margin-top: 32px;
             font-size: 13px;
-            color: #adb5bd;
+            color: var(--text-secondary);
             transition: color 0.3s ease;
         }
 
@@ -366,111 +367,26 @@
             to { transform: rotate(360deg); }
         }
 
-        /* Dark Mode Styles */
-        body.dark-mode {
-            background: #0f0f1e;
+        /* Back to Home Link */
+        .back-link {
+            text-align: center;
+            margin-top: 20px;
         }
 
-        body.dark-mode .theme-toggle {
-            background: #1a1a2e;
-            border-color: #2d2d44;
+        .back-link a {
+            color: var(--admin-color);
+            text-decoration: none;
+            font-size: 14px;
+            font-weight: 500;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            transition: all 0.2s;
         }
 
-        body.dark-mode .theme-toggle i {
-            color: #ffd700;
-        }
-
-        body.dark-mode .brand h1 {
-            color: #ffffff;
-        }
-
-        body.dark-mode .brand p {
-            color: #9ca3af;
-        }
-
-        body.dark-mode .login-card {
-            background: #1a1a2e;
-            border-color: #2d2d44;
-            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
-        }
-
-        body.dark-mode .form-header h2 {
-            color: #ffffff;
-        }
-
-        body.dark-mode .form-header p {
-            color: #9ca3af;
-        }
-
-        body.dark-mode .form-label {
-            color: #d1d5db;
-        }
-
-        body.dark-mode .form-control {
-            background: #0f0f1e;
-            border-color: #2d2d44;
-            color: #ffffff;
-        }
-
-        body.dark-mode .form-control:focus {
-            background: #0f0f1e;
-            border-color: #667eea;
-            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.2);
-        }
-
-        body.dark-mode .form-control::placeholder {
-            color: #6b7280;
-        }
-
-        body.dark-mode .input-icon {
-            color: #6b7280;
-        }
-
-        body.dark-mode .password-toggle {
-            color: #6b7280;
-        }
-
-        body.dark-mode .password-toggle:hover {
-            color: #667eea;
-        }
-
-        body.dark-mode .form-check-input {
-            background: #0f0f1e;
-            border-color: #2d2d44;
-        }
-
-        body.dark-mode .form-check-label {
-            color: #d1d5db;
-        }
-
-        body.dark-mode .divider::before {
-            background: #2d2d44;
-        }
-
-        body.dark-mode .divider span {
-            background: #1a1a2e;
-            color: #6b7280;
-        }
-
-        body.dark-mode .help-text {
-            background: #0f0f1e;
-        }
-
-        body.dark-mode .help-text p {
-            color: #9ca3af;
-        }
-
-        body.dark-mode .help-text strong {
-            color: #d1d5db;
-        }
-
-        body.dark-mode .footer-text {
-            color: #6b7280;
-        }
-
-        body.dark-mode .alert-danger {
-            background: #3d1f1f;
-            color: #f87171;
+        .back-link a:hover {
+            gap: 8px;
+            color: var(--admin-hover);
         }
 
         @@media (max-width: 480px) {
@@ -541,31 +457,26 @@
                 </div>
                 
                 <!-- Remember Me -->
-                <div class="form-check mb-3">
+                @* <div class="form-check mb-3">
                     <input asp-for="RememberMe" class="form-check-input" type="checkbox" id="rememberMe" />
                     <label asp-for="RememberMe" class="form-check-label" for="rememberMe">
                         Remember me for 30 days
                     </label>
                 </div>
-                
+                 *@
                 <!-- Login Button -->
                 <button type="submit" class="btn-login" id="loginBtn">
                     Sign In
                 </button>
-
-                @* <!-- Divider -->
-                <div class="divider">
-                    <span>Need help?</span>
-                </div> *@
-
-                <!-- Default Credentials Help -->
-                @* <div class="help-text">
-                    <p>
-                        <i class="fas fa-info-circle"></i>
-                        Default credentials: <strong>admin</strong> / <strong>Admin@123</strong>
-                    </p>
-                </div> *@
             </form>
+
+            <!-- Back to Home -->
+            <div class="back-link">
+                <a href="/">
+                    <i class="fas fa-arrow-left"></i>
+                    <span>Back to Home</span>
+                </a>
+            </div>
         </div>
 
         <!-- Footer -->

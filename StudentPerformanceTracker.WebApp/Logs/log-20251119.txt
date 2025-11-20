@@ -1,0 +1,16 @@
+2025-11-19 18:30:10.263 +08:00 [INF] Starting Student Performance Tracker application
+2025-11-19 18:30:12.662 +08:00 [INF] Database migration completed successfully
+2025-11-19 18:30:42.334 +08:00 [WRN] Failed to determine the https port for redirect.
+2025-11-19 18:30:42.719 +08:00 [INF] HTTP GET /Admin/Account/Login responded 200 in 388.8449 ms
+2025-11-19 18:30:46.674 +08:00 [INF] HTTP GET /Admin/Students responded 302 in 13.4634 ms
+2025-11-19 18:30:46.698 +08:00 [INF] HTTP GET /Admin/Account/Login responded 200 in 14.4095 ms
+2025-11-19 18:30:46.846 +08:00 [INF] HTTP GET /lib/jquery-validation/dist/jquery.validate.min.js responded 304 in 3.9849 ms
+2025-11-19 18:30:46.847 +08:00 [INF] HTTP GET /lib/bootstrap/css/bootstrap.min.css responded 304 in 0.4222 ms
+2025-11-19 18:30:46.848 +08:00 [INF] HTTP GET /lib/jquery-validation-unobtrusive/jquery.validate.unobtrusive.min.js responded 304 in 0.2197 ms
+2025-11-19 18:30:46.849 +08:00 [INF] HTTP GET /lib/bootstrap/js/bootstrap.bundle.min.js responded 304 in 0.2077 ms
+2025-11-19 18:30:46.850 +08:00 [INF] HTTP GET /lib/jquery/jquery.min.js responded 304 in 0.1901 ms
+2025-11-19 18:30:46.850 +08:00 [INF] HTTP GET /lib/font-awesome/css/all.min.css responded 304 in 0.1559 ms
+2025-11-19 18:30:47.174 +08:00 [INF] HTTP GET /lib/font-awesome/webfonts/fa-solid-900.woff2 responded 304 in 0.2521 ms
+2025-11-19 18:30:50.745 +08:00 [INF] HTTP GET / responded 200 in 19.7878 ms
+2025-11-19 18:30:50.814 +08:00 [INF] HTTP GET /css/site.css responded 304 in 0.2409 ms
+2025-11-19 18:30:50.831 +08:00 [INF] HTTP GET /js/site.js responded 304 in 1.0148 ms
